@@ -1,0 +1,12 @@
+[
+  {
+    "id": 1773090082075,
+    "nombre": "Guitarra",
+    "precio": 1299.99
+  },
+  {
+    "id": 2,
+    "nombre": "Bateria",
+    "precio": 2500.00
+  }
+]

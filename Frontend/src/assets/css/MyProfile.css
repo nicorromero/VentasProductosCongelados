@@ -1,0 +1,81 @@
+.profile-card {
+  background: var(--color-surface);
+  border-radius: 16px;
+  padding: 2rem;
+  width: 100%;
+  max-width: 440px;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.profile-form-card {
+  --form-card-bg: transparent;
+  --form-card-max-width: none;
+  --form-card-radius: 0;
+  --form-card-padding: 0;
+  --form-card-gap: 12px;
+  --form-title-size: 13px;
+  --form-title-weight: 600;
+  --form-title-color: var(--color-text-muted);
+  --form-title-margin: 8px 0 0;
+  --form-title-align: left;
+  --form-wrapper-gap: 12px;
+  --form-control-bg: var(--color-surface-alt);
+  --form-control-border: none;
+  --form-control-radius: 8px;
+  --form-control-padding: 10px 14px;
+  --form-control-size: 14px;
+  --form-control-color: var(--color-text-muted);
+  --form-submit-bg: var(--color-text);
+  --form-submit-color: var(--color-accent-contrast);
+  --form-submit-radius: 8px;
+  --form-submit-padding: 12px;
+  --form-submit-size: 14px;
+  --form-submit-weight: 500;
+  --form-submit-hover-bg: var(--color-border-strong);
+  --form-submit-align: stretch;
+}
+
+.profile-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.profile-label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.profile-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.profile-toggle {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  color: var(--color-text-muted);
+  cursor: pointer;
+}
+
+.profile-input-disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.profile-section {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--color-border);
+}

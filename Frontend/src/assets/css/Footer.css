@@ -1,0 +1,22 @@
+.footer {
+  background: var(--color-text);
+  padding: 2rem 5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.footer-icons {
+  display: flex;
+  gap: 16px;
+  font-size: 22px;
+  color: var(--color-link);
+}
+
+.footer-icons a {
+  color: var(--color-link);
+}
+.footer-copy { color: var(--color-text-muted); 
+  font-size: 12px; 
+}
