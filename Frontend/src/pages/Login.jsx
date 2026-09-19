@@ -24,8 +24,8 @@ function Login() {
         try {
             const { data } = await axios.post(`${API_URL}/api/auth/login`, form);
             localStorage.setItem('token', data.token);
-            const decodedUser = jwtDecode(data.token); //para leer el token y obtener el rol del usuario
-            localStorage.setItem('user', JSON.stringify(decodedUser)); //guardar el rol del usuario en localStorage
+            const decodedUser = jwtDecode(data.token);
+            localStorage.setItem('user', JSON.stringify(decodedUser));
             toast.success('Sesión iniciada');
             navigate(redirect || '/');
         } catch (err) {
@@ -36,30 +36,33 @@ function Login() {
     };
 
     return (
-        <div className="login-page auth-page">
-            <Form
-                title="Iniciar sesión"
-                onSubmit={handleSubmit}
-                submitText={loading ? 'Ingresando...' : 'Entrar'}
-                submitDisabled={loading}
-                className="auth-form-card"
-            >
-                <input
-                    type="email"
-                    placeholder="Email"
-                    value={form.email}
-                    onChange={(e) => setForm({ ...form, email: e.target.value })}
-                />
-                <input
-                    type="password"
-                    placeholder="Contraseña"
-                    value={form.password}
-                    onChange={(e) => setForm({ ...form, password: e.target.value })}
-                />
-                <Link to="/forgot-password" className="auth-link">¿Olvidaste tu contraseña?</Link>
-            </Form>
-
-        </div>
+        <section className="d-flex align-items-center justify-content-center p-3 flex-grow-1" style={{ minHeight: '80vh' }}>
+            <div style={{ width: '100%', maxWidth: '420px' }}>
+                <Form
+                    title="Iniciar sesión"
+                    onSubmit={handleSubmit}
+                    submitText={loading ? 'Ingresando...' : 'Entrar'}
+                    submitDisabled={loading}
+                    className="shadow rounded-4"
+                >
+                    <input
+                        className="form-control rounded-3 py-2"
+                        type="email"
+                        placeholder="Email"
+                        value={form.email}
+                        onChange={(e) => setForm({ ...form, email: e.target.value })}
+                    />
+                    <input
+                        className="form-control rounded-3 py-2"
+                        type="password"
+                        placeholder="Contraseña"
+                        value={form.password}
+                        onChange={(e) => setForm({ ...form, password: e.target.value })}
+                    />
+                    <Link to="/forgot-password" className="text-muted small text-decoration-none d-block text-end">¿Olvidaste tu contraseña?</Link>
+                </Form>
+            </div>
+        </section>
     );
 }
 

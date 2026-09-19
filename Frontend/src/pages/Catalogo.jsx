@@ -2,8 +2,6 @@ import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import ProductCard from '../components/ProductCard';
-import '../assets/css/Catalogo.css';
-
 
 const API_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -43,9 +41,9 @@ function Catalogo() {
         : products.filter((p) => p.category.toLowerCase() === categoriaFiltro);
 
     const categoriaMap = {
-        hombres: 'Hombre',
-        mujer: 'Mujer',
-        ninos: 'Niños',
+        Pizzas: 'Pizzas',
+        Tarteletas: 'Tarteletas',
+        Milanesas: 'Milanesas',
     };
     const categoriaLabel = categoriaMap[categoria?.toLowerCase()] || null;
 
@@ -57,44 +55,47 @@ function Catalogo() {
         } catch { return false; }
     })();
 
-    if (loading) return <div>Cargando productos...</div>;
-    if (error) return <div>{error}</div>;
-    console.log("Datos listos para renderizar:", products);
+    if (loading) return <div className="text-center py-5">Cargando productos...</div>;
+    if (error) return <div className="text-center py-5 text-danger">{error}</div>;
+
     return (
-        <div className="catalogo-page">
-            <div className="container-cards">
+        <section className="container-fluid px-3 px-md-4 py-4">
+            <div className="row g-3">
                 {isAdmin && !categoriaFiltro && (
-                    <ProductCard
-                        isCreate={true}
-                        id="new"
-                        name=""
-                        details=""
-                        price=""
-                        image=""
-                        stock=""
-                        category=""
-                        active={true}
-                        badge=""
-                        onCreateSuccess={(newProduct) => {
-                            setProducts([...products, newProduct]);
-                        }}
-                    />
+                    <div className="col-12 col-sm-6 col-lg-3">
+                        <ProductCard
+                            isCreate={true}
+                            id="new"
+                            name=""
+                            details=""
+                            price=""
+                            image=""
+                            stock=""
+                            category=""
+                            active={true}
+                            badge=""
+                            onCreateSuccess={(newProduct) => {
+                                setProducts([...products, newProduct]);
+                            }}
+                        />
+                    </div>
                 )}
                 {productosFiltrados.map((product) => (
-                    <ProductCard
-                        key={product._id}
-                        id={product._id}
-                        name={product.name}
-                        price={product.price}
-                        image={product.image}
-                        details={product.details}
-                        category={product.category}
-                        stock={product.stock}
-                        badge={product.badge}
-                    />
+                    <div className="col-12 col-sm-6 col-lg-3" key={product._id}>
+                        <ProductCard
+                            id={product._id}
+                            name={product.name}
+                            price={product.price}
+                            image={product.image}
+                            details={product.details}
+                            category={product.category}
+                            stock={product.stock}
+                            badge={product.badge}
+                        />
+                    </div>
                 ))}
             </div>
-        </div>
+        </section>
     );
 }
 

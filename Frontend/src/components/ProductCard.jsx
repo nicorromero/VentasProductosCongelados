@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import '../assets/css/ProductCard.css';
 import { useNavigate } from 'react-router-dom';
 import { FiRotateCcw, FiMinus, FiPlus, FiCheck } from 'react-icons/fi';
 import { toast } from 'react-toastify';
@@ -148,197 +147,163 @@ function ProductCard({id, name, details, price, image, stock, category, active, 
         }
     };
 
+    // ── SHOW/HIDE: Editing mode (replaces 3D flip) ──
+    if (isEditing) {
+        return (
+            <article ref={cardRef} className="card border-0 shadow-sm rounded-3 overflow-hidden">
+                <div className="card-body p-3">
+                    <InlineProductEdit
+                        id={id}
+                        initialData={localData}
+                        isCreate={isCreate}
+                        onCancel={() => setIsEditing(false)}
+                        onSuccess={(data) => {
+                            if (isCreate) {
+                                setIsEditing(false);
+                                if (onCreateSuccess) onCreateSuccess(data);
+                            } else {
+                                handleEditSuccess(data);
+                            }
+                        }}
+                    />
+                </div>
+            </article>
+        );
+    }
+
+    // ── CREATE card ──
+    if (isCreate) {
+        return (
+            <article ref={cardRef} className="card border-0 shadow-sm rounded-3 overflow-hidden" role="button" onClick={handleStartEditing}>
+                <div className="bg-body-secondary d-flex align-items-center justify-content-center" style={{ height: '220px' }}>
+                    <img
+                        src="https://placehold.co/300x300/f8fafc/cbd5e1?text=%2B"
+                        alt="Nuevo Producto"
+                        className="w-100 h-100 object-fit-cover opacity-50"
+                    />
+                </div>
+                <div className="card-body p-3 opacity-75">
+                    <p className="text-muted small text-uppercase mb-1">-</p>
+                    <h3 className="fs-6 fw-medium text-secondary mb-1">Nuevo Producto</h3>
+                    <span className="text-muted">$0</span>
+                    <button type="button" className="btn btn-light btn-sm w-100 mt-2 border d-flex align-items-center justify-content-center gap-1" style={{ pointerEvents: 'none' }}>
+                        <FiPlus /> Crear Producto
+                    </button>
+                </div>
+            </article>
+        );
+    }
+
+    // ── NORMAL card (front) ──
     return (
-        <article ref={cardRef} className={`card ${isEditing ? 'is-flipped' : ''}`}>
-            <div className="card-inner">
-                <div className="card-front">
-                    {isCreate ? (
+        <article ref={cardRef} className="card border-0 shadow-sm rounded-3 overflow-hidden h-100">
+            <div onClick={isAdmin ? handleStartEditing : undefined} role={isAdmin ? 'button' : undefined} className="d-flex flex-column h-100">
+                {/* Image container */}
+                <div className="position-relative bg-body-secondary overflow-hidden" style={{ height: '220px' }}>
+                    {isAdmin ? (
+                        <span className="badge bg-dark bg-opacity-75 position-absolute top-0 start-0 m-2 z-1 small fw-medium">
+                            Clic para editar
+                        </span>
+                    ) : (
+                        localData.badge && <span className="badge bg-danger position-absolute top-0 start-0 m-2 z-1 small">{localData.badge}</span>
+                    )}
+                    <img
+                        src={localData.image || `https://placehold.co/300x300/e2e8f0/64748b?text=${encodeURIComponent(localData.name || 'Producto')}`}
+                        alt={localData.name}
+                        className="w-100 h-100 object-fit-cover"
+                        onError={(e) => {
+                            e.target.onerror = null;
+                            e.target.src = `https://placehold.co/300x300/e2e8f0/64748b?text=${encodeURIComponent(localData.name || 'Producto')}`;
+                        }}
+                    />
+                </div>
+
+                {/* Info */}
+                <div className="card-body p-3 d-flex flex-column">
+                    <p className="text-muted small text-uppercase mb-1" style={{ letterSpacing: '1px', fontSize: '0.7rem' }}>{localData.category}</p>
+                    <h3 className="fs-6 fw-medium mb-1">{localData.name}</h3>
+                    <span className="fw-medium mb-2">${localData.price}</span>
+
+                    {isAdmin ? (
+                        /* Admin stock control */
                         <div
-                            className="create-card-front"
-                            onClick={handleStartEditing}
-                            style={{ cursor: 'pointer', height: '100%', display: 'flex', flexDirection: 'column' }}
+                            onClick={(e) => e.stopPropagation()}
+                            className="input-group input-group-sm mt-auto rounded-3 overflow-hidden"
                         >
-                            <div className="imageContainer">
-                                <img
-                                    src="https://placehold.co/300x300/f8fafc/cbd5e1?text=%2B"
-                                    alt="Nuevo Producto"
-                                    className="image"
-                                    style={{ opacity: 0.7 }}
-                                />
-                            </div>
-                            <div className="info" style={{ opacity: 0.8 }}>
-                                <p className="category" style={{ color: '#94a3b8' }}>-</p>
-                                <h3 className="name" style={{ color: '#64748b' }}>Nuevo Producto</h3>
-                                <div className="priceRow">
-                                    <span className="price" style={{ color: '#94a3b8' }}>$0</span>
-                                </div>
-                                <button
-                                    type="button"
-                                    className="app-btn app-btn--small"
-                                    style={{ backgroundColor: '#f1f5f9', color: '#64748b', borderColor: '#cbd5e1', pointerEvents: 'none' }}
-                                >
-                                    <FiPlus style={{ marginRight: '4px', display: 'inline-block', verticalAlign: 'middle' }} />
-                                    Crear Producto
-                                </button>
-                            </div>
+                            <button
+                                type="button"
+                                className="btn btn-outline-secondary"
+                                onClick={(e) => handleQuickStockChange(e, -1)}
+                                title="Disminuir stock"
+                            >
+                                <FiMinus size={14} />
+                            </button>
+                            <input
+                                type="number"
+                                className="form-control text-center border-secondary"
+                                value={localData.stock || 0}
+                                onChange={(e) => setLocalData(prev => ({ ...prev, stock: e.target.value }))}
+                                onBlur={(e) => handleQuickStockChange(e, undefined, e.target.value)}
+                                onClick={(e) => e.stopPropagation()}
+                            />
+                            <button
+                                type="button"
+                                className="btn btn-outline-secondary"
+                                onClick={(e) => handleQuickStockChange(e, 1)}
+                                title="Aumentar stock"
+                            >
+                                <FiPlus size={14} />
+                            </button>
                         </div>
                     ) : (
-                        <div onClick={isAdmin ? handleStartEditing : undefined} style={{ cursor: isAdmin ? 'pointer' : 'default', height: '100%', display: 'flex', flexDirection: 'column' }}>
-                            <div className="imageContainer">
-                                {isAdmin ? (
-                                    <span className="badge" style={{ backgroundColor: 'rgba(15, 23, 42, 0.7)', backdropFilter: 'blur(4px)', color: 'white', fontWeight: '500', padding: '6px 12px' }}>
-                                        Clic para editar
-                                    </span>
-                                ) : (
-                                    localData.badge && <span className="badge">{localData.badge}</span>
-                                )}
-                                <img
-                                    src={localData.image || `https://placehold.co/300x300/e2e8f0/64748b?text=${encodeURIComponent(localData.name || 'Producto')}`}
-                                    alt={localData.name}
-                                    className="image"
-                                    onError={(e) => {
-                                        e.target.onerror = null;
-                                        e.target.src = `https://placehold.co/300x300/e2e8f0/64748b?text=${encodeURIComponent(localData.name || 'Producto')}`;
-                                    }}
-                                />
+                        !isSelecting ? (
+                            <button
+                                type="button"
+                                className="btn btn-dark btn-sm w-100 mt-auto rounded-3"
+                                onClick={handleStartSelecting}
+                            >
+                                Agregar al Carrito
+                            </button>
+                        ) : (
+                            /* Quantity control bar */
+                            <div className="btn-group w-100 mt-auto" onClick={(e) => e.stopPropagation()}>
+                                <button
+                                    type="button"
+                                    className="btn btn-dark btn-sm"
+                                    onClick={(e) => { e.stopPropagation(); handleUndo(); }}
+                                    title="Deshacer"
+                                    aria-label="Deshacer"
+                                >
+                                    <FiRotateCcw size={14} />
+                                </button>
+                                <button
+                                    type="button"
+                                    className="btn btn-dark btn-sm"
+                                    onClick={handleDecrease}
+                                    disabled={quantity <= 1}
+                                    aria-label="Disminuir cantidad"
+                                >
+                                    <FiMinus size={14} />
+                                </button>
+                                <span className="btn btn-dark btn-sm disabled fw-bold">{quantity}</span>
+                                <button
+                                    type="button"
+                                    className="btn btn-dark btn-sm"
+                                    onClick={handleIncrease}
+                                    aria-label="Aumentar cantidad"
+                                >
+                                    <FiPlus size={14} />
+                                </button>
+                                <button
+                                    type="button"
+                                    className="btn btn-success btn-sm"
+                                    onClick={handleConfirm}
+                                    aria-label="Confirmar"
+                                >
+                                    <FiCheck size={16} />
+                                </button>
                             </div>
-                            <div className="info">
-                                <p className="category">{localData.category}</p>
-                                <h3 className="name">{localData.name}</h3>
-                                <div className="priceRow">
-                                    <span className="price">${localData.price}</span>
-                                </div>
-
-                                {isAdmin ? (
-                                    <div 
-                                        onClick={(e) => e.stopPropagation()} 
-                                        style={{ 
-                                            marginTop: 'auto', 
-                                            display: 'flex', 
-                                            alignItems: 'center', 
-                                            justifyContent: 'center', 
-                                            background: 'rgba(241, 245, 249, 0.6)', 
-                                            backdropFilter: 'blur(8px)',
-                                            border: '1px solid rgba(226, 232, 240, 0.8)',
-                                            borderRadius: '12px',
-                                            padding: '4px',
-                                            color: '#475569'
-                                        }}
-                                    >
-                                        <button
-                                            type="button"
-                                            onClick={(e) => handleQuickStockChange(e, -1)}
-                                            style={{ background: 'transparent', border: 'none', color: '#64748b', cursor: 'pointer', padding: '6px', borderRadius: '8px', display: 'flex', alignItems: 'center' }}
-                                            onMouseOver={(e) => e.currentTarget.style.background = 'rgba(226, 232, 240, 0.8)'}
-                                            onMouseOut={(e) => e.currentTarget.style.background = 'transparent'}
-                                            title="Disminuir stock"
-                                        >
-                                            <FiMinus size={16} />
-                                        </button>
-                                        <input 
-                                            type="number" 
-                                            value={localData.stock || 0} 
-                                            onChange={(e) => setLocalData(prev => ({ ...prev, stock: e.target.value }))}
-                                            onBlur={(e) => handleQuickStockChange(e, undefined, e.target.value)}
-                                            onClick={(e) => e.stopPropagation()}
-                                            style={{ 
-                                                width: '60px', 
-                                                textAlign: 'center', 
-                                                border: 'none', 
-                                                background: 'transparent', 
-                                                fontSize: '1.05rem', 
-                                                fontWeight: '600',
-                                                color: '#334155',
-                                                outline: 'none'
-                                            }}
-                                        />
-                                        <button
-                                            type="button"
-                                            onClick={(e) => handleQuickStockChange(e, 1)}
-                                            style={{ background: 'transparent', border: 'none', color: '#64748b', cursor: 'pointer', padding: '6px', borderRadius: '8px', display: 'flex', alignItems: 'center' }}
-                                            onMouseOver={(e) => e.currentTarget.style.background = 'rgba(226, 232, 240, 0.8)'}
-                                            onMouseOut={(e) => e.currentTarget.style.background = 'transparent'}
-                                            title="Aumentar stock"
-                                        >
-                                            <FiPlus size={16} />
-                                        </button>
-                                    </div>
-                                ) : (
-                                    !isSelecting ? (
-                                        <button
-                                            type="button"
-                                            className="app-btn app-btn--small app-btn--cart"
-                                            onClick={handleStartSelecting}
-                                        >
-                                            Agregar al Carrito
-                                        </button>
-                                    ) : (
-                                        <div className="card-qty-control" onClick={(e) => e.stopPropagation()}>
-                                            <button
-                                                type="button"
-                                                className="qty-control__btn qty-control__btn--undo"
-                                                onClick={(e) => { e.stopPropagation(); handleUndo(); }}
-                                                title="Deshacer"
-                                                aria-label="Deshacer"
-                                            >
-                                                <FiRotateCcw size={14} />
-                                            </button>
-                                            <span className="qty-control__divider" />
-                                            <div className="qty-control__stepper">
-                                                <button
-                                                    type="button"
-                                                    className="qty-control__btn qty-control__btn--step"
-                                                    onClick={handleDecrease}
-                                                    disabled={quantity <= 1}
-                                                    title="Disminuir cantidad"
-                                                    aria-label="Disminuir cantidad"
-                                                >
-                                                    <FiMinus size={14} />
-                                                </button>
-                                                <span className="qty-control__value">{quantity}</span>
-                                                <button
-                                                    type="button"
-                                                    className="qty-control__btn qty-control__btn--step"
-                                                    onClick={handleIncrease}
-                                                    title="Aumentar cantidad"
-                                                    aria-label="Aumentar cantidad"
-                                                >
-                                                    <FiPlus size={14} />
-                                                </button>
-                                            </div>
-                                            <span className="qty-control__divider" />
-                                            <button
-                                                type="button"
-                                                className="qty-control__btn qty-control__btn--confirm"
-                                                onClick={handleConfirm}
-                                                title="Confirmar"
-                                                aria-label="Confirmar"
-                                            >
-                                                <FiCheck size={16} />
-                                            </button>
-                                        </div>
-                                    )
-                                )}
-                            </div>
-                        </div>
-                    )}
-                </div>
-                <div className="card-back">
-                    {isEditing && (
-                        <InlineProductEdit
-                            id={id}
-                            initialData={localData}
-                            isCreate={isCreate}
-                            onCancel={() => setIsEditing(false)}
-                            onSuccess={(data) => {
-                                if (isCreate) {
-                                    setIsEditing(false);
-                                    if (onCreateSuccess) onCreateSuccess(data);
-                                } else {
-                                    handleEditSuccess(data);
-                                }
-                            }}
-                        />
+                        )
                     )}
                 </div>
             </div>
@@ -347,4 +312,3 @@ function ProductCard({id, name, details, price, image, stock, category, active, 
 }
 
 export default ProductCard;
-

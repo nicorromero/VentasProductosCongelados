@@ -1,7 +1,6 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import '../assets/css/Home.css';
 
 const API_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -11,83 +10,83 @@ const CATEGORIES = [
   { label: 'Niños',  ruta: '/catalogo/ninos'   },
 ];
 
-const VISIBLE = 4; // tarjetas visibles a la vez
+const VISIBLE = 4;
 
 function FeaturedCarousel({ products }) {
-  const navigate = useNavigate();
-  const [index, setIndex] = useState(0);
-  const total = products.length;
-  const maxIndex = Math.max(0, total - VISIBLE);
-
-  const prev = () => setIndex(i => Math.max(0, i - 1));
-  const next = () => setIndex(i => Math.min(maxIndex, i + 1));
-
-  const offset = -(index * (100 / VISIBLE));
+  const chunkedProducts = [];
+  for (let i = 0; i < products.length; i += VISIBLE) {
+    chunkedProducts.push(products.slice(i, i + VISIBLE));
+  }
 
   return (
-    <div className="carousel-wrapper">
-      <button
-        className="carousel-arrow carousel-arrow--left"
-        onClick={prev}
-        disabled={index === 0}
-        aria-label="Anterior"
-      >
-        &#8249;
-      </button>
-
-      <div className="carousel-viewport">
-        <div
-          className="carousel-track"
-          style={{ transform: `translateX(${offset}%)` }}
-        >
-          {products.map(p => (
-            <div
-              key={p._id}
-              className="carousel-slide"
-              style={{ flex: `0 0 ${100 / VISIBLE}%` }}
-            >
-              <div className="carousel-img-wrap">
-                {p.badge && <span className="carousel-badge">{p.badge}</span>}
-                <img
-                  src={p.image || `https://placehold.co/300x300/e2e8f0/64748b?text=${encodeURIComponent(p.name || 'Producto')}`}
-                  alt={p.name}
-                  className="carousel-img"
-                  onError={e => {
-                    e.target.onerror = null;
-                    e.target.src = `https://placehold.co/300x300/e2e8f0/64748b?text=${encodeURIComponent(p.name || 'Producto')}`;
-                  }}
-                />
-              </div>
-              <div className="carousel-info">
-                <p className="carousel-category">{p.category}</p>
-                <h3 className="carousel-name">{p.name}</h3>
-                <span className="carousel-price">${p.price}</span>
-              </div>
-            </div>
+    <div id="featuredCarousel" className="carousel slide" data-bs-ride="carousel">
+      {/* Indicators */}
+      {chunkedProducts.length > 1 && (
+        <div className="carousel-indicators mb-0" style={{ bottom: '-2.5rem' }}>
+          {chunkedProducts.map((_, index) => (
+            <button
+              key={index}
+              type="button"
+              data-bs-target="#featuredCarousel"
+              data-bs-slide-to={index}
+              className={index === 0 ? 'active bg-dark' : 'bg-dark'}
+              aria-current={index === 0 ? 'true' : undefined}
+              aria-label={`Slide ${index + 1}`}
+            ></button>
           ))}
         </div>
-      </div>
+      )}
 
-      <button
-        className="carousel-arrow carousel-arrow--right"
-        onClick={next}
-        disabled={index >= maxIndex}
-        aria-label="Siguiente"
-      >
-        &#8250;
-      </button>
-
-      {/* Dots */}
-      <div className="carousel-dots">
-        {Array.from({ length: maxIndex + 1 }).map((_, i) => (
-          <button
-            key={i}
-            className={`carousel-dot${i === index ? ' carousel-dot--active' : ''}`}
-            onClick={() => setIndex(i)}
-            aria-label={`Ir a página ${i + 1}`}
-          />
+      {/* Slides */}
+      <div className="carousel-inner">
+        {chunkedProducts.map((group, index) => (
+          <div key={index} className={`carousel-item ${index === 0 ? 'active' : ''}`}>
+            <div className="row g-3 px-2 px-md-4 pb-3">
+              {group.map(p => (
+                <div key={p._id} className="col-6 col-md-3">
+                  <div className="card h-100 border-0 shadow-sm rounded-3 overflow-hidden">
+                    <div className="position-relative bg-body-secondary" style={{ height: '180px' }}>
+                      {p.badge && (
+                        <span className="badge bg-dark position-absolute top-0 start-0 m-2 z-1 small text-uppercase">
+                          {p.badge}
+                        </span>
+                      )}
+                      <img
+                        src={p.image || `https://placehold.co/300x300/e2e8f0/64748b?text=${encodeURIComponent(p.name || 'Producto')}`}
+                        alt={p.name}
+                        className="w-100 h-100 object-fit-cover"
+                        onError={e => {
+                          e.target.onerror = null;
+                          e.target.src = `https://placehold.co/300x300/e2e8f0/64748b?text=${encodeURIComponent(p.name || 'Producto')}`;
+                        }}
+                      />
+                    </div>
+                    <div className="card-body p-2 text-center">
+                      <p className="text-muted mb-0" style={{ fontSize: '0.7rem', letterSpacing: '0.5px' }}>{p.category}</p>
+                      <h6 className="card-title text-truncate mb-1 small fw-semibold">{p.name}</h6>
+                      <span className="fw-bold small">${p.price}</span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         ))}
       </div>
+
+      {/* Controls */}
+      {chunkedProducts.length > 1 && (
+        <>
+          <button className="carousel-control-prev" type="button" data-bs-target="#featuredCarousel" data-bs-slide="prev" style={{ width: '2.5rem' }}>
+            <span className="carousel-control-prev-icon bg-dark rounded-circle p-3" aria-hidden="true"></span>
+            <span className="visually-hidden">Anterior</span>
+          </button>
+          <button className="carousel-control-next" type="button" data-bs-target="#featuredCarousel" data-bs-slide="next" style={{ width: '2.5rem' }}>
+            <span className="carousel-control-next-icon bg-dark rounded-circle p-3" aria-hidden="true"></span>
+            <span className="visually-hidden">Siguiente</span>
+          </button>
+        </>
+      )}
     </div>
   );
 }
@@ -113,43 +112,62 @@ function Home() {
   return (
     <main>
       {/* Hero */}
-      <div className="home-hero">
-        <div className="home-hero-content">
-          <h1>STORE SHOP</h1>
-          <p>Las mejores zapatillas, al mejor precio.</p>
+      <section
+        className="position-relative text-white text-center d-flex align-items-center justify-content-center"
+        style={{ minHeight: '55vh', background: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)' }}
+      >
+        <div className="container position-relative z-1 py-5">
+          <h1 className="display-4 fw-bold mb-3" style={{ letterSpacing: '2px' }}>KE · PERNIL</h1>
+          <p className="lead mb-4 opacity-75">Los mejores productos congelados, al mejor precio.</p>
           <button
-            className="home-hero-btn"
-            onClick={() => navigate('/catalogo/hombres')}
+            className="btn btn-light rounded-pill px-4 py-2 fw-semibold"
+            onClick={() => navigate('/productos')}
           >
-            Ver colección
+            Ver productos
           </button>
         </div>
-      </div>
+      </section>
 
-      {/* Productos destacados — carrusel */}
-      <div className="home-featured">
-        <h2>Productos destacados</h2>
-        {loading && <p style={{ textAlign: 'center' }}>Cargando...</p>}
+      {/* Productos destacados */}
+      <section className="container py-5">
+        <h2 className="text-center fw-bold mb-4">Productos destacados</h2>
+        {loading && (
+          <div className="text-center py-4">
+            <div className="spinner-border text-secondary" role="status">
+              <span className="visually-hidden">Cargando...</span>
+            </div>
+          </div>
+        )}
         {!loading && products.length > 0 && (
           <FeaturedCarousel products={products} />
         )}
-      </div>
+        {!loading && products.length === 0 && (
+          <p className="text-center text-muted">No hay productos destacados aún.</p>
+        )}
+      </section>
 
       {/* Categorías */}
-      <div className="home-categories">
-        <h2>Explorar por categoría</h2>
-        <div className="home-categories-grid">
+      <section className="container py-5">
+        <h2 className="text-center fw-bold mb-4">Explorar por categoría</h2>
+        <div className="row g-3">
           {CATEGORIES.map(({ label, ruta }) => (
-            <div
-              key={ruta}
-              className="home-cat-banner"
-              onClick={() => navigate(ruta)}
-            >
-              <span>{label}</span>
+            <div key={ruta} className="col-12 col-md-4">
+              <div
+                className="rounded-3 d-flex align-items-end p-3 text-white shadow-sm"
+                onClick={() => navigate(ruta)}
+                role="button"
+                style={{
+                  height: '180px',
+                  cursor: 'pointer',
+                  background: 'linear-gradient(to top, rgba(0,0,0,0.85), rgba(0,0,0,0.3)), #343a40',
+                }}
+              >
+                <span className="fs-5 fw-semibold">{label}</span>
+              </div>
             </div>
           ))}
         </div>
-      </div>
+      </section>
     </main>
   );
 }

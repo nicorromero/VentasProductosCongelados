@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import axios from 'axios';
-import '../assets/css/Contact.css';
 import Form from '../components/Form';
 
 const API_URL = import.meta.env.VITE_API_BASE_URL;
@@ -33,60 +32,65 @@ function Contact() {
   };
 
   return (
-    <div className="contact-page">
-      <div className="contact-container">
+    <section className="container py-4">
+      <div className="row g-4 justify-content-center">
 
-        <div className="contact-info">
-          <h2 className="page-heading">Contactanos</h2>
-          <div className="contact-item">
-            <div className="contact-text">
-              <span>contacto@storeshop.com</span>
-              <small>Email</small>
-            </div>
+        {/* Contact Info */}
+        <div className="col-12 col-md-5">
+          <h2 className="fs-4 fw-semibold mb-4">Contactanos</h2>
+
+          <div className="card bg-body-secondary border-0 rounded-3 p-3 mb-3">
+            <span className="fw-medium small">contacto@storeshop.com</span>
+            <small className="text-muted">Email</small>
           </div>
-          <div className="contact-item">
-            <div className="contact-text">
-              <span>Concepción del Uruguay</span>
-              <small>Ubicación</small>
-            </div>
+
+          <div className="card bg-body-secondary border-0 rounded-3 p-3 mb-3">
+            <span className="fw-medium small">Concepción del Uruguay</span>
+            <small className="text-muted">Ubicación</small>
           </div>
-          <div className="contact-item">
-            <div className="contact-text">
-              <span>@storeshop</span>
-              <small>Instagram</small>
-            </div>
+
+          <div className="card bg-body-secondary border-0 rounded-3 p-3 mb-3">
+            <span className="fw-medium small">@storeshop</span>
+            <small className="text-muted">Instagram</small>
           </div>
         </div>
 
-        <Form
-          title="Enviar mensaje"
-          onSubmit={handleSubmit}
-          submitText={sending ? 'Enviando...' : 'Enviar'}
-          submitDisabled={sending}
-          message={status}
-          error={error}
-        >
-          <input
-            type="text"
-            placeholder="Nombre"
-            value={contactData.name}
-            onChange={(e) => setContactData({ ...contactData, name: e.target.value })}
-          />
-          <input
-            type="email"
-            placeholder="Email"
-            value={contactData.email}
-            onChange={(e) => setContactData({ ...contactData, email: e.target.value })}
-          />
-          <textarea
-            placeholder="Mensaje..."
-            value={contactData.message}
-            onChange={(e) => setContactData({ ...contactData, message: e.target.value })}
-          />
-        </Form>
+        {/* Contact Form */}
+        <div className="col-12 col-md-7" style={{ maxWidth: '500px' }}>
+          <Form
+            title="Enviar mensaje"
+            onSubmit={handleSubmit}
+            submitText={sending ? 'Enviando...' : 'Enviar'}
+            submitDisabled={sending}
+            message={status}
+            error={error}
+          >
+            <input
+              className="form-control rounded-3 py-2"
+              type="text"
+              placeholder="Nombre"
+              value={contactData.name}
+              onChange={(e) => setContactData({ ...contactData, name: e.target.value })}
+            />
+            <input
+              className="form-control rounded-3 py-2"
+              type="email"
+              placeholder="Email"
+              value={contactData.email}
+              onChange={(e) => setContactData({ ...contactData, email: e.target.value })}
+            />
+            <textarea
+              className="form-control rounded-3 py-2"
+              placeholder="Mensaje..."
+              rows="5"
+              value={contactData.message}
+              onChange={(e) => setContactData({ ...contactData, message: e.target.value })}
+            />
+          </Form>
+        </div>
 
       </div>
-    </div>
+    </section>
   );
 }
 

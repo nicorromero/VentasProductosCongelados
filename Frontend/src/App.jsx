@@ -4,7 +4,6 @@ import Contact from './pages/Contact';
 import Catalogo from './pages/Catalogo';
 import NavBar from './components/NavBar';
 import Footer from './components/Footer';
-import './App.css';
 import Login from './pages/Login';
 
 import Users from './pages/Users';
@@ -18,19 +17,10 @@ import InactiveUsers from './pages/InactiveUsers';
 import InactiveProducts from './pages/InactiveProducts';
 
 function App() {
-  const links = [
-    { href: "/", text: "Inicio" },
-    { href: "/catalogo/hombres", text: "Hombre" },
-    { href: "/catalogo/ninos", text: "Niños" },
-    { href: "/catalogo/mujer", text: "Mujer" },
-    { href: "/contacto", text: "Contacto" }
-  ];
-  
   const location = useLocation();
   const rutasFijasExactas = [
     '/',
     '/admin-login',
-
     '/contacto',
     '/mi-perfil',
     '/forgot-password',
@@ -38,9 +28,9 @@ function App() {
   const esLayoutFijo = rutasFijasExactas.includes(location.pathname);
 
   return (
-    <div className={`app-container ${esLayoutFijo ? 'layout-fijo' : 'layout-normal'}`}>
+    <div className={`d-flex flex-column ${esLayoutFijo ? 'vh-100 overflow-hidden' : 'min-vh-100'}`}>
       <NavBar />
-      <main className="main-content">
+      <main className={`flex-grow-1 ${esLayoutFijo ? 'overflow-auto' : ''}`}>
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/contacto" element={<Contact />} />

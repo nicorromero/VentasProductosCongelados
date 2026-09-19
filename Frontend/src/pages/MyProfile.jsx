@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import Form from '../components/Form';
-import '../assets/css/MyProfile.css';
 
 const API_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -110,29 +109,32 @@ function MyProfile() {
         }
     };
 
-    if (loading) return <div>Cargando...</div>;
+    if (loading) return <div className="text-center py-5 text-muted">Cargando...</div>;
 
     return (
-        <div className="profile-page">
-            <div className="profile-card">
-                <h2 className="page-heading">Mi perfil</h2>
+        <section className="d-flex justify-content-center p-3 p-md-4">
+            <div className="card border-0 shadow-sm rounded-4 p-4 w-100" style={{ maxWidth: '440px' }}>
+                <h2 className="fs-4 fw-semibold mb-4">Mi perfil</h2>
 
-                <Form title="Datos personales" onSubmit={handleSaveDatos} submitText="Guardar datos" className="profile-form-card">
+                <Form title="Datos personales" onSubmit={handleSaveDatos} submitText="Guardar datos" className="border-0 shadow-none p-0">
 
-                    <div className="profile-field">
-                        <div className="profile-label-row">
-                            <label className="profile-label">Nombre de usuario</label>
-                            <label className="profile-toggle">
+                    <div className="mb-2">
+                        <div className="d-flex justify-content-between align-items-center mb-1">
+                            <label className="form-label small text-muted text-uppercase fw-semibold mb-0" style={{ letterSpacing: '0.5px', fontSize: '0.75rem' }}>Nombre de usuario</label>
+                            <div className="form-check form-switch mb-0">
                                 <input
+                                    className="form-check-input"
                                     type="checkbox"
+                                    role="switch"
                                     checked={editing.name}
                                     onChange={(e) => setEditing({ ...editing, name: e.target.checked })}
+                                    id="editNameSwitch"
                                 />
-                                Editar
-                            </label>
+                                <label className="form-check-label small text-muted" htmlFor="editNameSwitch">Editar</label>
+                            </div>
                         </div>
                         <input
-                            className={editing.name ? '' : 'profile-input-disabled'}
+                            className="form-control rounded-3"
                             type="text"
                             placeholder="Tu nombre"
                             value={form.name}
@@ -141,20 +143,23 @@ function MyProfile() {
                         />
                     </div>
 
-                    <div className="profile-field">
-                        <div className="profile-label-row">
-                            <label className="profile-label">Email</label>
-                            <label className="profile-toggle">
+                    <div className="mb-2">
+                        <div className="d-flex justify-content-between align-items-center mb-1">
+                            <label className="form-label small text-muted text-uppercase fw-semibold mb-0" style={{ letterSpacing: '0.5px', fontSize: '0.75rem' }}>Email</label>
+                            <div className="form-check form-switch mb-0">
                                 <input
+                                    className="form-check-input"
                                     type="checkbox"
+                                    role="switch"
                                     checked={editing.email}
                                     onChange={(e) => setEditing({ ...editing, email: e.target.checked })}
+                                    id="editEmailSwitch"
                                 />
-                                Editar
-                            </label>
+                                <label className="form-check-label small text-muted" htmlFor="editEmailSwitch">Editar</label>
+                            </div>
                         </div>
                         <input
-                            className={editing.email ? '' : 'profile-input-disabled'}
+                            className="form-control rounded-3"
                             type="email"
                             placeholder="tu@email.com"
                             value={form.email}
@@ -165,11 +170,14 @@ function MyProfile() {
 
                 </Form>
 
-                <Form title="Cambiar contraseña" onSubmit={handleSavePassword} submitText="Cambiar contraseña" className="profile-form-card">
+                <hr className="my-3" />
 
-                    <div className="profile-field">
-                        <label className="profile-label">Contraseña actual</label>
+                <Form title="Cambiar contraseña" onSubmit={handleSavePassword} submitText="Cambiar contraseña" className="border-0 shadow-none p-0">
+
+                    <div className="mb-2">
+                        <label className="form-label small text-muted text-uppercase fw-semibold" style={{ letterSpacing: '0.5px', fontSize: '0.75rem' }}>Contraseña actual</label>
                         <input
+                            className="form-control rounded-3"
                             type="password"
                             placeholder="••••••••"
                             value={passwords.current}
@@ -177,9 +185,10 @@ function MyProfile() {
                         />
                     </div>
 
-                    <div className="profile-field">
-                        <label className="profile-label">Nueva contraseña</label>
+                    <div className="mb-2">
+                        <label className="form-label small text-muted text-uppercase fw-semibold" style={{ letterSpacing: '0.5px', fontSize: '0.75rem' }}>Nueva contraseña</label>
                         <input
+                            className="form-control rounded-3"
                             type="password"
                             placeholder="••••••••"
                             value={passwords.newPass}
@@ -187,9 +196,10 @@ function MyProfile() {
                         />
                     </div>
 
-                    <div className="profile-field">
-                        <label className="profile-label">Repetir nueva contraseña</label>
+                    <div className="mb-2">
+                        <label className="form-label small text-muted text-uppercase fw-semibold" style={{ letterSpacing: '0.5px', fontSize: '0.75rem' }}>Repetir nueva contraseña</label>
                         <input
+                            className="form-control rounded-3"
                             type="password"
                             placeholder="••••••••"
                             value={passwords.repeat}
@@ -198,9 +208,8 @@ function MyProfile() {
                     </div>
 
                 </Form>
-
             </div>
-        </div>
+        </section>
     );
 }
 

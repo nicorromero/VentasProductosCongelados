@@ -1,21 +1,17 @@
-import '../assets/css/Form.css';
-
 function Form({ title, children, onSubmit, submitText = 'Enviar', message, error, className = '', submitDisabled = false }) {
   return (
-    <div className={`form-card ${className}`}>
+    <div className={`card border-0 shadow-sm rounded-4 p-4 ${className}`}>
       {title && (
-        <div className="form-title">
-          <h1>{title}</h1>
-        </div>
+        <h2 className="card-title fs-5 fw-semibold mb-3">{title}</h2>
       )}
 
-      <form className="form-wrapper" onSubmit={onSubmit}>
+      <form className="d-flex flex-column gap-3" onSubmit={onSubmit}>
         {children}
-        <button type="submit" className="app-btn" disabled={submitDisabled}>
+        <button type="submit" className="btn btn-dark w-100 rounded-3 py-2 fw-semibold" disabled={submitDisabled}>
           {submitText}
         </button>
-        {message && <p className="form-message success">{message}</p>}
-        {error && <p className="form-message error">{error}</p>}
+        {message && <div className="alert alert-success py-2 mb-0 small">{message}</div>}
+        {error && <div className="alert alert-danger py-2 mb-0 small">{error}</div>}
       </form>
     </div>
   );

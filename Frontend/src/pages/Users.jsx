@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import Form from '../components/Form';
-import '../assets/css/Users.css';
 
 const API_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -78,19 +77,20 @@ function Users() {
         }
     };
 
-    if (loading) return <div>Cargando...</div>;
+    if (loading) return <div className="text-center py-5 text-muted">Cargando...</div>;
 
     return (
-        <div className="users-page">
-            <div className="users-container">
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <h2 className="page-heading">Usuarios</h2>
-                    <button className="app-btn" onClick={() => navigate('/usuarios/inactivos')}>
-                        Ver dados de baja
-                    </button>
-                </div>
-                <table className="users-table">
-                    <thead>
+        <section className="container py-4" style={{ maxWidth: '860px' }}>
+            <div className="d-flex justify-content-between align-items-center mb-3">
+                <h2 className="fs-4 fw-semibold mb-0">Usuarios</h2>
+                <button className="btn btn-dark btn-sm rounded-3" onClick={() => navigate('/usuarios/inactivos')}>
+                    Ver dados de baja
+                </button>
+            </div>
+
+            <div className="table-responsive mb-4">
+                <table className="table table-striped table-hover align-middle">
+                    <thead className="table-dark">
                         <tr>
                             <th>Nombre</th>
                             <th>Email</th>
@@ -105,36 +105,37 @@ function Users() {
                                 <td>{u.email}</td>
                                 <td>{u.role}</td>
                                 <td>
-                                    <button
-                                        className="app-btn"
-                                        onClick={() => navigate(`/usuarios/editar/${u._id}`)}
-                                    >
-                                        Editar
-                                    </button>
-                                    <button
-                                        className="app-btn"
-                                        style={{ background: '#ff1a1a', marginLeft: '8px' }}
-                                        onClick={() => handleDarDeBaja(u._id)}
-                                    >
-                                        Dar de baja
-                                    </button>
+                                    <div className="d-flex gap-2">
+                                        <button
+                                            className="btn btn-dark btn-sm"
+                                            onClick={() => navigate(`/usuarios/editar/${u._id}`)}
+                                        >
+                                            Editar
+                                        </button>
+                                        <button
+                                            className="btn btn-danger btn-sm"
+                                            onClick={() => handleDarDeBaja(u._id)}
+                                        >
+                                            Dar de baja
+                                        </button>
+                                    </div>
                                 </td>
                             </tr>
                         ))}
                     </tbody>
                 </table>
-
-                <Form title="Nuevo usuario" onSubmit={handleSubmit} submitText="Crear usuario" className="users-form-card">
-                    <input type="text" placeholder="Nombre" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
-                    <input type="email" placeholder="Email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
-                    <input type="password" placeholder="Contraseña" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} />
-                    <select value={form.role} onChange={(e) => setForm({ ...form, role: e.target.value })}>
-                        <option value="user">Cliente</option>
-                        <option value="admin">Admin</option>
-                    </select>
-                </Form>
             </div>
-        </div>
+
+            <Form title="Nuevo usuario" onSubmit={handleSubmit} submitText="Crear usuario" className="bg-body-secondary border-0 rounded-3">
+                <input className="form-control rounded-3" type="text" placeholder="Nombre" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
+                <input className="form-control rounded-3" type="email" placeholder="Email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
+                <input className="form-control rounded-3" type="password" placeholder="Contraseña" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} />
+                <select className="form-select rounded-3" value={form.role} onChange={(e) => setForm({ ...form, role: e.target.value })}>
+                    <option value="user">Cliente</option>
+                    <option value="admin">Admin</option>
+                </select>
+            </Form>
+        </section>
     );
 }
 

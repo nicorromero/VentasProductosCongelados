@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { toast } from 'react-toastify';
-import '../assets/css/Users.css';
 
 const API_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -56,23 +55,23 @@ function InactiveUsers() {
         }
     };
 
-    if (loading) return <div>Cargando...</div>;
+    if (loading) return <div className="text-center py-5 text-muted">Cargando...</div>;
 
     return (
-        <div className="users-page">
-            <div className="users-container">
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <h2 className="page-heading">Usuarios dados de baja</h2>
-                    <button className="app-btn" onClick={() => navigate('/usuarios')}>
-                        Volver
-                    </button>
-                </div>
+        <section className="container py-4" style={{ maxWidth: '860px' }}>
+            <div className="d-flex justify-content-between align-items-center mb-3">
+                <h2 className="fs-4 fw-semibold mb-0">Usuarios dados de baja</h2>
+                <button className="btn btn-dark btn-sm rounded-3" onClick={() => navigate('/usuarios')}>
+                    Volver
+                </button>
+            </div>
 
-                {users.length === 0 ? (
-                    <p style={{ color: 'var(--color-text-muted)' }}>No hay usuarios dados de baja.</p>
-                ) : (
-                    <table className="users-table">
-                        <thead>
+            {users.length === 0 ? (
+                <p className="text-muted">No hay usuarios dados de baja.</p>
+            ) : (
+                <div className="table-responsive">
+                    <table className="table table-striped table-hover align-middle">
+                        <thead className="table-dark">
                             <tr>
                                 <th>Nombre</th>
                                 <th>Email</th>
@@ -88,8 +87,7 @@ function InactiveUsers() {
                                     <td>{u.role}</td>
                                     <td>
                                         <button
-                                            className="app-btn"
-                                            style={{ background: '#2e7d32' }}
+                                            className="btn btn-success btn-sm"
                                             onClick={() => handleReactivar(u._id)}
                                         >
                                             Reactivar
@@ -99,9 +97,9 @@ function InactiveUsers() {
                             ))}
                         </tbody>
                     </table>
-                )}
-            </div>
-        </div>
+                </div>
+            )}
+        </section>
     );
 }
 

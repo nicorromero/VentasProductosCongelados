@@ -36,28 +36,32 @@ function ResetPassword() {
     };
 
     return (
-        <div className="login-page auth-page">
-            <Form
-                title="Nueva contraseña"
-                onSubmit={handleSubmit}
-                submitText={loading ? 'Guardando...' : 'Guardar contraseña'}
-                submitDisabled={loading}
-                className="auth-form-card"
-            >
-                <input
-                    type="password"
-                    placeholder="Nueva contraseña"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                />
-                <input
-                    type="password"
-                    placeholder="Repetir contraseña"
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                />
-            </Form>
-        </div>
+        <section className="d-flex align-items-center justify-content-center p-3 flex-grow-1" style={{ minHeight: '80vh' }}>
+            <div style={{ width: '100%', maxWidth: '420px' }}>
+                <Form
+                    title="Nueva contraseña"
+                    onSubmit={handleSubmit}
+                    submitText={loading ? 'Guardando...' : 'Guardar contraseña'}
+                    submitDisabled={loading}
+                    className="shadow rounded-4"
+                >
+                    <input
+                        className="form-control rounded-3 py-2"
+                        type="password"
+                        placeholder="Nueva contraseña"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                    />
+                    <input
+                        className="form-control rounded-3 py-2"
+                        type="password"
+                        placeholder="Repetir contraseña"
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                    />
+                </Form>
+            </div>
+        </section>
     );
 }
 
