@@ -80,6 +80,7 @@
   font-weight: 500;
   padding: 4px 10px;
   border-radius: 6px;
+  z-index: 10;
 }
 
 .info {

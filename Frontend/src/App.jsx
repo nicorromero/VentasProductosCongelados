@@ -6,7 +6,7 @@ import NavBar from './components/NavBar';
 import Footer from './components/Footer';
 import './App.css';
 import Login from './pages/Login';
-import Register from './pages/Register';
+
 import Users from './pages/Users';
 import MyProfile from './pages/MyProfile';
 import EditUser from './pages/EditUser';
@@ -29,8 +29,8 @@ function App() {
   const location = useLocation();
   const rutasFijasExactas = [
     '/',
-    '/login',
-    '/register',
+    '/admin-login',
+
     '/contacto',
     '/mi-perfil',
     '/forgot-password',
@@ -46,8 +46,8 @@ function App() {
           <Route path="/contacto" element={<Contact />} />
           <Route path="/catalogo/:categoria" element={<Catalogo />} />
           <Route path="/productos" element={<Catalogo />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
+          <Route path="/admin-login" element={<Login />} />
+
           <Route path="/usuarios" element={<Users />} />
           <Route path="/mi-perfil" element={<MyProfile />} />
           <Route path="/usuarios/editar/:id" element={<EditUser />} />

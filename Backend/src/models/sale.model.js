@@ -8,7 +8,7 @@ const SaleSchema = new mongoose.Schema({
     items: [{
         product: { type: mongoose.Schema.Types.ObjectId, ref: 'Product', required: true },
         quantity: { type: Number, required: true },
-        price:    { type: Number, required: true },
+        price: { type: Number, required: true },
         subtotal: { type: Number, required: true }
     }],
 
@@ -34,16 +34,16 @@ const SaleSchema = new mongoose.Schema({
 
     facturacion: {
         nombreCompleto: { type: String },
-        dni:            { type: String },
-        domicilio:      { type: String }
+        celular: { type: String },
+        domicilio: { type: String }
     },
 
     direccionEnvio: {
-        calle:         { type: String },
-        numero:        { type: String },
-        ciudad:        { type: String },
-        provincia:     { type: String },
-        codigoPostal:  { type: String }
+        calle: { type: String },
+        numero: { type: String },
+        ciudad: { type: String },
+        provincia: { type: String },
+        codigoPostal: { type: String }
     },
 
     estado: {
@@ -53,8 +53,8 @@ const SaleSchema = new mongoose.Schema({
             'pendiente de pago',
             'pago confirmado',
             'enviado',
-            'entregado',
             'listo para retiro',
+            'entregado',
             'cancelado'
         ]
     }

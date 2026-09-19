@@ -101,7 +101,7 @@ const createOrder = async (req, res) => {
         }
 
         const orderData = {
-            user:          req.usuario.id,
+            user:          req.usuario ? req.usuario.id : undefined,
             items:         orderItems,
             total,
             medioPago,

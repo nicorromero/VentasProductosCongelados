@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import '../assets/css/Orders.css';
@@ -41,8 +41,13 @@ function Orders() {
 
     const tokenData = getTokenData();
     const isAdmin = tokenData?.role === 'admin';
+    const navigate = useNavigate();
 
     useEffect(() => {
+        if (!isAdmin) {
+            navigate('/');
+            return;
+        }
         const fetchOrders = async () => {
             try {
                 const token = localStorage.getItem('token');
@@ -57,7 +62,7 @@ function Orders() {
             }
         };
         fetchOrders();
-    }, []);
+    }, [isAdmin, navigate]);
 
     const handleConfirmarPago = async (orderId) => {
         try {

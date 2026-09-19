@@ -15,11 +15,9 @@ function Cart() {
     const navigate = useNavigate();
 
     const [showCheckout, setShowCheckout] = useState(false);
-    const [facturacion, setFacturacion] = useState({ nombreCompleto: '', dni: '', domicilio: '' });
+    const [facturacion, setFacturacion] = useState({ nombreCompleto: '', celular: '', domicilio: '' });
     const [medioPago, setMedioPago] = useState('efectivo');
     const [metodoEntrega, setMetodoEntrega] = useState('retiro');
-    const [usarDomicilioFacturacion, setUsarDomicilioFacturacion] = useState(true);
-    const [direccionEnvio, setDireccionEnvio] = useState({ calle: '', numero: '', ciudad: '', provincia: '', codigoPostal: '' });
     const [enviandoPedido, setEnviandoPedido] = useState(false);
     const [ordenCreada, setOrdenCreada] = useState(null);
 
@@ -38,23 +36,13 @@ function Cart() {
                     <p className="cart-confirm__row"><span>Medio de pago</span><span>{pagoLabel}</span></p>
                 </div>
 
-                {ordenCreada.medioPago === 'transferencia' && (
-                    <div className="cart-confirm__transfer">
-                        <h2 className="cart-confirm__transfer-title">Datos para la transferencia</h2>
-                        <p className="cart-confirm__row"><span>Alias</span><strong>mitienda.shop</strong></p>
-                        <p className="cart-confirm__row"><span>CBU</span><strong>0000003100012345678901</strong></p>
-                        <p className="cart-confirm__row"><span>Banco</span><span>Banco Ejemplo</span></p>
-                        <p className="cart-confirm__row"><span>Titular</span><span>Mi Tienda SRL</span></p>
-                        <p className="cart-confirm__transfer-note">
-                            Una vez realizada la transferencia, te contactaremos para confirmar tu pedido.
-                        </p>
-                    </div>
-                )}
+                <div className="cart-confirm__transfer">
+                    <p className="cart-confirm__transfer-note" style={{ textAlign: 'center', fontSize: '1.1rem', marginTop: '1rem', fontWeight: '500' }}>
+                        ¡En breve nos comunicaremos por WhatsApp para confirmar tu pedido!
+                    </p>
+                </div>
 
                 <div className="cart-confirm__actions">
-                    <button className="app-btn checkout-btn--back" onClick={() => navigate('/pedidos')}>
-                        Ver mis pedidos
-                    </button>
                     <button className="app-btn checkout-btn--submit" onClick={() => navigate('/catalogo/hombres')}>
                         Seguir comprando
                     </button>
@@ -76,10 +64,6 @@ function Cart() {
     }
 
     function handleCheckout() {
-        if (!localStorage.getItem('token')) {
-            navigate('/login?redirect=/carrito');
-            return;
-        }
         setShowCheckout(true);
     }
 
@@ -91,24 +75,24 @@ function Cart() {
 
     async function handleRealizarPedido() {
         // Validaciones
-        if (!facturacion.nombreCompleto || !facturacion.dni || !facturacion.domicilio) {
-            toast.error('Completá los datos de facturación');
+        if (!facturacion.nombreCompleto || !facturacion.celular) {
+            toast.error('Completá tus datos personales');
             return;
         }
-        if (metodoEntrega === 'envio' && !usarDomicilioFacturacion) {
-            const { calle, numero, ciudad, provincia, codigoPostal } = direccionEnvio;
-            if (!calle || !numero || !ciudad || !provincia || !codigoPostal) {
-                toast.error('Completá los datos de envío');
-                return;
-            }
+        if (metodoEntrega === 'envio' && !facturacion.domicilio) {
+            toast.error('Completá el domicilio de envío');
+            return;
         }
 
         const body = {
             items: cartItems.map((item) => ({ product: item._id, quantity: item.quantity })),
             medioPago,
             metodoEntrega,
-            facturacion,
-            ...(metodoEntrega === 'envio' && !usarDomicilioFacturacion && { direccionEnvio })
+            facturacion: {
+                nombreCompleto: facturacion.nombreCompleto,
+                celular: `+54 3442 ${facturacion.celular}`,
+                domicilio: metodoEntrega === 'envio' ? facturacion.domicilio : ''
+            }
         };
 
         setEnviandoPedido(true);
@@ -181,7 +165,7 @@ function Cart() {
                 <div className="checkout-form">
 
                     <section className="checkout-section">
-                        <h2 className="checkout-section__title">Datos de facturación</h2>
+                        <h2 className="checkout-section__title">Tus datos</h2>
                         <label className="checkout-label">
                             Nombre completo
                             <input
@@ -193,24 +177,31 @@ function Cart() {
                             />
                         </label>
                         <label className="checkout-label">
-                            DNI
-                            <input
-                                type="text"
-                                className="checkout-input"
-                                value={facturacion.dni}
-                                onChange={(e) => setFacturacion({ ...facturacion, dni: e.target.value })}
-                                placeholder="12345678"
-                            />
-                        </label>
-                        <label className="checkout-label">
-                            Domicilio
-                            <input
-                                type="text"
-                                className="checkout-input"
-                                value={facturacion.domicilio}
-                                onChange={(e) => setFacturacion({ ...facturacion, domicilio: e.target.value })}
-                                placeholder="Av. Corrientes 1234, CABA"
-                            />
+                            Celular
+                            <div style={{ display: 'flex', gap: '10px' }}>
+                                <input
+                                    type="text"
+                                    className="checkout-input"
+                                    value="+54"
+                                    disabled
+                                    style={{ width: '60px', textAlign: 'center', backgroundColor: '#f0f0f0' }}
+                                />
+                                <input
+                                    type="text"
+                                    className="checkout-input"
+                                    value="3442"
+                                    disabled
+                                    style={{ width: '80px', textAlign: 'center', backgroundColor: '#f0f0f0' }}
+                                />
+                                <input
+                                    type="text"
+                                    className="checkout-input"
+                                    value={facturacion.celular}
+                                    onChange={(e) => setFacturacion({ ...facturacion, celular: e.target.value })}
+                                    placeholder="65872"
+                                    style={{ flex: 1 }}
+                                />
+                            </div>
                         </label>
                     </section>
 
@@ -266,50 +257,17 @@ function Cart() {
                         </div>
 
                         {metodoEntrega === 'envio' && (
-                            <div className="checkout-envio">
-                                <label className="checkout-checkbox">
+                            <div className="checkout-envio" style={{ marginTop: '15px' }}>
+                                <label className="checkout-label">
+                                    Domicilio
                                     <input
-                                        type="checkbox"
-                                        checked={usarDomicilioFacturacion}
-                                        onChange={(e) => setUsarDomicilioFacturacion(e.target.checked)}
+                                        type="text"
+                                        className="checkout-input"
+                                        value={facturacion.domicilio}
+                                        onChange={(e) => setFacturacion({ ...facturacion, domicilio: e.target.value })}
+                                        placeholder="Av. Corrientes 1234, CABA"
                                     />
-                                    Usar domicilio de facturación para el envío
                                 </label>
-
-                                {!usarDomicilioFacturacion && (
-                                    <div className="checkout-envio__fields">
-                                        <label className="checkout-label">
-                                            Calle
-                                            <input type="text" className="checkout-input" value={direccionEnvio.calle}
-                                                onChange={(e) => setDireccionEnvio({ ...direccionEnvio, calle: e.target.value })}
-                                                placeholder="Av. Rivadavia" />
-                                        </label>
-                                        <label className="checkout-label">
-                                            Número
-                                            <input type="text" className="checkout-input" value={direccionEnvio.numero}
-                                                onChange={(e) => setDireccionEnvio({ ...direccionEnvio, numero: e.target.value })}
-                                                placeholder="1234" />
-                                        </label>
-                                        <label className="checkout-label">
-                                            Ciudad
-                                            <input type="text" className="checkout-input" value={direccionEnvio.ciudad}
-                                                onChange={(e) => setDireccionEnvio({ ...direccionEnvio, ciudad: e.target.value })}
-                                                placeholder="Buenos Aires" />
-                                        </label>
-                                        <label className="checkout-label">
-                                            Provincia
-                                            <input type="text" className="checkout-input" value={direccionEnvio.provincia}
-                                                onChange={(e) => setDireccionEnvio({ ...direccionEnvio, provincia: e.target.value })}
-                                                placeholder="Buenos Aires" />
-                                        </label>
-                                        <label className="checkout-label">
-                                            Código postal
-                                            <input type="text" className="checkout-input" value={direccionEnvio.codigoPostal}
-                                                onChange={(e) => setDireccionEnvio({ ...direccionEnvio, codigoPostal: e.target.value })}
-                                                placeholder="1406" />
-                                        </label>
-                                    </div>
-                                )}
                             </div>
                         )}
                     </section>

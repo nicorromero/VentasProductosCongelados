@@ -36,7 +36,7 @@ function ForgotPassword() {
                         Si el email existe en nuestro sistema, recibirás un link de recuperación
                         en los próximos minutos. Revisá también tu carpeta de spam.
                     </p>
-                    <Link to="/login" className="app-btn" style={{ textDecoration: 'none', marginTop: '0.5rem' }}>
+                    <Link to="/admin-login" className="app-btn" style={{ textDecoration: 'none', marginTop: '0.5rem' }}>
                         Volver al inicio de sesión
                     </Link>
                 </div>
@@ -61,7 +61,7 @@ function ForgotPassword() {
                 />
             </Form>
             <p className="auth-note">
-                <Link to="/login">Volver al inicio de sesión</Link>
+                <Link to="/admin-login">Volver al inicio de sesión</Link>
             </p>
         </div>
     );

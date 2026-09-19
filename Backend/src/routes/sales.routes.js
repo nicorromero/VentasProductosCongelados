@@ -8,7 +8,7 @@ const { authMiddleware, adminMiddleware } =
     require('../middlewares/auth.middleware');
 
 // Rutas específicas ANTES de los wildcards (/:id captura cualquier segmento)
-router.post('/ordenes', authMiddleware, createOrder);
+router.post('/ordenes', createOrder);
 router.get('/ordenes', authMiddleware, getSales);
 router.get('/mis-ordenes', authMiddleware, getMyOrders);
 router.patch('/ordenes/:id/estado', authMiddleware, adminMiddleware, updateOrderStatus);

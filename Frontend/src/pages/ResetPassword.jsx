@@ -27,7 +27,7 @@ function ResetPassword() {
         try {
             await axios.post(`${API_URL}/api/auth/reset-password/${token}`, { password });
             toast.success('Contraseña actualizada. Podés iniciar sesión.');
-            navigate('/login');
+            navigate('/admin-login');
         } catch (err) {
             toast.error(err.response?.data?.error || 'El link es inválido o expiró');
         } finally {

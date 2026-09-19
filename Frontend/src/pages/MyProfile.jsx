@@ -20,7 +20,7 @@ const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 function doLogout(navigate) {
     setTimeout(() => {
         localStorage.removeItem('token');
-        navigate('/login');
+        navigate('/admin-login');
     }, 1500);
 }
 
@@ -33,7 +33,7 @@ function MyProfile() {
     const navigate = useNavigate();
 
     useEffect(() => {
-        if (!getTokenData()) { navigate('/login'); return; }
+        if (!getTokenData()) { navigate('/admin-login'); return; }
         const fetchMe = async () => {
             try {
                 const token = localStorage.getItem('token');

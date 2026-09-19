@@ -31,7 +31,7 @@ function NavBar() {
 
     const logout = () => {
         localStorage.removeItem('token');
-        navigate('/login');
+        navigate('/');
     };
 
     return (
@@ -75,9 +75,9 @@ function NavBar() {
                         Usuarios
                     </NavLink>
                 )}
-                {isLoggedIn && (
+                {isAdmin && (
                     <NavLink to="/pedidos" className="navbar-action-btn">
-                        {isAdmin ? 'Pedidos' : 'Mis pedidos'}
+                        Pedidos
                     </NavLink>
                 )}
                 {isLoggedIn && (
@@ -86,14 +86,10 @@ function NavBar() {
                     </NavLink>
                 )}
 
-                {isLoggedIn ? (
+                {isLoggedIn && (
                     <button className="navbar-action-btn" onClick={logout}>
                         Cerrar sesión
                     </button>
-                ) : (
-                    <NavLink to="/login" className="navbar-action-btn">
-                        Iniciar sesión
-                    </NavLink>
                 )}
             </div>
 
