@@ -6,10 +6,7 @@ import '../assets/css/Catalogo.css';
 
 
 const API_URL = import.meta.env.VITE_API_BASE_URL;
-axios.get(`${API_URL}/products`)
-  .then(res => console.log(res.data))
-  .catch(err => console.error("Error en la petición:", err));
-  
+
 function Catalogo() {
     const { categoria } = useParams();
     const [products, setProducts] = useState([]);
@@ -34,9 +31,9 @@ function Catalogo() {
     }, []);
 
     const slugToCategory = {
-        hombres: 'hombre',
-        mujer: 'mujer',
-        ninos: 'niños',
+        Milanesas: 'Milanesas',
+        Tarteletas: 'Tarteletas',
+        Pizzas: 'Pizzas',
     };
 
     const categoriaFiltro = slugToCategory[categoria?.toLowerCase()];
@@ -57,9 +54,6 @@ function Catalogo() {
     console.log("Datos listos para renderizar:", products);
     return (
         <div className="catalogo-page">
-            <div className="app-title">
-                <h1>{categoriaLabel ? `Productos de ${categoriaLabel}` : 'Store Shop'}</h1>
-            </div>
             <div className="container-cards">
                 {productosFiltrados.map((product) => (
                     <ProductCard

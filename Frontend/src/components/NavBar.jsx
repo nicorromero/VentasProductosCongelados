@@ -5,10 +5,9 @@ import useCart from '../hooks/useCart';
 
 const categorias = [
     { href: '/productos', text: 'Productos' },
-    { href: '/catalogo/hombres', text: 'Hombre' },
-    { href: '/catalogo/mujer', text: 'Mujer' },
-    { href: '/catalogo/ninos', text: 'Niños' },
-    { href: '/contacto', text: 'Contacto' }
+    { href: '/catalogo/Pizzas', text: 'Pizzas' },
+    { href: '/catalogo/Milanesas', text: 'Milanesas' },
+    { href: '/catalogo/Tarteletas', text: 'Tarteletas' },
 ];
 
 function getTokenData() {
@@ -41,7 +40,7 @@ function NavBar() {
             {/* Sección 1 — Logo */}
             <div className="navbar-logo">
                 <NavLink to="/" className="navbar-brand">
-                    STORE <span className="brand-dot">·</span> SHOP
+                    KE <span className="brand-dot">·</span> PERNIL
                 </NavLink>
             </div>
             <div className="navbar-sep" />
