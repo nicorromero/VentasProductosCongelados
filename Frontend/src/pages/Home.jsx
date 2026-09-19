@@ -45,7 +45,6 @@ function FeaturedCarousel({ products }) {
               key={p._id}
               className="carousel-slide"
               style={{ flex: `0 0 ${100 / VISIBLE}%` }}
-              onClick={() => navigate(`/producto/${p._id}`)}
             >
               <div className="carousel-img-wrap">
                 {p.badge && <span className="carousel-badge">{p.badge}</span>}

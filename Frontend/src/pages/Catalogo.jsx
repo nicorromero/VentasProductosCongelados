@@ -49,12 +49,37 @@ function Catalogo() {
     };
     const categoriaLabel = categoriaMap[categoria?.toLowerCase()] || null;
 
+    const isAdmin = (() => {
+        try {
+            const token = localStorage.getItem('token');
+            if (!token) return false;
+            return JSON.parse(atob(token.split('.')[1])).role === 'admin';
+        } catch { return false; }
+    })();
+
     if (loading) return <div>Cargando productos...</div>;
     if (error) return <div>{error}</div>;
     console.log("Datos listos para renderizar:", products);
     return (
         <div className="catalogo-page">
             <div className="container-cards">
+                {isAdmin && !categoriaFiltro && (
+                    <ProductCard
+                        isCreate={true}
+                        id="new"
+                        name=""
+                        details=""
+                        price=""
+                        image=""
+                        stock=""
+                        category=""
+                        active={true}
+                        badge=""
+                        onCreateSuccess={(newProduct) => {
+                            setProducts([...products, newProduct]);
+                        }}
+                    />
+                )}
                 {productosFiltrados.map((product) => (
                     <ProductCard
                         key={product._id}

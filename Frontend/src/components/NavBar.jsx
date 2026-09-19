@@ -75,11 +75,6 @@ function NavBar() {
                         Usuarios
                     </NavLink>
                 )}
-                {isAdmin && (
-                    <NavLink to="/crear-producto" className="navbar-action-btn">
-                        Nuevo producto
-                    </NavLink>
-                )}
                 {isLoggedIn && (
                     <NavLink to="/pedidos" className="navbar-action-btn">
                         {isAdmin ? 'Pedidos' : 'Mis pedidos'}
