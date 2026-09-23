@@ -1,6 +1,7 @@
 require('dotenv').config();
 const connectDB = require('./config/database');
 const app = require('./app');
+const { logger } = require('./middlewares/logger.middleware');
 
 const PORT = process.env.PORT || 3000;
 
@@ -8,5 +9,5 @@ const PORT = process.env.PORT || 3000;
 connectDB();
 
 app.listen(PORT, () => {
-    console.log(`Servidor escuchando en el puerto ${PORT}`);
+    logger.info(`Servidor escuchando en el puerto ${PORT}`);
 });

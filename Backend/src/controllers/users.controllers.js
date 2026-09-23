@@ -53,7 +53,7 @@ const deleteUser = async (req, res) => {
         const user = await User.findByIdAndUpdate(
             req.params.id,
             { active: false },
-            { new: true }
+            { returnDocument: 'after' }
         );
         if (!user) {
             return res.status(404).json({ error: 'User no encontrado' });
@@ -82,7 +82,7 @@ const reactivateUser = async (req, res) => {
         const user = await User.findByIdAndUpdate(
             req.params.id,
             { active: true },
-            { new: true }
+            { returnDocument: 'after' }
         );
         if (!user) {
             return res.status(404).json({ error: 'User no encontrado' });

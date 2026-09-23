@@ -19,6 +19,7 @@ function Cart() {
     const [metodoEntrega, setMetodoEntrega] = useState('retiro');
     const [enviandoPedido, setEnviandoPedido] = useState(false);
     const [ordenCreada, setOrdenCreada] = useState(null);
+    const [showClearCartModal, setShowClearCartModal] = useState(false);
 
     // ── Vista de confirmación ────────────────────────────
     if (ordenCreada) {
@@ -67,9 +68,7 @@ function Cart() {
     }
 
     function handleClearCart() {
-        if (window.confirm('¿Vaciar el carrito? Se eliminarán todos los productos.')) {
-            clearCart();
-        }
+        setShowClearCartModal(true);
     }
 
     async function handleRealizarPedido() {
@@ -289,6 +288,38 @@ function Cart() {
                     </div>
 
                 </div>
+            )}
+
+            {/* Modal de Advertencia para Vaciar Carrito */}
+            {showClearCartModal && (
+                <>
+                    <div className="modal-backdrop fade show" style={{ zIndex: 1050 }}></div>
+                    <div className="modal fade show d-block" tabIndex="-1" style={{ zIndex: 1055 }} aria-modal="true" role="dialog">
+                        <div className="modal-dialog modal-dialog-centered">
+                            <div className="modal-content border-0 shadow-lg rounded-4">
+                                <div className="modal-header border-bottom-0 pb-0">
+                                    <h5 className="modal-title fw-bold text-dark">Vaciar carrito</h5>
+                                    <button type="button" className="btn-close" onClick={() => setShowClearCartModal(false)} aria-label="Cerrar"></button>
+                                </div>
+                                <div className="modal-body text-dark">
+                                    <div className="p-2">
+                                        <p className="mb-2 fs-5"><strong>¿Estás seguro de que querés vaciar el carrito?</strong></p>
+                                        <p className="mb-0 text-secondary">
+                                            Se eliminarán todos los productos y no podrás deshacer esta acción.
+                                        </p>
+                                    </div>
+                                </div>
+                                <div className="modal-footer border-top-0 pt-0 pb-3 px-4 d-flex justify-content-end gap-2">
+                                    <button type="button" className="btn btn-light rounded-pill px-4 fw-medium border" onClick={() => setShowClearCartModal(false)}>Cancelar</button>
+                                    <button type="button" className="btn btn-danger rounded-pill px-4 fw-medium" onClick={() => {
+                                        clearCart();
+                                        setShowClearCartModal(false);
+                                    }}>Vaciar</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </>
             )}
         </div>
     );

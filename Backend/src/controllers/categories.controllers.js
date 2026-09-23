@@ -7,7 +7,7 @@ const seedCategories = async () => {
         await Category.findOneAndUpdate(
             { name },
             { name },
-            { upsert: true, new: true }
+            { upsert: true, returnDocument: 'after' }
         );
     }
 };

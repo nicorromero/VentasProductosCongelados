@@ -51,7 +51,7 @@ const addProductToCart = async (req, res) => {
         const cart = await Cart.findByIdAndUpdate(
             req.params.id,
             { $push: { items: { product: productId, quantity } } },
-            { new: true }
+            { returnDocument: 'after' }
         );
         if (!cart) {
             return res.status(404).json({ error: "carrito no encontrado" });

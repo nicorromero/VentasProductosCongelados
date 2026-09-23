@@ -1,11 +1,12 @@
 const mongoose = require('mongoose');
+const { logger } = require('../middlewares/logger.middleware');
 
 const connectDB = async () => {
     try {
         await mongoose.connect(process.env.MONGO_URI);
-        console.log('Conexión a MongoDB exitosa');
+        logger.info('Conexión a MongoDB exitosa');
     } catch (error) {
-        console.error('Error al conectar a MongoDB:', error.message);
+        logger.error(`Error al conectar a MongoDB: ${error.message}`);
         process.exit(1); // Detiene la app si no puede conectar a la BD
     }
 };

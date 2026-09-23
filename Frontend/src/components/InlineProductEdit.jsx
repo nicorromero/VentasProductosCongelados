@@ -136,7 +136,7 @@ function InlineProductEdit({ id, initialData, onCancel, onSuccess, isCreate, onT
 
             <input required className="form-control form-control-sm" type="text" placeholder="Nombre" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
             <input required className="form-control form-control-sm" type="number" placeholder="Precio" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} />
-            <input className="form-control form-control-sm" type="text" placeholder="Descripción" value={form.details || ''} onChange={(e) => setForm({ ...form, details: e.target.value })} />
+            <input className="form-control form-control-sm" type="text" placeholder="Insignia (ej: OFERTA, NUEVO)" value={form.badge || ''} onChange={(e) => setForm({ ...form, badge: e.target.value })} />
             
             {/* Categoría: dropdown + nueva categoría */}
             {!creatingCategory ? (

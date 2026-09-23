@@ -26,8 +26,8 @@ const textoEntrega = (metodo) =>
     metodo === 'envio' ? 'Envío a domicilio' : 'Retiro en local';
 
 const ESTADO_CLASE = {
-    'pendiente':  'bg-warning text-dark',
-    'entregado':  'bg-success',
+    'pendiente': 'bg-warning text-dark',
+    'entregado': 'bg-success',
 };
 
 function Orders() {
@@ -73,7 +73,7 @@ function Orders() {
             <p className="mt-2 text-muted">Cargando pedidos...</p>
         </div>
     );
-    
+
     if (error) return (
         <div className="container py-5">
             <div className="alert alert-danger" role="alert">{error}</div>
@@ -117,11 +117,7 @@ function Orders() {
 
         return (
             <main className="container-fluid py-4 pb-5">
-                <header className="d-flex flex-column align-items-center gap-1 py-4">
-                    <h1 className="text-success m-0 fw-bold" style={{ letterSpacing: '-0.5px' }}>Estado del día</h1>
-                    <p className="text-muted m-0" style={{ fontSize: '0.85rem' }}>Resumen de pedidos</p>
-                    <hr className="w-100 text-secondary mt-3 mb-2" />
-                </header>
+
 
                 <div className="row g-3 mb-4">
                     <div className="col-6">
@@ -166,19 +162,19 @@ function Orders() {
 
                 <div className="row g-4">
                     <div className="col-12 col-lg-6">
-                        <SeccionPedidos 
-                            titulo="PENDIENTES" 
-                            orders={pendientes} 
-                            done={false} 
+                        <SeccionPedidos
+                            titulo="PENDIENTES"
+                            orders={pendientes}
+                            done={false}
                             onUpdate={handleUpdateOrder}
                             onDelete={handleDeleteOrder}
                         />
                     </div>
                     <div className="col-12 col-lg-6">
-                        <SeccionPedidos 
-                            titulo="ENTREGADAS" 
-                            orders={entregados} 
-                            done={true} 
+                        <SeccionPedidos
+                            titulo="ENTREGADAS"
+                            orders={entregados}
+                            done={true}
                             onUpdate={handleUpdateOrder}
                             onDelete={handleDeleteOrder}
                         />

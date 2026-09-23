@@ -64,7 +64,7 @@ const deleteProduct = async (req, res) => {
 const updateProduct = async (req, res) => {
     try {
         const product = await Product.findByIdAndUpdate(req.params.id, req.body, {
-            new: true,
+            returnDocument: 'after',
             runValidators: true
         });
         if (!product) {
@@ -116,7 +116,7 @@ const reactivateProduct = async (req, res) => {
         const product = await Product.findByIdAndUpdate(
             req.params.id,
             { active: true },
-            { new: true }
+            { returnDocument: 'after' }
         );
         if (!product) {
             res.status(404).json({ error: 'Producto no encontrado' });

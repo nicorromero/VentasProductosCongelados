@@ -84,6 +84,7 @@ function NavBar() {
                     {/* PC Admin Options */}
                     {isAdmin && (
                         <div className="d-none d-lg-flex gap-2">
+                            <button className="btn btn-outline-secondary rounded-pill py-1 px-3 small" onClick={() => navigate('/productos')} type="button">Productos</button>
                             <button className="btn btn-outline-secondary rounded-pill py-1 px-3 small" onClick={() => navigate('/pedidos')} type="button">Pedidos</button>
                         </div>
                     )}

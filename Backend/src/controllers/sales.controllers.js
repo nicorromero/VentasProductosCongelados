@@ -145,7 +145,7 @@ const updateOrderStatus = async (req, res) => {
         const order = await Sales.findByIdAndUpdate(
             req.params.id,
             { estado },
-            { new: true }
+            { returnDocument: 'after' }
         );
 
         if (!order) {
