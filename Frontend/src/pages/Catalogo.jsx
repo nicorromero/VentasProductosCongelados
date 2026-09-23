@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import ProductCard from '../components/ProductCard';
 
@@ -7,16 +7,22 @@ const API_URL = import.meta.env.VITE_API_BASE_URL;
 
 function Catalogo() {
     const { categoria } = useParams();
+    const navigate = useNavigate();
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
+    const [categories, setCategories] = useState([]);
+
     useEffect(() => {
-        const fetchProducts = async () => {
+        const fetchData = async () => {
             try {
-                const response = await axios.get(`${API_URL}/products`);
-                console.log("Datos del backend:", response.data);
-                setProducts(response.data);
+                const [productsRes, categoriesRes] = await Promise.all([
+                    axios.get(`${API_URL}/products`),
+                    axios.get(`${API_URL}/categories`).catch(() => ({ data: [] }))
+                ]);
+                setProducts(productsRes.data);
+                setCategories(categoriesRes.data);
             } catch (err) {
                 setError('Error al cargar los productos');
                 console.error(err);
@@ -25,7 +31,7 @@ function Catalogo() {
             }
         };
 
-        fetchProducts();
+        fetchData();
     }, []);
 
     const categoriaFiltro = categoria ? categoria.toLowerCase() : null;
@@ -47,6 +53,24 @@ function Catalogo() {
 
     return (
         <section className="container-fluid px-3 px-md-4 py-4">
+            <div className="d-flex align-items-center mb-4">
+                <span className="me-2 fw-medium fs-5">Mostrar:</span>
+                <div className="dropdown">
+                    <button className="btn btn-outline-secondary dropdown-toggle rounded-pill px-3 fw-medium" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        {categoria ? categoria.charAt(0).toUpperCase() + categoria.slice(1) : 'Todos los productos'}
+                    </button>
+                    <ul className="dropdown-menu shadow-sm border-0">
+                        <li><button className="dropdown-item" onClick={() => navigate('/productos')}>Todos los productos</button></li>
+                        {categories.map((cat) => (
+                            <li key={cat.name}>
+                                <button className="dropdown-item" onClick={() => navigate(`/catalogo/${cat.name}`)}>
+                                    {cat.name}
+                                </button>
+                            </li>
+                        ))}
+                    </ul>
+                </div>
+            </div>
             <div className="row g-3">
                 {isAdmin && !categoriaFiltro && (
                     <div className="col-12 col-sm-6 col-lg-3">

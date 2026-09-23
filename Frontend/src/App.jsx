@@ -1,5 +1,4 @@
-import { Routes, Route, useLocation } from 'react-router-dom';
-import Home from './pages/Home';
+import { Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import Contact from './pages/Contact';
 import Catalogo from './pages/Catalogo';
 import NavBar from './components/NavBar';
@@ -32,20 +31,20 @@ function App() {
       <NavBar />
       <main className={`flex-grow-1 ${esLayoutFijo ? 'overflow-auto' : ''}`}>
         <Routes>
-          <Route path="/" element={<Home />} />
+          <Route path="/" element={<Navigate to="/productos" />} />
           <Route path="/contacto" element={<Contact />} />
           <Route path="/catalogo/:categoria" element={<Catalogo />} />
           <Route path="/productos" element={<Catalogo />} />
           <Route path="/admin-login" element={<Login />} />
 
-          <Route path="/usuarios" element={<Users />} />
+          {/* <Route path="/usuarios" element={<Users />} /> */}
           <Route path="/mi-perfil" element={<MyProfile />} />
-          <Route path="/usuarios/editar/:id" element={<EditUser />} />
+          {/* <Route path="/usuarios/editar/:id" element={<EditUser />} /> */}
           <Route path="/carrito" element={<Cart />} />
           <Route path="/pedidos" element={<Orders />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password/:token" element={<ResetPassword />} />
-          <Route path="/usuarios/inactivos" element={<InactiveUsers />} />
+          {/* <Route path="/usuarios/inactivos" element={<InactiveUsers />} /> */}
           <Route path="/productos/inactivos" element={<InactiveProducts />} />
         </Routes>
       </main>

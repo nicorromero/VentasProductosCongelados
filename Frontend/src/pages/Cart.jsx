@@ -42,7 +42,7 @@ function Cart() {
                 </div>
 
                 <div className="mt-4 text-center">
-                    <button className="btn btn-danger px-4 py-2 rounded-3" onClick={() => navigate('/catalogo/hombres')}>
+                    <button className="btn btn-danger px-4 py-2 rounded-3" onClick={() => navigate('/productos')}>
                         Seguir comprando
                     </button>
                 </div>
@@ -55,7 +55,7 @@ function Cart() {
         return (
             <div className="container py-4 mx-auto d-flex flex-column align-items-center justify-content-center gap-3" style={{ maxWidth: '860px', minHeight: '40vh' }}>
                 <p className="fs-5 text-muted mb-0">Tu carrito está vacío</p>
-                <Link to="/catalogo/hombres" className="btn btn-danger px-4 py-2 rounded-3">
+                <Link to="/productos" className="btn btn-danger px-4 py-2 rounded-3">
                     Ver productos
                 </Link>
             </div>

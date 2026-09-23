@@ -43,6 +43,8 @@ function InlineProductEdit({ id, initialData, onCancel, onSuccess, isCreate, onT
             setCreatingCategory(false);
             setNewCategoryName('');
             toast.success('Categoría creada');
+            // Notificar a otros componentes que se creó una categoría
+            window.dispatchEvent(new CustomEvent('category-created'));
         } catch (err) {
             toast.error(err.response?.data?.error || 'Error al crear categoría');
         }
