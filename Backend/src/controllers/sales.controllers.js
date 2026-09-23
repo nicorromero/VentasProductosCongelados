@@ -107,7 +107,7 @@ const createOrder = async (req, res) => {
             medioPago,
             metodoEntrega,
             facturacion,
-            estado:        'pendiente de pago',
+            estado:        'pendiente',
             numeroOrden:   Date.now()
         };
 
@@ -135,7 +135,7 @@ const getMyOrders = async (req, res) => {
 
 const updateOrderStatus = async (req, res) => {
     try {
-        const ESTADOS_VALIDOS = ['pendiente de pago', 'pago confirmado', 'enviado', 'listo para retiro', 'entregado', 'cancelado'];
+        const ESTADOS_VALIDOS = ['pendiente', 'entregado'];
         const { estado } = req.body;
 
         if (!estado || !ESTADOS_VALIDOS.includes(estado)) {
@@ -161,6 +161,39 @@ const updateOrderStatus = async (req, res) => {
     }
 };
 
+const updateOrderItems = async (req, res) => {
+    try {
+        const { items } = req.body;
+        const order = await Sales.findById(req.params.id);
+        if (!order) return res.status(404).json({ error: 'Orden no encontrada' });
+
+        // Revertir el stock de los items originales
+        for (const oldItem of order.items) {
+            await Product.findByIdAndUpdate(oldItem.product, { $inc: { stock: oldItem.quantity } });
+        }
+        
+        let newTotal = 0;
+        // Aplicar el nuevo stock y recalcular subtotales
+        for (const newItem of items) {
+            newTotal += newItem.price * newItem.quantity;
+            await Product.findByIdAndUpdate(newItem.product, { $inc: { stock: -newItem.quantity } });
+            newItem.subtotal = newItem.price * newItem.quantity;
+        }
+
+        order.items = items;
+        order.total = newTotal;
+        await order.save();
+        await order.populate('items.product', 'name image price');
+
+        res.json(order);
+    } catch (error) {
+        if (error.name === 'CastError') {
+            return res.status(400).json({ error: 'ID inválido' });
+        }
+        res.status(500).json({ error: error.message });
+    }
+};
+
 module.exports = {
     getSales,
     getSaleById,
@@ -168,5 +201,6 @@ module.exports = {
     deleteSale,
     createOrder,
     getMyOrders,
-    updateOrderStatus
+    updateOrderStatus,
+    updateOrderItems
 };

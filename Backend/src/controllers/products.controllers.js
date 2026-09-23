@@ -2,7 +2,7 @@ const Product = require('../models/product.model');
 
 const getProducts = async (req, res) => {
     try {
-        const products = await Product.find({ active: { $ne: false } });
+        const products = await Product.find();
         res.json(products);
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -46,16 +46,12 @@ const createProduct = async (req, res) => {
 
 const deleteProduct = async (req, res) => {
     try {
-        const product = await Product.findByIdAndUpdate(
-            req.params.id,
-            { active: false },
-            { new: true }
-        );
+        const product = await Product.findByIdAndDelete(req.params.id);
         if (!product) {
             res.status(404).json({ error: 'Producto no encontrado' });
             return;
         }
-        res.json({ message: 'Producto dado de baja', product });
+        res.json({ message: 'Producto eliminado permanentemente' });
     } catch (error) {
         if (error.name === 'CastError') {
             res.status(400).json({ error: 'ID de producto inválido' });
@@ -84,6 +80,23 @@ const updateProduct = async (req, res) => {
         if (error.name === 'CastError') {
             res.status(400).json({ error: 'ID de producto inválido' });
             return;
+        }
+        res.status(500).json({ message: error.message });
+    }
+};
+
+const toggleActive = async (req, res) => {
+    try {
+        const product = await Product.findById(req.params.id);
+        if (!product) {
+            return res.status(404).json({ error: 'Producto no encontrado' });
+        }
+        product.active = !product.active;
+        await product.save();
+        res.json(product);
+    } catch (error) {
+        if (error.name === 'CastError') {
+            return res.status(400).json({ error: 'ID de producto inválido' });
         }
         res.status(500).json({ message: error.message });
     }
@@ -125,6 +138,7 @@ module.exports = {
     createProduct,
     deleteProduct,
     updateProduct,
+    toggleActive,
     getInactiveProducts,
     reactivateProduct
 };

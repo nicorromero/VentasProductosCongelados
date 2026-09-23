@@ -1,14 +1,10 @@
-import { useRef, useCallback } from 'react';
+import { useRef, useCallback, useState, useEffect } from 'react';
 import { useNavigate, useLocation, NavLink } from 'react-router-dom';
 import { FiShoppingCart, FiUser, FiLogOut } from 'react-icons/fi';
+import axios from 'axios';
 import useCart from '../hooks/useCart';
 
-const categorias = [
-    { href: '/productos', text: 'Productos' },
-    { href: '/catalogo/Pizzas', text: 'Pizzas' },
-    { href: '/catalogo/Milanesas', text: 'Milanesas' },
-    { href: '/catalogo/Tarteletas', text: 'Tarteletas' },
-];
+const API_URL = import.meta.env.VITE_API_BASE_URL;
 
 function getTokenData() {
     try {
@@ -25,10 +21,25 @@ function NavBar() {
     useLocation();
     const { cartQuantity } = useCart();
     const offcanvasRef = useRef(null);
+    const [categoryList, setCategoryList] = useState([]);
 
     const tokenData = getTokenData();
     const isLoggedIn = !!tokenData;
     const isAdmin = tokenData?.role === 'admin';
+
+    useEffect(() => {
+        axios.get(`${API_URL}/categories`)
+            .then(res => setCategoryList(res.data))
+            .catch(() => {});
+    }, []);
+
+    const categorias = [
+        { href: '/productos', text: 'Productos' },
+        ...categoryList.map(cat => ({
+            href: `/catalogo/${cat.name}`,
+            text: cat.name
+        }))
+    ];
 
     // Cierra el offcanvas programáticamente
     const closeOffcanvas = useCallback(() => {

@@ -5,9 +5,9 @@ import axios from 'axios';
 const API_URL = import.meta.env.VITE_API_BASE_URL;
 
 const CATEGORIES = [
-  { label: 'Hombre', ruta: '/catalogo/hombres' },
-  { label: 'Mujer',  ruta: '/catalogo/mujer'   },
-  { label: 'Niños',  ruta: '/catalogo/ninos'   },
+  { label: 'Pizzas', ruta: '/catalogo/Pizzas' },
+  { label: 'Tarteletas', ruta: '/catalogo/Tarteletas' },
+  { label: 'Milanesas', ruta: '/catalogo/Milanesas' },
 ];
 
 const VISIBLE = 4;
@@ -94,7 +94,7 @@ function FeaturedCarousel({ products }) {
 function Home() {
   const navigate = useNavigate();
   const [products, setProducts] = useState([]);
-  const [loading, setLoading]   = useState(false);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     setLoading(true);

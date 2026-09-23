@@ -22,8 +22,10 @@ function ProductCard({id, name, details, price, image, stock, category, active, 
 
     const cardRef = useRef(null);
     const [isSelecting, setIsSelecting] = useState(false);
+    const [isAdminSelectingStock, setIsAdminSelectingStock] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
     const initialQtyRef = useRef(0);
+    const initialStockRef = useRef(0);
 
     const [localData, setLocalData] = useState({ name, details, price, image, stock, category, active, badge });
 
@@ -44,13 +46,19 @@ function ProductCard({id, name, details, price, image, stock, category, active, 
         setIsSelecting(false);
     }, [id, removeFromCart, updateQty]);
 
+    const handleUndoAdminStock = useCallback(() => {
+        setLocalData(prev => ({ ...prev, stock: initialStockRef.current }));
+        setIsAdminSelectingStock(false);
+    }, []);
+
     useEffect(() => {
-        if (!isSelecting && !isEditing) return;
+        if (!isSelecting && !isEditing && !isAdminSelectingStock) return;
 
         const handleClickOutside = (e) => {
             if (cardRef.current && !cardRef.current.contains(e.target)) {
                 if (isSelecting) handleUndo();
                 if (isEditing) setIsEditing(false);
+                if (isAdminSelectingStock) handleUndoAdminStock();
             }
         };
 
@@ -58,6 +66,7 @@ function ProductCard({id, name, details, price, image, stock, category, active, 
             if (e.detail?.id !== id) {
                 if (isSelecting) handleUndo();
                 if (isEditing) setIsEditing(false);
+                if (isAdminSelectingStock) handleUndoAdminStock();
             }
         };
 
@@ -68,7 +77,7 @@ function ProductCard({id, name, details, price, image, stock, category, active, 
             document.removeEventListener('mousedown', handleClickOutside);
             window.removeEventListener('product-card-activate', handleOtherCardActivated);
         };
-    }, [isSelecting, isEditing, id, handleUndo]);
+    }, [isSelecting, isEditing, isAdminSelectingStock, id, handleUndo, handleUndoAdminStock]);
 
     const handleStartSelecting = (e) => {
         e.stopPropagation();
@@ -121,7 +130,23 @@ function ProductCard({id, name, details, price, image, stock, category, active, 
         setIsEditing(false);
     };
 
-    const handleQuickStockChange = async (e, delta, overrideValue) => {
+    const handleToggleActive = (updatedData) => {
+        setLocalData({ ...localData, active: updatedData.active });
+    };
+
+    const handleDeleteProduct = () => {
+        // Al eliminar, simplemente refrescamos la pagina o forzamos re-render
+        window.location.reload();
+    };
+
+    const handleStartAdminStock = (e) => {
+        e.stopPropagation();
+        window.dispatchEvent(new CustomEvent('product-card-activate', { detail: { id } }));
+        initialStockRef.current = Number(localData.stock || 0);
+        setIsAdminSelectingStock(true);
+    };
+
+    const handleAdminStockChange = (e, delta, overrideValue) => {
         if (e) e.stopPropagation();
         
         let newStock;
@@ -134,6 +159,12 @@ function ProductCard({id, name, details, price, image, stock, category, active, 
         if (newStock < 0) newStock = 0;
         
         setLocalData(prev => ({ ...prev, stock: newStock }));
+    };
+
+    const handleConfirmAdminStock = async (e) => {
+        if (e) e.stopPropagation();
+        const newStock = Number(localData.stock || 0);
+        setIsAdminSelectingStock(false);
 
         try {
             const token = localStorage.getItem('token');
@@ -141,9 +172,10 @@ function ProductCard({id, name, details, price, image, stock, category, active, 
                 { ...localData, stock: newStock }, 
                 { headers: { Authorization: `Bearer ${token}` } }
             );
-            toast.success('Producto actualizado');
+            toast.success('Stock actualizado');
         } catch (err) {
             toast.error(err.response?.data?.error || 'Error al actualizar');
+            setLocalData(prev => ({ ...prev, stock: initialStockRef.current }));
         }
     };
 
@@ -165,6 +197,8 @@ function ProductCard({id, name, details, price, image, stock, category, active, 
                                 handleEditSuccess(data);
                             }
                         }}
+                        onToggleActive={handleToggleActive}
+                        onDeleteProduct={handleDeleteProduct}
                     />
                 </div>
             </article>
@@ -195,15 +229,18 @@ function ProductCard({id, name, details, price, image, stock, category, active, 
     }
 
     // ── NORMAL card (front) ──
+    const isInactive = localData.active === false;
+
     return (
-        <article ref={cardRef} className="card border-0 shadow-sm rounded-3 overflow-hidden h-100">
-            <div onClick={isAdmin ? handleStartEditing : undefined} role={isAdmin ? 'button' : undefined} className="d-flex flex-column h-100">
+        <article ref={cardRef} className={`card border-0 shadow-sm rounded-3 overflow-hidden h-100 ${isInactive && !isAdmin ? 'opacity-50' : ''}`}>
+            <div onClick={isAdmin ? handleStartEditing : undefined} role={isAdmin ? 'button' : undefined} className="d-flex flex-column h-100" style={{ pointerEvents: (isInactive && !isAdmin) ? 'none' : 'auto' }}>
                 {/* Image container */}
                 <div className="position-relative bg-body-secondary overflow-hidden" style={{ height: '220px' }}>
                     {isAdmin ? (
-                        <span className="badge bg-dark bg-opacity-75 position-absolute top-0 start-0 m-2 z-1 small fw-medium">
-                            Clic para editar
-                        </span>
+                        <div className="position-absolute top-0 start-0 m-2 z-1 d-flex gap-1">
+                            <span className="badge bg-dark bg-opacity-75 small fw-medium">Clic para editar</span>
+                            {isInactive && <span className="badge bg-danger bg-opacity-75 small fw-medium">INACTIVO</span>}
+                        </div>
                     ) : (
                         localData.badge && <span className="badge bg-danger position-absolute top-0 start-0 m-2 z-1 small">{localData.badge}</span>
                     )}
@@ -226,43 +263,65 @@ function ProductCard({id, name, details, price, image, stock, category, active, 
 
                     {isAdmin ? (
                         /* Admin stock control */
-                        <div
-                            onClick={(e) => e.stopPropagation()}
-                            className="input-group input-group-sm mt-auto rounded-3 overflow-hidden"
-                        >
+                        !isAdminSelectingStock ? (
                             <button
                                 type="button"
-                                className="btn btn-outline-secondary"
-                                onClick={(e) => handleQuickStockChange(e, -1)}
-                                title="Disminuir stock"
+                                className="btn btn-outline-dark btn-sm w-100 mt-auto rounded-3 fw-medium"
+                                onClick={handleStartAdminStock}
                             >
-                                <FiMinus size={14} />
+                                Stock: {localData.stock || 0}
                             </button>
-                            <input
-                                type="number"
-                                className="form-control text-center border-secondary"
-                                value={localData.stock || 0}
-                                onChange={(e) => setLocalData(prev => ({ ...prev, stock: e.target.value }))}
-                                onBlur={(e) => handleQuickStockChange(e, undefined, e.target.value)}
-                                onClick={(e) => e.stopPropagation()}
-                            />
-                            <button
-                                type="button"
-                                className="btn btn-outline-secondary"
-                                onClick={(e) => handleQuickStockChange(e, 1)}
-                                title="Aumentar stock"
-                            >
-                                <FiPlus size={14} />
-                            </button>
-                        </div>
+                        ) : (
+                            <div className="btn-group w-100 mt-auto" onClick={(e) => e.stopPropagation()}>
+                                <button
+                                    type="button"
+                                    className="btn btn-dark btn-sm"
+                                    onClick={(e) => { e.stopPropagation(); handleUndoAdminStock(); }}
+                                    title="Deshacer"
+                                >
+                                    <FiRotateCcw size={14} />
+                                </button>
+                                <button
+                                    type="button"
+                                    className="btn btn-dark btn-sm"
+                                    onClick={(e) => handleAdminStockChange(e, -1)}
+                                >
+                                    <FiMinus size={14} />
+                                </button>
+                                <input
+                                    type="number"
+                                    className="btn btn-dark btn-sm fw-bold border-0 text-center"
+                                    style={{ width: '40px', padding: '0.25rem', MozAppearance: 'textfield' }}
+                                    value={localData.stock || 0}
+                                    onChange={(e) => handleAdminStockChange(e, undefined, e.target.value)}
+                                    onClick={(e) => e.stopPropagation()}
+                                />
+                                <button
+                                    type="button"
+                                    className="btn btn-dark btn-sm"
+                                    onClick={(e) => handleAdminStockChange(e, 1)}
+                                >
+                                    <FiPlus size={14} />
+                                </button>
+                                <button
+                                    type="button"
+                                    className="btn btn-success btn-sm"
+                                    onClick={handleConfirmAdminStock}
+                                    title="Confirmar"
+                                >
+                                    <FiCheck size={16} />
+                                </button>
+                            </div>
+                        )
                     ) : (
                         !isSelecting ? (
                             <button
                                 type="button"
-                                className="btn btn-dark btn-sm w-100 mt-auto rounded-3"
-                                onClick={handleStartSelecting}
+                                className={`btn ${isInactive ? 'btn-secondary' : 'btn-dark'} btn-sm w-100 mt-auto rounded-3`}
+                                onClick={isInactive ? undefined : handleStartSelecting}
+                                disabled={isInactive}
                             >
-                                Agregar al Carrito
+                                {isInactive ? 'No disponible' : 'Agregar al Carrito'}
                             </button>
                         ) : (
                             /* Quantity control bar */

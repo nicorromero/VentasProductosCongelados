@@ -8,6 +8,7 @@ const {
     createProduct,
     deleteProduct,
     updateProduct,
+    toggleActive,
     getInactiveProducts,
     reactivateProduct
 } = require('../controllers/products.controllers');
@@ -18,6 +19,7 @@ router.get('/:id', getProductById);
 router.post('/', authMiddleware, adminMiddleware, createProduct);
 router.put('/:id', authMiddleware, adminMiddleware, updateProduct);
 router.delete('/:id', authMiddleware, adminMiddleware, deleteProduct);
+router.patch('/:id/toggle-active', authMiddleware, adminMiddleware, toggleActive);
 router.patch('/:id/reactivate', authMiddleware, adminMiddleware, reactivateProduct);
 
 module.exports = router;

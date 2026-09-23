@@ -6,6 +6,7 @@ const salesRoutes = require('./routes/sales.routes');
 const cartsRoutes = require('./routes/carts.routes');
 const authRoutes = require('./routes/auth.routes');
 const contactRoutes = require('./routes/contact.routes');
+const categoriesRoutes = require('./routes/categories.routes');
 const logger = require('./middlewares/logger.middleware');
 const cors = require('cors');
 const app = express();
@@ -27,5 +28,6 @@ app.use('/api', salesRoutes);
 app.use('/carts', cartsRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/contact', contactRoutes);
+app.use('/categories', categoriesRoutes);
 
 module.exports = app;

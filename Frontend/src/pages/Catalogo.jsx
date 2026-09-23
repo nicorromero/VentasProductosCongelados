@@ -28,24 +28,11 @@ function Catalogo() {
         fetchProducts();
     }, []);
 
-    const slugToCategory = {
-        Milanesas: 'Milanesas',
-        Tarteletas: 'Tarteletas',
-        Pizzas: 'Pizzas',
-    };
-
-    const categoriaFiltro = slugToCategory[categoria?.toLowerCase()];
+    const categoriaFiltro = categoria ? categoria.toLowerCase() : null;
 
     const productosFiltrados = !categoriaFiltro
         ? products
         : products.filter((p) => p.category.toLowerCase() === categoriaFiltro);
-
-    const categoriaMap = {
-        Pizzas: 'Pizzas',
-        Tarteletas: 'Tarteletas',
-        Milanesas: 'Milanesas',
-    };
-    const categoriaLabel = categoriaMap[categoria?.toLowerCase()] || null;
 
     const isAdmin = (() => {
         try {
@@ -91,6 +78,7 @@ function Catalogo() {
                             category={product.category}
                             stock={product.stock}
                             badge={product.badge}
+                            active={product.active}
                         />
                     </div>
                 ))}

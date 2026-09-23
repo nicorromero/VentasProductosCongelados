@@ -48,14 +48,10 @@ const SaleSchema = new mongoose.Schema({
 
     estado: {
         type: String,
-        default: 'pendiente de pago',
+        default: 'pendiente',
         enum: [
-            'pendiente de pago',
-            'pago confirmado',
-            'enviado',
-            'listo para retiro',
-            'entregado',
-            'cancelado'
+            'pendiente',
+            'entregado'
         ]
     }
 });
