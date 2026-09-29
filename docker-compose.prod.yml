@@ -1,0 +1,24 @@
+services:
+  backend:
+    # En producción usamos las imágenes subidas al registro de GitHub por el CI/CD, no hacemos build local
+    image: ghcr.io/nicorromero/ventasproductoscongelados-backend:latest
+    container_name: app_backend
+    restart: always
+    ports:
+      - "3000:3000"
+    # El archivo .env debe existir en el servidor (/opt/ventas-app/.env)
+    env_file: .env
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  frontend:
+    image: ghcr.io/nicorromero/ventasproductoscongelados-frontend:latest
+    container_name: app_frontend
+    restart: always
+    ports:
+      - "80:80"
+    depends_on:
+      - backend

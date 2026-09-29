@@ -1,7 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import ProductCard from '../components/ProductCard';
+import { FaPizzaSlice, FaHamburger, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
+import { GiPieSlice, GiDumpling, GiFrenchFries } from 'react-icons/gi';
+import { MdOutlineRestaurantMenu } from 'react-icons/md';
 
 const API_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -38,7 +41,7 @@ function Catalogo() {
 
     const productosFiltrados = !categoriaFiltro
         ? products
-        : products.filter((p) => p.category.toLowerCase() === categoriaFiltro);
+        : products.filter((p) => p.category && p.category.toLowerCase() === categoriaFiltro);
 
     const isAdmin = (() => {
         try {
@@ -48,28 +51,75 @@ function Catalogo() {
         } catch { return false; }
     })();
 
+    const scrollRef = useRef(null);
+
+    const scroll = (scrollOffset) => {
+        if (scrollRef.current) {
+            scrollRef.current.scrollBy({ left: scrollOffset, behavior: 'smooth' });
+        }
+    };
+
+    const getCategoryIcon = (catName) => {
+        if (!catName) return <MdOutlineRestaurantMenu className="me-2 fs-5" />;
+        const name = catName.toLowerCase();
+        if (name.includes('pizza')) return <FaPizzaSlice className="me-2 fs-5" />;
+        if (name.includes('tarta')) return <GiPieSlice className="me-2 fs-5" />;
+        if (name.includes('empanada')) return <GiDumpling className="me-2 fs-5" />;
+        if (name.includes('hamburguesa') || name.includes('burger')) return <FaHamburger className="me-2 fs-5" />;
+        if (name.includes('papa') || name.includes('frita')) return <GiFrenchFries className="me-2 fs-5" />;
+        return <MdOutlineRestaurantMenu className="me-2 fs-5" />;
+    };
+
     if (loading) return <div className="text-center py-5">Cargando productos...</div>;
     if (error) return <div className="text-center py-5 text-danger">{error}</div>;
 
     return (
         <section className="container-fluid px-3 px-md-4 py-4">
-            <div className="d-flex align-items-center mb-4">
-                <span className="me-2 fw-medium fs-5">Mostrar:</span>
-                <div className="dropdown">
-                    <button className="btn btn-outline-secondary dropdown-toggle rounded-pill px-3 fw-medium" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        {categoria ? categoria.charAt(0).toUpperCase() + categoria.slice(1) : 'Todos los productos'}
+            <style>{`
+                .hide-scrollbar::-webkit-scrollbar { display: none; }
+                .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+            `}</style>
+            
+            <div className="d-flex align-items-center mb-4 position-relative w-100">
+                <button 
+                    className="btn btn-light rounded-circle shadow-sm position-absolute start-0 z-3" 
+                    onClick={() => scroll(-200)}
+                    style={{ width: '40px', height: '40px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                >
+                    <FaChevronLeft />
+                </button>
+                
+                <div 
+                    ref={scrollRef}
+                    className="d-flex gap-3 justify-content-between overflow-auto px-5 py-2 w-100 hide-scrollbar"
+                    style={{ whiteSpace: 'nowrap' }}
+                >
+                    <button 
+                        className={`btn d-flex align-items-center justify-content-center flex-fill rounded-pill px-4 py-2 ${!categoria ? 'btn-primary shadow' : 'btn-outline-primary border-2'}`}
+                        onClick={() => navigate('/productos')}
+                        style={{ whiteSpace: 'nowrap' }}
+                    >
+                        <MdOutlineRestaurantMenu className="me-2 fs-5" /> Todos
                     </button>
-                    <ul className="dropdown-menu shadow-sm border-0">
-                        <li><button className="dropdown-item" onClick={() => navigate('/productos')}>Todos los productos</button></li>
-                        {categories.map((cat) => (
-                            <li key={cat.name}>
-                                <button className="dropdown-item" onClick={() => navigate(`/catalogo/${cat.name}`)}>
-                                    {cat.name}
-                                </button>
-                            </li>
-                        ))}
-                    </ul>
+                    {Array.isArray(categories) && categories.map((cat) => (
+                        <button 
+                            key={cat.name || Math.random()}
+                            className={`btn d-flex align-items-center justify-content-center flex-fill rounded-pill px-4 py-2 ${categoriaFiltro === (cat.name || '').toLowerCase() ? 'btn-primary shadow' : 'btn-outline-primary border-2'}`}
+                            onClick={() => navigate(`/catalogo/${cat.name}`)}
+                            style={{ whiteSpace: 'nowrap' }}
+                        >
+                            {getCategoryIcon(cat.name)} {cat.name || 'Sin nombre'}
+                        </button>
+                    ))}
                 </div>
+
+                <button 
+                    className="btn btn-light rounded-circle shadow-sm position-absolute end-0 z-3" 
+                    onClick={() => scroll(200)}
+                    style={{ width: '40px', height: '40px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                >
+                    <FaChevronRight />
+                </button>
             </div>
             <div className="row g-3">
                 {isAdmin && !categoriaFiltro && (
@@ -91,7 +141,7 @@ function Catalogo() {
                         />
                     </div>
                 )}
-                {productosFiltrados.map((product) => (
+                {Array.isArray(productosFiltrados) && productosFiltrados.map((product) => (
                     <div className="col-12 col-sm-6 col-lg-3" key={product._id}>
                         <ProductCard
                             id={product._id}
