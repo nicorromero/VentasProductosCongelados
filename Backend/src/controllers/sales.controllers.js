@@ -5,14 +5,14 @@ const getSales = async (req, res) => {
     try {
         if (req.usuario?.role === 'admin') {
             const sales = await Sales.find()
-                .populate('items.product', 'name image price')
+                .populate('items.product', 'name image images price')
                 .populate('user', 'name email')
                 .sort({ date: -1 });
             return res.json(sales);
         }
         // Usuario autenticado no-admin: devuelve solo sus órdenes
         const sales = await Sales.find({ user: req.usuario.id })
-            .populate('items.product', 'name image price')
+            .populate('items.product', 'name image images price')
             .sort({ date: -1 });
         res.json(sales);
     } catch (error) {
@@ -57,6 +57,14 @@ const deleteSale = async (req, res) => {
         if(!sale){
             return res.status(404).json({ error: 'Venta no encontrada' });
         }
+
+        // Revertir stock de los productos
+        if (sale.items && sale.items.length > 0) {
+            for (const item of sale.items) {
+                await Product.findByIdAndUpdate(item.product, { $inc: { stock: item.quantity } });
+            }
+        }
+
         res.json(sale)
     } catch (error) {
         if (error.name === 'CastError') {
@@ -125,7 +133,7 @@ const createOrder = async (req, res) => {
 const getMyOrders = async (req, res) => {
     try {
         const orders = await Sales.find({ user: req.usuario.id })
-            .populate('items.product', 'name image price')
+            .populate('items.product', 'name image images price')
             .sort({ date: -1 });
         res.json(orders);
     } catch (error) {
@@ -183,7 +191,7 @@ const updateOrderItems = async (req, res) => {
         order.items = items;
         order.total = newTotal;
         await order.save();
-        await order.populate('items.product', 'name image price');
+        await order.populate('items.product', 'name image images price');
 
         res.json(order);
     } catch (error) {

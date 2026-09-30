@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { FiRotateCcw, FiMinus, FiPlus, FiCheck } from 'react-icons/fi';
+import { createPortal } from 'react-dom';
+import { FiRotateCcw, FiMinus, FiPlus, FiCheck, FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 import { toast } from 'react-toastify';
 import axios from 'axios';
 import useCart from '../hooks/useCart';
@@ -15,23 +15,57 @@ function getRole() {
     } catch { return null; }
 }
 
-function ProductCard({id, name, details, price, image, stock, category, active, badge, isCreate, onCreateSuccess}) {
-    const navigate = useNavigate();
+function normalizeImages(data) {
+    if (Array.isArray(data?.images) && data.images.length > 0) {
+        return data.images.slice(0, 5);
+    }
+    if (data?.image) {
+        return [data.image];
+    }
+    return [];
+}
+
+function ProductCard({id, name, details, price, image, images = [], stock, category, active, badge, isCreate, onCreateSuccess}) {
     const { cartItems, addToCart, removeFromCart, increaseQty, decreaseQty, updateQty } = useCart();
     const isAdmin = getRole() === 'admin';
 
     const cardRef = useRef(null);
+    const modalCardRef = useRef(null);
     const [isSelecting, setIsSelecting] = useState(false);
     const [isAdminSelectingStock, setIsAdminSelectingStock] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
     const initialQtyRef = useRef(0);
     const initialStockRef = useRef(0);
 
-    const [localData, setLocalData] = useState({ name, details, price, image, stock, category, active, badge });
+    const initialImages = normalizeImages({ images, image });
+    const [localData, setLocalData] = useState({
+        name,
+        details,
+        price,
+        image: initialImages[0] || image || '',
+        images: initialImages,
+        stock,
+        category,
+        active,
+        badge
+    });
+    const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
     useEffect(() => {
-        setLocalData({ name, details, price, image, stock, category, active, badge });
-    }, [name, details, price, image, stock, category, active, badge]);
+        const norm = normalizeImages({ images, image });
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        setLocalData({
+            name,
+            details,
+            price,
+            image: norm[0] || image || '',
+            images: norm,
+            stock,
+            category,
+            active,
+            badge
+        });
+    }, [name, details, price, image, images, stock, category, active, badge]);
 
     const cartItem = cartItems?.find((item) => item._id === id);
     const quantity = cartItem ? cartItem.quantity : 0;
@@ -55,9 +89,14 @@ function ProductCard({id, name, details, price, image, stock, category, active, 
         if (!isSelecting && !isEditing && !isAdminSelectingStock) return;
 
         const handleClickOutside = (e) => {
+            if (isEditing) {
+                if (modalCardRef.current && !modalCardRef.current.contains(e.target)) {
+                    setIsEditing(false);
+                }
+                return;
+            }
             if (cardRef.current && !cardRef.current.contains(e.target)) {
                 if (isSelecting) handleUndo();
-                if (isEditing) setIsEditing(false);
                 if (isAdminSelectingStock) handleUndoAdminStock();
             }
         };
@@ -79,6 +118,23 @@ function ProductCard({id, name, details, price, image, stock, category, active, 
         };
     }, [isSelecting, isEditing, isAdminSelectingStock, id, handleUndo, handleUndoAdminStock]);
 
+    useEffect(() => {
+        if (!isEditing) return;
+        const handleKeyDown = (e) => {
+            if (e.key === 'Escape') {
+                setIsEditing(false);
+            }
+        };
+        const prevOverflow = document.body.style.overflow;
+        document.body.style.overflow = 'hidden';
+        window.addEventListener('keydown', handleKeyDown);
+
+        return () => {
+            document.body.style.overflow = prevOverflow;
+            window.removeEventListener('keydown', handleKeyDown);
+        };
+    }, [isEditing]);
+
     const handleStartSelecting = (e) => {
         e.stopPropagation();
         if (localData.stock !== undefined && localData.stock !== null && localData.stock <= 0) {
@@ -91,8 +147,9 @@ function ProductCard({id, name, details, price, image, stock, category, active, 
         const currentQtyInCart = cartItem ? cartItem.quantity : 0;
         initialQtyRef.current = currentQtyInCart;
 
+        const displayImages = normalizeImages(localData);
         if (currentQtyInCart === 0) {
-            addToCart({ _id: id, nombre: localData.name, precio: localData.price, imagen: localData.image, stock: localData.stock });
+            addToCart({ _id: id, nombre: localData.name, precio: localData.price, imagen: displayImages[0] || localData.image, stock: localData.stock });
         }
         setIsSelecting(true);
     };
@@ -126,12 +183,36 @@ function ProductCard({id, name, details, price, image, stock, category, active, 
     };
 
     const handleEditSuccess = (updatedData) => {
-        setLocalData({ ...localData, ...updatedData });
+        const norm = normalizeImages(updatedData);
+        setLocalData({
+            ...localData,
+            ...updatedData,
+            images: norm,
+            image: norm[0] || updatedData.image || ''
+        });
+        window.dispatchEvent(new CustomEvent('product-updated', { detail: updatedData }));
+        setCurrentImageIndex(0);
         setIsEditing(false);
     };
 
+    const displayImages = normalizeImages(localData);
+    const safeImageIndex = currentImageIndex < displayImages.length ? currentImageIndex : 0;
+
+    const handlePrevImage = (e) => {
+        e.stopPropagation();
+        if (displayImages.length <= 1) return;
+        setCurrentImageIndex((prev) => (prev === 0 ? displayImages.length - 1 : prev - 1));
+    };
+
+    const handleNextImage = (e) => {
+        e.stopPropagation();
+        if (displayImages.length <= 1) return;
+        setCurrentImageIndex((prev) => (prev === displayImages.length - 1 ? 0 : prev + 1));
+    };
+
     const handleToggleActive = (updatedData) => {
-        setLocalData({ ...localData, active: updatedData.active });
+        setLocalData(prev => ({ ...prev, active: updatedData.active }));
+        window.dispatchEvent(new CustomEvent('product-updated', { detail: updatedData }));
     };
 
     const handleDeleteProduct = () => {
@@ -179,11 +260,98 @@ function ProductCard({id, name, details, price, image, stock, category, active, 
         }
     };
 
-    // ── SHOW/HIDE: Editing mode (replaces 3D flip) ──
-    if (isEditing) {
-        return (
-            <article ref={cardRef} className="card border-0 shadow-sm rounded-3 overflow-hidden">
-                <div className="card-body p-3">
+    const editModal = isEditing && typeof document !== 'undefined' ? createPortal(
+        <div
+            className="position-fixed top-0 start-0 w-100 h-100"
+            style={{ zIndex: 1060 }}
+        >
+            <style>{`
+                @keyframes adminBackdropFadeIn {
+                    from { opacity: 0; }
+                    to { opacity: 1; }
+                }
+                @keyframes adminCardFlipEnlarge {
+                    0% {
+                        transform: perspective(1200px) rotateY(-180deg) scale(0.6);
+                        opacity: 0;
+                    }
+                    65% {
+                        transform: perspective(1200px) rotateY(6deg) scale(1.02);
+                        opacity: 1;
+                    }
+                    100% {
+                        transform: perspective(1200px) rotateY(0deg) scale(1);
+                        opacity: 1;
+                    }
+                }
+                @keyframes adminCardMobileIn {
+                    0% {
+                        transform: scale(0.9);
+                        opacity: 0;
+                    }
+                    100% {
+                        transform: scale(1);
+                        opacity: 1;
+                    }
+                }
+
+                .admin-edit-backdrop {
+                    background-color: rgba(15, 23, 42, 0.75);
+                    animation: adminBackdropFadeIn 0.2s ease-out forwards;
+                }
+
+                /* En desktop y tablet: blur elegante de fondo */
+                @media (min-width: 768px) {
+                    .admin-edit-backdrop {
+                        background-color: rgba(15, 23, 42, 0.6);
+                        backdrop-filter: blur(8px);
+                        -webkit-backdrop-filter: blur(8px);
+                    }
+                    .admin-edit-modal-card {
+                        animation: adminCardFlipEnlarge 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+                    }
+                }
+
+                /* En celulares: sin blur para máxima nitidez y rendimiento */
+                @media (max-width: 767.98px) {
+                    .admin-edit-backdrop {
+                        backdrop-filter: none !important;
+                        -webkit-backdrop-filter: none !important;
+                    }
+                    .admin-edit-modal-card {
+                        animation: adminCardMobileIn 0.25s ease-out forwards !important;
+                    }
+                }
+            `}</style>
+
+            {/* Telón de fondo independiente (al hacer clic descarta cambios) */}
+            <div
+                className="position-absolute top-0 start-0 w-100 h-100 admin-edit-backdrop"
+                onClick={() => setIsEditing(false)}
+            />
+
+            {/* Contenedor centrado */}
+            <div
+                className="position-relative w-100 h-100 d-flex align-items-center justify-content-center p-2 p-sm-3"
+                style={{ pointerEvents: 'none' }}
+                onClick={() => setIsEditing(false)}
+            >
+                <div
+                    ref={modalCardRef}
+                    className="card border-0 shadow-lg rounded-4 overflow-hidden admin-edit-modal-card"
+                    style={{
+                        pointerEvents: 'auto',
+                        maxWidth: '580px',
+                        width: '100%',
+                        maxHeight: '92vh',
+                        overflowY: 'auto',
+                        WebkitOverflowScrolling: 'touch',
+                        transformOrigin: 'center center',
+                        boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)'
+                    }}
+                    onClick={(e) => e.stopPropagation()}
+                >
+                <div className="card-body p-2 p-sm-3 p-md-4">
                     <InlineProductEdit
                         id={id}
                         initialData={localData}
@@ -201,30 +369,35 @@ function ProductCard({id, name, details, price, image, stock, category, active, 
                         onDeleteProduct={handleDeleteProduct}
                     />
                 </div>
-            </article>
-        );
-    }
+            </div>
+            </div>
+        </div>,
+        document.body
+    ) : null;
 
     // ── CREATE card ──
     if (isCreate) {
         return (
-            <article ref={cardRef} className="card rounded-3 overflow-hidden" style={{ border: '2px dashed #dee2e6' }} role="button" onClick={handleStartEditing}>
-                <div className="bg-body-secondary d-flex align-items-center justify-content-center" style={{ height: '220px' }}>
-                    <img
-                        src="https://placehold.co/300x300/f8fafc/cbd5e1?text=%2B"
-                        alt="Nuevo Producto"
-                        className="w-100 h-100 object-fit-cover opacity-50"
-                    />
-                </div>
-                <div className="card-body p-3 opacity-75">
-                    <p className="text-muted small text-uppercase mb-1">-</p>
-                    <h3 className="fs-6 fw-medium text-secondary mb-1">Nuevo Producto</h3>
-                    <span className="text-muted">$0</span>
-                    <button type="button" className="btn btn-light btn-sm w-100 mt-2 border d-flex align-items-center justify-content-center gap-1" style={{ pointerEvents: 'none' }}>
-                        <FiPlus /> Crear Producto
-                    </button>
-                </div>
-            </article>
+            <>
+                <article ref={cardRef} className="card rounded-3 overflow-hidden" style={{ border: '2px dashed #dee2e6' }} role="button" onClick={handleStartEditing}>
+                    <div className="bg-body-secondary d-flex align-items-center justify-content-center" style={{ height: '220px' }}>
+                        <img
+                            src="https://placehold.co/300x300/f8fafc/cbd5e1?text=%2B"
+                            alt="Nuevo Producto"
+                            className="w-100 h-100 object-fit-cover opacity-50"
+                        />
+                    </div>
+                    <div className="card-body p-3 opacity-75">
+                        <p className="text-muted small text-uppercase mb-1">-</p>
+                        <h3 className="fs-6 fw-medium text-secondary mb-1">Nuevo Producto</h3>
+                        <span className="text-muted">$0</span>
+                        <button type="button" className="btn btn-light btn-sm w-100 mt-2 border d-flex align-items-center justify-content-center gap-1" style={{ pointerEvents: 'none' }}>
+                            <FiPlus /> Crear Producto
+                        </button>
+                    </div>
+                </article>
+                {editModal}
+            </>
         );
     }
 
@@ -232,7 +405,8 @@ function ProductCard({id, name, details, price, image, stock, category, active, 
     const isInactive = localData.active === false;
 
     return (
-        <article ref={cardRef} className={`card border-0 shadow-sm rounded-3 overflow-hidden h-100 ${isInactive && !isAdmin ? 'opacity-50' : ''}`}>
+        <>
+            <article ref={cardRef} className={`card border-0 shadow-sm rounded-3 overflow-hidden h-100 ${isInactive && !isAdmin ? 'opacity-50' : ''}`}>
             <div onClick={isAdmin ? handleStartEditing : undefined} role={isAdmin ? 'button' : undefined} className="d-flex flex-column h-100" style={{ pointerEvents: (isInactive && !isAdmin) ? 'none' : 'auto' }}>
                 {/* Image container */}
                 <div className="position-relative bg-body-secondary overflow-hidden" style={{ height: '220px' }}>
@@ -245,8 +419,19 @@ function ProductCard({id, name, details, price, image, stock, category, active, 
                     ) : (
                         localData.badge && <span className="badge bg-danger position-absolute top-0 start-0 m-2 z-1 small">{localData.badge}</span>
                     )}
+
+                    {/* Counter badge when multiple images */}
+                    {displayImages.length > 1 && (
+                        <span
+                            className="badge bg-dark bg-opacity-75 rounded-pill position-absolute top-0 end-0 m-2 z-2 small px-2 py-1"
+                            style={{ fontSize: '0.7rem' }}
+                        >
+                            {safeImageIndex + 1}/{displayImages.length}
+                        </span>
+                    )}
+
                     <img
-                        src={localData.image || `https://placehold.co/300x300/e2e8f0/64748b?text=${encodeURIComponent(localData.name || 'Producto')}`}
+                        src={displayImages[safeImageIndex] || `https://placehold.co/300x300/e2e8f0/64748b?text=${encodeURIComponent(localData.name || 'Producto')}`}
                         alt={localData.name}
                         className="w-100 h-100 object-fit-cover"
                         onError={(e) => {
@@ -254,6 +439,56 @@ function ProductCard({id, name, details, price, image, stock, category, active, 
                             e.target.src = `https://placehold.co/300x300/e2e8f0/64748b?text=${encodeURIComponent(localData.name || 'Producto')}`;
                         }}
                     />
+
+                    {/* Carousel controls if > 1 image */}
+                    {displayImages.length > 1 && (
+                        <>
+                            <button
+                                type="button"
+                                className="btn btn-dark btn-sm rounded-circle position-absolute start-0 top-50 translate-middle-y ms-2 z-3 d-flex align-items-center justify-content-center p-0 opacity-75 shadow-sm border-0 text-white"
+                                style={{ width: '28px', height: '28px' }}
+                                onClick={handlePrevImage}
+                                aria-label="Foto anterior"
+                            >
+                                <FiChevronLeft size={16} />
+                            </button>
+                            <button
+                                type="button"
+                                className="btn btn-dark btn-sm rounded-circle position-absolute end-0 top-50 translate-middle-y me-2 z-3 d-flex align-items-center justify-content-center p-0 opacity-75 shadow-sm border-0 text-white"
+                                style={{ width: '28px', height: '28px' }}
+                                onClick={handleNextImage}
+                                aria-label="Siguiente foto"
+                            >
+                                <FiChevronRight size={16} />
+                            </button>
+
+                            {/* Dots */}
+                            <div
+                                className="position-absolute bottom-0 start-50 translate-middle-x mb-2 z-3 d-flex gap-1 align-items-center bg-dark bg-opacity-50 px-2 py-1 rounded-pill"
+                                onClick={(e) => e.stopPropagation()}
+                            >
+                                {displayImages.map((_, idx) => (
+                                    <button
+                                        key={idx}
+                                        type="button"
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            setCurrentImageIndex(idx);
+                                        }}
+                                        className="border-0 p-0 rounded-pill"
+                                        style={{
+                                            width: idx === safeImageIndex ? '14px' : '6px',
+                                            height: '6px',
+                                            backgroundColor: idx === safeImageIndex ? '#ffffff' : 'rgba(255,255,255,0.5)',
+                                            transition: 'all 0.2s ease',
+                                            cursor: 'pointer'
+                                        }}
+                                        aria-label={`Foto ${idx + 1}`}
+                                    />
+                                ))}
+                            </div>
+                        </>
+                    )}
                 </div>
 
                 {/* Info */}
@@ -368,6 +603,8 @@ function ProductCard({id, name, details, price, image, stock, category, active, 
                 </div>
             </div>
         </article>
+        {editModal}
+        </>
     );
 }
 

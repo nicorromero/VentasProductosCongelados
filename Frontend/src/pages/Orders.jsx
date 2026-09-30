@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { SeccionPedidos } from '../components/PedidoCard';
-import { Save } from 'lucide-react';
+import { Save, ChevronDown, ChevronUp } from 'lucide-react';
 
 const API_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -34,6 +34,8 @@ function Orders() {
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [expandedPendientes, setExpandedPendientes] = useState(false);
+    const [expandedEntregados, setExpandedEntregados] = useState(false);
 
     const tokenData = getTokenData();
     const isAdmin = tokenData?.role === 'admin';
@@ -117,48 +119,65 @@ function Orders() {
 
         return (
             <main className="container-fluid px-3 px-lg-4 py-4 pb-5">
-                <h1 className="fs-5 fw-bold text-dark mb-3 d-flex align-items-center gap-2">
-                    📋 Panel de Pedidos
-                    <span className="badge bg-dark bg-opacity-10 text-dark rounded-pill fw-medium" style={{ fontSize: '0.75rem' }}>{orders.length} total</span>
-                </h1>
-
                 <div className="row g-3 mb-4">
-                    <div className="col-6">
-                        <div className="d-flex flex-column rounded-4 border overflow-hidden shadow-sm" style={{ backgroundColor: 'rgba(220, 53, 69, 0.05)', borderColor: '#dc3545' }}>
-                            <span className="fw-bold text-uppercase px-3 pt-2 pb-1 text-danger border-bottom border-danger border-opacity-25" style={{ fontSize: '0.65rem', letterSpacing: '0.1em' }}>
-                                Faltan
-                            </span>
-                            <ul className="list-unstyled m-0 overflow-auto px-2 py-1" style={{ maxHeight: '6.5rem' }}>
-                                {Object.entries(porViandaPendientes).length === 0 ? (
-                                    <li className="text-danger opacity-75 fst-italic py-1 px-1" style={{ fontSize: '0.75rem' }}>—</li>
-                                ) : (
-                                    Object.entries(porViandaPendientes).map(([vianda, total]) => (
-                                        <li key={vianda} className="d-flex justify-content-between align-items-baseline py-1">
-                                            <span className="text-danger fw-medium text-truncate me-2" style={{ fontSize: '0.75rem' }}>{vianda}</span>
-                                            <span className="text-danger fw-bold flex-shrink-0" style={{ fontSize: '0.85rem' }}>{total}</span>
-                                        </li>
-                                    ))
-                                )}
-                            </ul>
+                    <div className="col-12 col-md-6">
+                        <div className="d-flex flex-column rounded-4 border overflow-hidden shadow-sm bg-white" style={{ borderColor: '#dc3545' }}>
+                            <div 
+                                className="d-flex justify-content-between align-items-center px-3 py-2 border-bottom border-danger border-opacity-25 user-select-none" 
+                                style={{ cursor: 'pointer', backgroundColor: 'rgba(220, 53, 69, 0.05)' }}
+                                onClick={() => setExpandedPendientes(!expandedPendientes)}
+                            >
+                                <span className="fw-bold text-uppercase text-danger" style={{ fontSize: '0.75rem', letterSpacing: '0.05em' }}>
+                                    Productos que faltan entregar
+                                </span>
+                                <span className="text-danger">
+                                    {expandedPendientes ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
+                                </span>
+                            </div>
+                            {expandedPendientes && (
+                                <ul className="list-unstyled m-0 overflow-auto px-3 py-2" style={{ maxHeight: '15rem' }}>
+                                    {Object.entries(porViandaPendientes).length === 0 ? (
+                                        <li className="text-danger opacity-75 fst-italic py-1" style={{ fontSize: '0.8rem' }}>No hay productos pendientes.</li>
+                                    ) : (
+                                        Object.entries(porViandaPendientes).map(([vianda, total]) => (
+                                            <li key={vianda} className="d-flex justify-content-between align-items-center py-1 border-bottom border-light">
+                                                <span className="text-dark fw-medium text-truncate me-2" style={{ fontSize: '0.85rem' }}>{vianda}</span>
+                                                <span className="badge bg-danger rounded-pill flex-shrink-0" style={{ fontSize: '0.8rem' }}>{total}</span>
+                                            </li>
+                                        ))
+                                    )}
+                                </ul>
+                            )}
                         </div>
                     </div>
-                    <div className="col-6">
-                        <div className="d-flex flex-column rounded-4 border overflow-hidden shadow-sm" style={{ backgroundColor: 'rgba(25, 135, 84, 0.05)', borderColor: '#198754' }}>
-                            <span className="fw-bold text-uppercase px-3 pt-2 pb-1 text-success border-bottom border-success border-opacity-25" style={{ fontSize: '0.65rem', letterSpacing: '0.1em' }}>
-                                Listas
-                            </span>
-                            <ul className="list-unstyled m-0 overflow-auto px-2 py-1" style={{ maxHeight: '6.5rem' }}>
-                                {Object.entries(porViandaEntregados).length === 0 ? (
-                                    <li className="text-success opacity-75 fst-italic py-1 px-1" style={{ fontSize: '0.75rem' }}>—</li>
-                                ) : (
-                                    Object.entries(porViandaEntregados).map(([vianda, total]) => (
-                                        <li key={vianda} className="d-flex justify-content-between align-items-baseline py-1">
-                                            <span className="text-success fw-medium text-truncate me-2" style={{ fontSize: '0.75rem' }}>{vianda}</span>
-                                            <span className="text-success fw-bold flex-shrink-0" style={{ fontSize: '0.85rem' }}>{total}</span>
-                                        </li>
-                                    ))
-                                )}
-                            </ul>
+                    <div className="col-12 col-md-6">
+                        <div className="d-flex flex-column rounded-4 border overflow-hidden shadow-sm bg-white" style={{ borderColor: '#198754' }}>
+                            <div 
+                                className="d-flex justify-content-between align-items-center px-3 py-2 border-bottom border-success border-opacity-25 user-select-none" 
+                                style={{ cursor: 'pointer', backgroundColor: 'rgba(25, 135, 84, 0.05)' }}
+                                onClick={() => setExpandedEntregados(!expandedEntregados)}
+                            >
+                                <span className="fw-bold text-uppercase text-success" style={{ fontSize: '0.75rem', letterSpacing: '0.05em' }}>
+                                    Productos entregados
+                                </span>
+                                <span className="text-success">
+                                    {expandedEntregados ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
+                                </span>
+                            </div>
+                            {expandedEntregados && (
+                                <ul className="list-unstyled m-0 overflow-auto px-3 py-2" style={{ maxHeight: '15rem' }}>
+                                    {Object.entries(porViandaEntregados).length === 0 ? (
+                                        <li className="text-success opacity-75 fst-italic py-1" style={{ fontSize: '0.8rem' }}>No hay productos entregados.</li>
+                                    ) : (
+                                        Object.entries(porViandaEntregados).map(([vianda, total]) => (
+                                            <li key={vianda} className="d-flex justify-content-between align-items-center py-1 border-bottom border-light">
+                                                <span className="text-dark fw-medium text-truncate me-2" style={{ fontSize: '0.85rem' }}>{vianda}</span>
+                                                <span className="badge bg-success rounded-pill flex-shrink-0" style={{ fontSize: '0.8rem' }}>{total}</span>
+                                            </li>
+                                        ))
+                                    )}
+                                </ul>
+                            )}
                         </div>
                     </div>
                 </div>

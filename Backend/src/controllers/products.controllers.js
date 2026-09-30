@@ -28,7 +28,16 @@ const getProductById = async (req, res) => {
 
 const createProduct = async (req, res) => {
     try {
-        const product = new Product(req.body);
+        const body = { ...req.body };
+        if (body.images && Array.isArray(body.images)) {
+            if (body.images.length > 5) {
+                return res.status(400).json({ error: 'No se pueden agregar más de 5 imágenes' });
+            }
+            body.image = body.images[0] || '';
+        } else if (body.image) {
+            body.images = [body.image];
+        }
+        const product = new Product(body);
         await product.save();
         res.status(201).json(product);
     } catch (error) {
@@ -37,7 +46,7 @@ const createProduct = async (req, res) => {
             return;
         }
         if (error.name === 'ValidationError') {
-            res.status(400).json({ error: 'Datos obligatorios no válidos' });
+            res.status(400).json({ error: error.message || 'Datos obligatorios no válidos' });
             return;
         }
         res.status(500).json({ message: error.message });
@@ -63,7 +72,16 @@ const deleteProduct = async (req, res) => {
 
 const updateProduct = async (req, res) => {
     try {
-        const product = await Product.findByIdAndUpdate(req.params.id, req.body, {
+        const body = { ...req.body };
+        if (body.images && Array.isArray(body.images)) {
+            if (body.images.length > 5) {
+                return res.status(400).json({ error: 'No se pueden agregar más de 5 imágenes' });
+            }
+            body.image = body.images[0] || '';
+        } else if (body.image && (!body.images || body.images.length === 0)) {
+            body.images = [body.image];
+        }
+        const product = await Product.findByIdAndUpdate(req.params.id, body, {
             returnDocument: 'after',
             runValidators: true
         });
@@ -74,7 +92,7 @@ const updateProduct = async (req, res) => {
         res.json(product);
     } catch (error) {
         if (error.name === 'ValidationError') {
-            res.status(400).json({ error: 'Datos obligatorios no válidos' });
+            res.status(400).json({ error: error.message || 'Datos obligatorios no válidos' });
             return;
         }
         if (error.name === 'CastError') {
@@ -91,9 +109,13 @@ const toggleActive = async (req, res) => {
         if (!product) {
             return res.status(404).json({ error: 'Producto no encontrado' });
         }
-        product.active = !product.active;
-        await product.save();
-        res.json(product);
+        const newActive = product.active === false ? true : false;
+        const updatedProduct = await Product.findByIdAndUpdate(
+            req.params.id,
+            { active: newActive },
+            { returnDocument: 'after' }
+        );
+        res.json(updatedProduct);
     } catch (error) {
         if (error.name === 'CastError') {
             return res.status(400).json({ error: 'ID de producto inválido' });

@@ -75,7 +75,7 @@ function InactiveProducts() {
                             <article className="card border-0 shadow-sm rounded-3 overflow-hidden opacity-75">
                                 <div className="bg-body-secondary" style={{ height: '220px' }}>
                                     <img
-                                        src={p.image || `https://placehold.co/300x300/e2e8f0/64748b?text=${encodeURIComponent(p.name)}`}
+                                        src={(p.images && p.images.length > 0 ? p.images[0] : p.image) || `https://placehold.co/300x300/e2e8f0/64748b?text=${encodeURIComponent(p.name)}`}
                                         alt={p.name}
                                         className="w-100 h-100 object-fit-cover"
                                         onError={(e) => {

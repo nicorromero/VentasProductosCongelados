@@ -13,6 +13,8 @@ router.get('/ordenes', authMiddleware, getSales);
 router.get('/mis-ordenes', authMiddleware, getMyOrders);
 router.patch('/ordenes/:id/estado', authMiddleware, adminMiddleware, updateOrderStatus);
 router.patch('/ordenes/:id/items', authMiddleware, adminMiddleware, updateOrderItems);
+router.delete('/ordenes/:id', authMiddleware, adminMiddleware, deleteSale);
+
 
 // Rutas legacy con wildcard
 router.get('/', getSales);

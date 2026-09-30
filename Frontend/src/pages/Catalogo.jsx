@@ -37,6 +37,16 @@ function Catalogo() {
         fetchData();
     }, []);
 
+    useEffect(() => {
+        const handleProductUpdated = (e) => {
+            const updated = e.detail;
+            if (!updated?._id) return;
+            setProducts(prev => prev.map(p => p._id === updated._id ? { ...p, ...updated } : p));
+        };
+        window.addEventListener('product-updated', handleProductUpdated);
+        return () => window.removeEventListener('product-updated', handleProductUpdated);
+    }, []);
+
     const categoriaFiltro = categoria ? categoria.toLowerCase() : null;
 
     const productosFiltrados = !categoriaFiltro
@@ -102,9 +112,9 @@ function Catalogo() {
                     >
                         <MdOutlineRestaurantMenu className="me-2 fs-5" /> Todos
                     </button>
-                    {Array.isArray(categories) && categories.map((cat) => (
+                    {Array.isArray(categories) && categories.map((cat, idx) => (
                         <button 
-                            key={cat.name || Math.random()}
+                            key={cat._id || cat.name || idx}
                             className={`btn d-flex align-items-center justify-content-center flex-fill rounded-pill px-4 py-2 fw-medium ${categoriaFiltro === (cat.name || '').toLowerCase() ? 'btn-dark shadow-sm' : 'btn-outline-dark border-2'}`}
                             onClick={() => navigate(`/catalogo/${cat.name}`)}
                             style={{ whiteSpace: 'nowrap' }}
@@ -133,6 +143,7 @@ function Catalogo() {
                             details=""
                             price=""
                             image=""
+                            images={[]}
                             stock=""
                             category=""
                             active={true}
@@ -150,6 +161,7 @@ function Catalogo() {
                             name={product.name}
                             price={product.price}
                             image={product.image}
+                            images={product.images}
                             details={product.details}
                             category={product.category}
                             stock={product.stock}
