@@ -82,9 +82,10 @@ function Catalogo() {
             
             <div className="d-flex align-items-center mb-4 position-relative w-100">
                 <button 
-                    className="btn btn-light rounded-circle shadow-sm position-absolute start-0 z-3" 
+                    className="btn btn-dark rounded-circle shadow-sm position-absolute start-0 z-3 d-flex align-items-center justify-content-center" 
                     onClick={() => scroll(-200)}
-                    style={{ width: '40px', height: '40px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                    style={{ width: '36px', height: '36px' }}
+                    aria-label="Desplazar izquierda"
                 >
                     <FaChevronLeft />
                 </button>
@@ -95,7 +96,7 @@ function Catalogo() {
                     style={{ whiteSpace: 'nowrap' }}
                 >
                     <button 
-                        className={`btn d-flex align-items-center justify-content-center flex-fill rounded-pill px-4 py-2 ${!categoria ? 'btn-primary shadow' : 'btn-outline-primary border-2'}`}
+                        className={`btn d-flex align-items-center justify-content-center flex-fill rounded-pill px-4 py-2 fw-medium ${!categoria ? 'btn-dark shadow-sm' : 'btn-outline-dark border-2'}`}
                         onClick={() => navigate('/productos')}
                         style={{ whiteSpace: 'nowrap' }}
                     >
@@ -104,7 +105,7 @@ function Catalogo() {
                     {Array.isArray(categories) && categories.map((cat) => (
                         <button 
                             key={cat.name || Math.random()}
-                            className={`btn d-flex align-items-center justify-content-center flex-fill rounded-pill px-4 py-2 ${categoriaFiltro === (cat.name || '').toLowerCase() ? 'btn-primary shadow' : 'btn-outline-primary border-2'}`}
+                            className={`btn d-flex align-items-center justify-content-center flex-fill rounded-pill px-4 py-2 fw-medium ${categoriaFiltro === (cat.name || '').toLowerCase() ? 'btn-dark shadow-sm' : 'btn-outline-dark border-2'}`}
                             onClick={() => navigate(`/catalogo/${cat.name}`)}
                             style={{ whiteSpace: 'nowrap' }}
                         >
@@ -114,9 +115,10 @@ function Catalogo() {
                 </div>
 
                 <button 
-                    className="btn btn-light rounded-circle shadow-sm position-absolute end-0 z-3" 
+                    className="btn btn-dark rounded-circle shadow-sm position-absolute end-0 z-3 d-flex align-items-center justify-content-center" 
                     onClick={() => scroll(200)}
-                    style={{ width: '40px', height: '40px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                    style={{ width: '36px', height: '36px' }}
+                    aria-label="Desplazar derecha"
                 >
                     <FaChevronRight />
                 </button>

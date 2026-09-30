@@ -62,7 +62,7 @@ function NavBar() {
                 {/* Left Actions */}
                 <div className="d-flex align-items-center">
                     {!isLoggedIn && (
-                        <button className="btn btn-outline-secondary rounded-circle p-2 d-flex align-items-center justify-content-center" onClick={handleLoginClick} type="button" title="Iniciar sesión (Solo Admin)">
+                        <button className="btn btn-outline-light opacity-75 rounded-circle p-2 d-flex align-items-center justify-content-center" onClick={handleLoginClick} type="button" title="Iniciar sesión (Solo Admin)">
                             <FiUser size={18} />
                         </button>
                     )}
@@ -72,10 +72,10 @@ function NavBar() {
                 <NavLink 
                     to="/productos" 
                     className="navbar-brand position-absolute top-50 start-50 translate-middle m-0 fw-bold" 
-                    style={{ fontSize: '1.75rem', letterSpacing: '2px', textShadow: '2px 2px 4px rgba(0,0,0,0.6)' }}
+                    style={{ fontSize: '1.75rem', letterSpacing: '2px', textShadow: '2px 2px 4px rgba(0,0,0,0.6)', fontFamily: "'Bebas Neue', sans-serif" }}
                     onClick={closeOffcanvas}
                 >
-                    KE <span className="text-danger">·</span> PERNIL
+                    KE <span className="text-warning">·</span> PERNIL
                 </NavLink>
 
                 {/* Right Actions */}
@@ -84,18 +84,18 @@ function NavBar() {
                     {/* PC Admin Options */}
                     {isAdmin && (
                         <div className="d-none d-lg-flex gap-2">
-                            <button className="btn btn-outline-secondary rounded-pill py-1 px-3 small" onClick={() => navigate('/productos')} type="button">Productos</button>
-                            <button className="btn btn-outline-secondary rounded-pill py-1 px-3 small" onClick={() => navigate('/pedidos')} type="button">Pedidos</button>
+                            <button className="btn btn-outline-light rounded-pill py-1 px-3 small" onClick={() => navigate('/productos')} type="button">Productos</button>
+                            <button className="btn btn-outline-light rounded-pill py-1 px-3 small" onClick={() => navigate('/pedidos')} type="button">Pedidos</button>
                         </div>
                     )}
                     
                     {/* PC Profile & Logout */}
                     {isLoggedIn && (
                         <div className="d-none d-lg-flex gap-2">
-                            <button className="btn btn-outline-secondary rounded-circle p-2 d-flex align-items-center justify-content-center" onClick={() => navigate('/mi-perfil')} type="button" title="Mi perfil">
+                            <button className="btn btn-outline-light rounded-circle p-2 d-flex align-items-center justify-content-center" onClick={() => navigate('/mi-perfil')} type="button" title="Mi perfil">
                                 <FiUser size={18} />
                             </button>
-                            <button className="btn btn-outline-secondary rounded-circle p-2 d-flex align-items-center justify-content-center" onClick={logout} type="button" title="Cerrar sesión">
+                            <button className="btn btn-outline-light rounded-circle p-2 d-flex align-items-center justify-content-center" onClick={logout} type="button" title="Cerrar sesión">
                                 <FiLogOut size={18} />
                             </button>
                         </div>
@@ -104,6 +104,7 @@ function NavBar() {
                     {!isAdmin && (
                         <button
                             className="btn btn-danger rounded-pill position-relative d-flex align-items-center gap-1 gap-lg-2 py-1 px-3 small fw-medium"
+                            style={{ boxShadow: '0 2px 8px rgba(220,53,69,0.3)', transition: 'all 0.2s ease' }}
                             onClick={() => navigate('/carrito')}
                             type="button"
                         >
@@ -133,7 +134,7 @@ function NavBar() {
 
                 {/* Mobile Offcanvas (For Logged-in Users) */}
                 {isLoggedIn && (
-                    <div className="offcanvas offcanvas-end bg-dark text-white d-lg-none" tabIndex="-1" id="userOffcanvas">
+                    <div className="offcanvas offcanvas-end bg-dark text-white d-lg-none" tabIndex="-1" id="userOffcanvas" style={{ width: '280px' }}>
                         <div className="offcanvas-header border-bottom border-secondary">
                             <h5 className="offcanvas-title text-white fw-bold">Menú</h5>
                             <button type="button" className="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Cerrar"></button>
@@ -148,7 +149,7 @@ function NavBar() {
                             <button className="btn btn-outline-light rounded-pill py-2 fw-medium d-flex align-items-center justify-content-center gap-2" onClick={() => handleNavClick('/mi-perfil')} type="button">
                                 <FiUser size={18} /> Mi perfil
                             </button>
-                            <button className="btn btn-danger rounded-pill py-2 fw-medium d-flex align-items-center justify-content-center gap-2" onClick={logout} type="button">
+                            <button className="btn btn-outline-danger rounded-pill py-2 fw-medium d-flex align-items-center justify-content-center gap-2" onClick={logout} type="button">
                                 <FiLogOut size={18} /> Cerrar sesión
                             </button>
                         </div>
@@ -179,7 +180,7 @@ function NavBar() {
                             </div>
                             <div className="modal-footer border-top-0 pt-0 pb-3 px-4 d-flex justify-content-end gap-2">
                                 <button type="button" className="btn btn-light rounded-pill px-4 fw-medium border" onClick={() => setShowLoginModal(false)}>Volver a la tienda</button>
-                                <button type="button" className="btn btn-dark rounded-pill px-4 fw-medium" onClick={handleConfirmLogin}>Continuar</button>
+                                <button type="button" className="btn btn-dark rounded-pill px-4 fw-medium shadow-sm" onClick={handleConfirmLogin}>Continuar</button>
                             </div>
                         </div>
                     </div>

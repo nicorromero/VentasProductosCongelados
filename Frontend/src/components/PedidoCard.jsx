@@ -127,14 +127,8 @@ function PedidoCard({ order, done, onUpdate, onDelete, expandido, onToggle }) {
 
     return (
         <div
-            className={`bg-white border rounded-xl mb-2 last:mb-0 cursor-pointer overflow-hidden transition-all
-                ${done
-                    ? "opacity-70 border-secondary"
-                    : "border-secondary hover:border-success hover:shadow-sm"
-                }
-                ${expandido ? "border-success shadow-sm" : ""}
-            `}
-            style={{ backgroundColor: done ? '#f8f9fa' : '#ffffff' }}
+            className={`bg-white border rounded-3 mb-2 overflow-hidden ${done ? 'opacity-75 border-secondary' : 'border-secondary'} ${expandido ? 'border-success shadow-sm' : ''}`}
+            style={{ cursor: 'pointer', backgroundColor: done ? '#f8f9fa' : '#ffffff' }}
             onClick={() => !editando && onToggle()}
             role="button"
             tabIndex={0}
@@ -151,7 +145,7 @@ function PedidoCard({ order, done, onUpdate, onDelete, expandido, onToggle }) {
                                 {celular}
                                 {wsNumber && (
                                     <a
-                                        className="text-success d-inline-flex align-items-center"
+                                        className="text-success d-inline-flex align-items-center ms-1"
                                         href={`https://wa.me/${wsNumber}`}
                                         target="_blank"
                                         rel="noopener noreferrer"
@@ -293,7 +287,7 @@ function PedidoCard({ order, done, onUpdate, onDelete, expandido, onToggle }) {
                                 </button>
 
                                 <button
-                                    className={`btn btn-sm d-flex align-items-center justify-content-center gap-1 rounded-3 fw-semibold px-2
+                                    className={`btn btn-sm d-flex align-items-center justify-content-center gap-1 rounded-3 fw-semibold px-2 ms-auto
                                         ${confirmDelete ? "btn-danger flex-grow-1" : "btn-outline-danger"}`}
                                     onClick={handleEliminar}
                                     onBlur={() => setConfirmDelete(false)}
@@ -338,7 +332,7 @@ function SeccionPedidos({ titulo, orders, done, onUpdate, onDelete }) {
         : orders.filter(o => o.metodoEntrega === filtro);
 
     return (
-        <section ref={sectionRef} className="bg-white border rounded-4 shadow-sm p-3 p-lg-4 h-100">
+        <section ref={sectionRef} className={`bg-white border rounded-3 shadow-sm p-3 p-lg-4 h-100 border-top border-3 ${done ? 'border-success' : 'border-warning'}`}>
             {/* Encabezado */}
             <div className="d-flex align-items-start justify-content-between gap-2 flex-wrap mb-3">
                 <h2 className={`h6 fw-bold m-0 d-flex align-items-center gap-2 ${done ? "text-success" : "text-warning"}`}>
@@ -357,7 +351,7 @@ function SeccionPedidos({ titulo, orders, done, onUpdate, onDelete }) {
                     {["todos", "retiro", "envio"].map(op => (
                         <button
                             key={op}
-                            className={`btn btn-sm d-flex align-items-center gap-1 px-2 py-1 border-0 rounded-2 text-nowrap fw-semibold
+                            className={`btn btn-sm d-flex align-items-center gap-1 px-2 py-1 border-0 rounded-2 text-nowrap fw-semibold user-select-none
                                 ${filtro === op
                                     ? "bg-white text-success shadow-sm"
                                     : "bg-transparent text-secondary"

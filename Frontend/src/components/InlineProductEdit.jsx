@@ -134,15 +134,16 @@ function InlineProductEdit({ id, initialData, onCancel, onSuccess, isCreate, onT
         <form className="d-flex flex-column gap-2" onSubmit={handleSave} onClick={(e) => e.stopPropagation()}>
             <h4 className="fs-6 fw-bold text-center mb-1">{isCreate ? 'Crear producto' : 'Editar producto'}</h4>
 
-            <input required className="form-control form-control-sm" type="text" placeholder="Nombre" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
-            <input required className="form-control form-control-sm" type="number" placeholder="Precio" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} />
-            <input className="form-control form-control-sm" type="text" placeholder="Insignia (ej: OFERTA, NUEVO)" value={form.badge || ''} onChange={(e) => setForm({ ...form, badge: e.target.value })} />
+            {/* — Datos del producto — */}
+            <input required className="form-control form-control-sm rounded-3" type="text" placeholder="Nombre" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
+            <input required className="form-control form-control-sm rounded-3" type="number" placeholder="Precio" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} />
+            <input className="form-control form-control-sm rounded-3" type="text" placeholder="Insignia (ej: OFERTA, NUEVO)" value={form.badge || ''} onChange={(e) => setForm({ ...form, badge: e.target.value })} />
             
             {/* Categoría: dropdown + nueva categoría */}
             {!creatingCategory ? (
                 <select
                     required
-                    className="form-select form-select-sm"
+                    className="form-select form-select-sm rounded-3"
                     value={form.category || ''}
                     onChange={handleCategorySelect}
                 >
@@ -155,64 +156,68 @@ function InlineProductEdit({ id, initialData, onCancel, onSuccess, isCreate, onT
             ) : (
                 <div className="d-flex gap-1">
                     <input
-                        className="form-control form-control-sm"
+                        className="form-control form-control-sm rounded-3"
                         type="text"
                         placeholder="Nombre de la categoría"
                         value={newCategoryName}
                         onChange={(e) => setNewCategoryName(e.target.value)}
                         autoFocus
                     />
-                    <button type="button" className="btn btn-success btn-sm px-2" onClick={handleCreateCategory} title="Crear">
+                    <button type="button" className="btn btn-success btn-sm px-2 rounded-3" onClick={handleCreateCategory} title="Crear">
                         <FiCheck size={14} />
                     </button>
-                    <button type="button" className="btn btn-outline-secondary btn-sm px-2" onClick={() => { setCreatingCategory(false); setNewCategoryName(''); }} title="Cancelar">
+                    <button type="button" className="btn btn-outline-secondary btn-sm px-2 rounded-3" onClick={() => { setCreatingCategory(false); setNewCategoryName(''); }} title="Cancelar">
                         <FiX size={14} />
                     </button>
                 </div>
             )}
 
-            <input required className="form-control form-control-sm" type="number" placeholder="Stock" value={form.stock || 0} onChange={(e) => setForm({ ...form, stock: e.target.value })} />
+            <input required className="form-control form-control-sm rounded-3" type="number" placeholder="Stock" value={form.stock || 0} onChange={(e) => setForm({ ...form, stock: e.target.value })} />
 
             <div>
                 <label className="form-label small text-muted mb-1">Imagen del Producto</label>
-                <input className="form-control form-control-sm" type="file" accept="image/*" onChange={handleImageUpload} disabled={isUploading || loading} />
+                <input className="form-control form-control-sm rounded-3" type="file" accept="image/*" onChange={handleImageUpload} disabled={isUploading || loading} />
                 {isUploading && <span className="text-muted small">Subiendo...</span>}
                 {form.image && !isUploading && (
-                    <img src={form.image} alt="Preview" className="rounded mt-1" style={{ maxWidth: '80px' }} />
+                    <img src={form.image} alt="Preview" className="rounded-3 mt-1" style={{ maxWidth: '80px' }} />
                 )}
             </div>
 
+            {/* — Acciones principales — */}
             <div className="d-flex gap-2 mt-2">
-                <button type="button" className="btn btn-outline-secondary btn-sm flex-fill d-flex align-items-center justify-content-center gap-1" onClick={(e) => { e.stopPropagation(); onCancel(); }} disabled={loading}>
-                    <FiX size={16} /> Cancelar
-                </button>
-                <button type="submit" className="btn btn-dark btn-sm flex-fill d-flex align-items-center justify-content-center gap-1" disabled={loading}>
+                <button type="submit" className="btn btn-dark btn-sm flex-fill d-flex align-items-center justify-content-center gap-1 rounded-3 fw-semibold" disabled={loading}>
                     <FiCheck size={16} /> Guardar
+                </button>
+                <button type="button" className="btn btn-outline-secondary btn-sm flex-fill d-flex align-items-center justify-content-center gap-1 rounded-3" onClick={(e) => { e.stopPropagation(); onCancel(); }} disabled={loading}>
+                    <FiX size={16} /> Cancelar
                 </button>
             </div>
 
-            {/* Botones de estado y eliminación (solo al editar, no al crear) */}
+            {/* — Acciones destructivas (visualmente separadas) — */}
             {!isCreate && (
-                <div className="d-flex gap-2 mt-1">
-                    <button
-                        type="button"
-                        className={`btn btn-sm flex-fill d-flex align-items-center justify-content-center gap-1 ${initialData.active === false ? 'btn-success' : 'btn-outline-warning'}`}
-                        onClick={handleToggleActive}
-                        disabled={loading}
-                    >
-                        {initialData.active === false ? <><FiEye size={14} /> Activar</> : <><FiEyeOff size={14} /> Desactivar</>}
-                    </button>
-                    <button
-                        type="button"
-                        className={`btn btn-sm d-flex align-items-center justify-content-center gap-1 ${confirmDelete ? 'btn-danger flex-fill' : 'btn-outline-danger'}`}
-                        onClick={handleDeleteProduct}
-                        onBlur={() => setConfirmDelete(false)}
-                        disabled={loading}
-                    >
-                        <FiTrash2 size={14} />
-                        {confirmDelete ? ' ¿Confirmar?' : ' Eliminar'}
-                    </button>
-                </div>
+                <>
+                    <hr className="my-1 border-secondary border-opacity-25" />
+                    <div className="d-flex gap-2">
+                        <button
+                            type="button"
+                            className={`btn btn-sm flex-fill d-flex align-items-center justify-content-center gap-1 rounded-3 ${initialData.active === false ? 'btn-success' : 'btn-outline-warning'}`}
+                            onClick={handleToggleActive}
+                            disabled={loading}
+                        >
+                            {initialData.active === false ? <><FiEye size={14} /> Activar</> : <><FiEyeOff size={14} /> Desactivar</>}
+                        </button>
+                        <button
+                            type="button"
+                            className={`btn btn-sm d-flex align-items-center justify-content-center gap-1 rounded-3 ${confirmDelete ? 'btn-danger flex-fill fw-semibold' : 'btn-outline-danger px-2'}`}
+                            onClick={handleDeleteProduct}
+                            onBlur={() => setConfirmDelete(false)}
+                            disabled={loading}
+                        >
+                            <FiTrash2 size={14} />
+                            {confirmDelete ? ' ¿Confirmar?' : ''}
+                        </button>
+                    </div>
+                </>
             )}
         </form>
     );

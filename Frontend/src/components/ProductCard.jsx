@@ -208,7 +208,7 @@ function ProductCard({id, name, details, price, image, stock, category, active, 
     // ── CREATE card ──
     if (isCreate) {
         return (
-            <article ref={cardRef} className="card border-0 shadow-sm rounded-3 overflow-hidden" role="button" onClick={handleStartEditing}>
+            <article ref={cardRef} className="card rounded-3 overflow-hidden" style={{ border: '2px dashed #dee2e6' }} role="button" onClick={handleStartEditing}>
                 <div className="bg-body-secondary d-flex align-items-center justify-content-center" style={{ height: '220px' }}>
                     <img
                         src="https://placehold.co/300x300/f8fafc/cbd5e1?text=%2B"
@@ -236,10 +236,11 @@ function ProductCard({id, name, details, price, image, stock, category, active, 
             <div onClick={isAdmin ? handleStartEditing : undefined} role={isAdmin ? 'button' : undefined} className="d-flex flex-column h-100" style={{ pointerEvents: (isInactive && !isAdmin) ? 'none' : 'auto' }}>
                 {/* Image container */}
                 <div className="position-relative bg-body-secondary overflow-hidden" style={{ height: '220px' }}>
+                    <div className="position-absolute top-0 start-0 w-100 h-100" style={{ background: 'linear-gradient(to bottom, rgba(0,0,0,0.4) 0%, transparent 40%)', pointerEvents: 'none', zIndex: 1 }}></div>
                     {isAdmin ? (
-                        <div className="position-absolute top-0 start-0 m-2 z-1 d-flex gap-1">
-                            <span className="badge bg-dark bg-opacity-75 small fw-medium">Clic para editar</span>
-                            {isInactive && <span className="badge bg-danger bg-opacity-75 small fw-medium">INACTIVO</span>}
+                        <div className="position-absolute top-0 start-0 m-2 z-2 d-flex gap-1">
+                            <span className="badge bg-dark bg-opacity-50 rounded-pill small fw-medium">Clic para editar</span>
+                            {isInactive && <span className="badge bg-danger rounded-pill small fw-medium">INACTIVO</span>}
                         </div>
                     ) : (
                         localData.badge && <span className="badge bg-danger position-absolute top-0 start-0 m-2 z-1 small">{localData.badge}</span>
@@ -259,14 +260,14 @@ function ProductCard({id, name, details, price, image, stock, category, active, 
                 <div className="card-body p-3 d-flex flex-column">
                     <p className="text-muted small text-uppercase mb-1" style={{ letterSpacing: '1px', fontSize: '0.7rem' }}>{localData.category}</p>
                     <h3 className="fs-6 fw-medium mb-1">{localData.name}</h3>
-                    <span className="fw-medium mb-2">${localData.price}</span>
+                    <span className="fw-medium mb-2 fs-5">${localData.price}</span>
 
                     {isAdmin ? (
                         /* Admin stock control */
                         !isAdminSelectingStock ? (
                             <button
                                 type="button"
-                                className="btn btn-outline-dark btn-sm w-100 mt-auto rounded-3 fw-medium"
+                                className="btn btn-outline-dark btn-sm w-100 mt-auto rounded-pill fw-medium"
                                 onClick={handleStartAdminStock}
                             >
                                 Stock: {localData.stock || 0}
@@ -317,7 +318,7 @@ function ProductCard({id, name, details, price, image, stock, category, active, 
                         !isSelecting ? (
                             <button
                                 type="button"
-                                className={`btn ${isInactive ? 'btn-secondary' : 'btn-dark'} btn-sm w-100 mt-auto rounded-3`}
+                                className={`btn ${isInactive ? 'btn-secondary opacity-50' : 'btn-dark rounded-pill fw-medium'} btn-sm w-100 mt-auto`}
                                 onClick={isInactive ? undefined : handleStartSelecting}
                                 disabled={isInactive}
                             >
@@ -325,7 +326,7 @@ function ProductCard({id, name, details, price, image, stock, category, active, 
                             </button>
                         ) : (
                             /* Quantity control bar */
-                            <div className="btn-group w-100 mt-auto" onClick={(e) => e.stopPropagation()}>
+                            <div className="btn-group w-100 mt-auto rounded-3" onClick={(e) => e.stopPropagation()}>
                                 <button
                                     type="button"
                                     className="btn btn-dark btn-sm"
@@ -355,7 +356,7 @@ function ProductCard({id, name, details, price, image, stock, category, active, 
                                 </button>
                                 <button
                                     type="button"
-                                    className="btn btn-success btn-sm"
+                                    className="btn btn-success btn-sm px-3"
                                     onClick={handleConfirm}
                                     aria-label="Confirmar"
                                 >

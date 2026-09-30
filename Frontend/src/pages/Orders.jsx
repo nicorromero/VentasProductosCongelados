@@ -116,8 +116,11 @@ function Orders() {
         }, {});
 
         return (
-            <main className="container-fluid py-4 pb-5">
-
+            <main className="container-fluid px-3 px-lg-4 py-4 pb-5">
+                <h1 className="fs-5 fw-bold text-dark mb-3 d-flex align-items-center gap-2">
+                    📋 Panel de Pedidos
+                    <span className="badge bg-dark bg-opacity-10 text-dark rounded-pill fw-medium" style={{ fontSize: '0.75rem' }}>{orders.length} total</span>
+                </h1>
 
                 <div className="row g-3 mb-4">
                     <div className="col-6">
@@ -185,8 +188,8 @@ function Orders() {
     }
 
     return (
-        <div className="container py-4">
-            <h1 className="mb-4">Mis pedidos</h1>
+        <div className="container py-4" style={{ maxWidth: '860px' }}>
+            <h1 className="fs-4 fw-semibold mb-4 pb-3 border-bottom">🧾 Mis pedidos</h1>
             <div className="row g-3">
                 {orders.map((order) => {
                     const badgeClass = `badge ${ESTADO_CLASE[order.estado] || 'bg-secondary'}`;
@@ -198,13 +201,13 @@ function Orders() {
 
                     return (
                         <div key={order._id} className="col-12">
-                            <div className="card border-0 shadow-sm rounded-3 mb-3">
-                                <div className="card-header bg-white border-bottom-0 d-flex justify-content-between align-items-center pt-3">
+                            <div className="card border-0 shadow-sm rounded-3 mb-3 overflow-hidden" style={{ borderLeft: `4px solid ${order.estado === 'entregado' ? '#198754' : order.estado === 'pendiente' ? '#ffc107' : '#6c757d'}` }}>
+                                <div className="card-header bg-white border-bottom-0 d-flex justify-content-between align-items-center pt-3 px-3">
                                     <div>
-                                        <h6 className="mb-0">Pedido #{order.numeroOrden}</h6>
+                                        <h6 className="mb-0 fw-semibold">Pedido #{order.numeroOrden}</h6>
                                         <small className="text-muted">{formatFecha(order.date)}</small>
                                     </div>
-                                    <span className={badgeClass}>{order.estado}</span>
+                                    <span className={`${badgeClass} rounded-pill px-3 py-1`}>{order.estado}</span>
                                 </div>
                                 <div className="card-body pt-0">
                                     <div className="row mb-3">
@@ -259,8 +262,8 @@ function Orders() {
                                     </div>
 
                                     <div className="d-flex justify-content-end align-items-center border-top pt-3">
-                                        <span className="me-2">Total:</span>
-                                        <strong className="fs-5">{formatARS(order.total)}</strong>
+                                        <span className="me-2 text-muted">Total:</span>
+                                        <strong className="fs-5 text-success">{formatARS(order.total)}</strong>
                                     </div>
                                 </div>
                             </div>

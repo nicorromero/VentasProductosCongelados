@@ -28,7 +28,7 @@ function Cart() {
 
         return (
             <div className="container py-4 mx-auto" style={{ maxWidth: '860px' }}>
-                <h1 className="fs-3 fw-semibold mb-4 text-center">¡Gracias por tu compra!</h1>
+                <h1 className="fs-3 fw-semibold mb-4 text-center text-success">¡Gracias por tu compra!</h1>
                 <div className="card border-0 shadow-sm rounded-4 p-4 mx-auto">
                     <div className="d-flex justify-content-between mb-2"><span>N° de orden</span><strong>#{ordenCreada.numeroOrden}</strong></div>
                     <div className="d-flex justify-content-between mb-2"><span>Total</span><strong>{formatARS(ordenCreada.total)}</strong></div>
@@ -54,7 +54,7 @@ function Cart() {
     // ── Carrito vacío ────────────────────────────────────
     if (cartItems.length === 0) {
         return (
-            <div className="container py-4 mx-auto d-flex flex-column align-items-center justify-content-center gap-3" style={{ maxWidth: '860px', minHeight: '40vh' }}>
+            <div className="container py-5 mx-auto d-flex flex-column align-items-center justify-content-center gap-3" style={{ maxWidth: '860px', minHeight: '40vh' }}>
                 <p className="fs-5 text-muted mb-0">Tu carrito está vacío</p>
                 <Link to="/productos" className="btn btn-danger px-4 py-2 rounded-3">
                     Ver productos
@@ -112,11 +112,11 @@ function Cart() {
 
     return (
         <div className="container py-4 mx-auto" style={{ maxWidth: '860px' }}>
-            <h1 className="fs-3 fw-semibold mb-3">Tu carrito</h1>
+            <h1 className="fs-4 fw-semibold border-bottom pb-3 mb-4">Tu carrito</h1>
 
             <ul className="list-unstyled d-flex flex-column gap-3 mb-4">
                 {cartItems.map((item) => (
-                    <li key={item._id} className="bg-body-secondary rounded-3 p-3 d-flex align-items-center gap-3 flex-wrap">
+                    <li key={item._id} className="bg-body-secondary rounded-3 p-3 d-flex align-items-center gap-3 flex-wrap border position-relative">
                         <img
                             className="rounded-3 bg-body-tertiary object-fit-cover flex-shrink-0"
                             style={{ width: '80px', height: '80px' }}
@@ -132,13 +132,13 @@ function Cart() {
                             <p className="text-muted small mb-0">{formatARS(item.precio)} c/u</p>
                         </div>
                         <div className="d-flex align-items-center gap-2">
-                            <button className="btn btn-outline-dark btn-sm rounded-circle d-flex align-items-center justify-content-center" style={{ width: '30px', height: '30px' }} onClick={() => decreaseQty(item._id)} aria-label="Disminuir cantidad">−</button>
+                            <button className="btn btn-light border btn-sm rounded-circle d-flex align-items-center justify-content-center" style={{ width: '30px', height: '30px' }} onClick={() => decreaseQty(item._id)} aria-label="Disminuir cantidad">−</button>
                             <span className="fw-medium text-center small" style={{ minWidth: '24px' }}>{item.quantity}</span>
-                            <button className="btn btn-outline-dark btn-sm rounded-circle d-flex align-items-center justify-content-center" style={{ width: '30px', height: '30px' }} onClick={() => increaseQty(item._id)} aria-label="Aumentar cantidad">+</button>
+                            <button className="btn btn-light border btn-sm rounded-circle d-flex align-items-center justify-content-center" style={{ width: '30px', height: '30px' }} onClick={() => increaseQty(item._id)} aria-label="Aumentar cantidad">+</button>
                         </div>
                         <p className="fw-semibold text-nowrap mb-0">{formatARS(item.precio * item.quantity)}</p>
-                        <button className="btn btn-outline-danger btn-sm rounded-3" onClick={() => removeFromCart(item._id)} aria-label="Eliminar producto">
-                            Eliminar
+                        <button className="btn btn-outline-danger btn-sm px-2 py-1 rounded-3 ms-auto" onClick={() => removeFromCart(item._id)} aria-label="Eliminar producto">
+                            🗑️
                         </button>
                     </li>
                 ))}
@@ -150,11 +150,11 @@ function Cart() {
                 </p>
                 {!showCheckout && (
                     <div className="d-flex gap-2">
-                        <button className="btn btn-outline-dark" onClick={handleClearCart}>
-                            Vaciar carrito
-                        </button>
-                        <button className="btn btn-danger" onClick={handleCheckout}>
+                        <button className="btn btn-danger btn-lg px-4 py-2 fw-semibold shadow-sm" onClick={handleCheckout}>
                             Finalizar compra
+                        </button>
+                        <button className="btn btn-outline-secondary btn-sm" onClick={handleClearCart}>
+                            Vaciar carrito
                         </button>
                     </div>
                 )}
@@ -163,7 +163,7 @@ function Cart() {
             {showCheckout && (
                 <div className="border-top pt-4 mt-4 d-flex flex-column gap-4">
 
-                    <section>
+                    <section className="bg-body-secondary rounded-3 p-3">
                         <h2 className="fs-6 fw-semibold border-bottom pb-2 mb-3">Tus datos</h2>
                         <div className="mb-3">
                             <label className="form-label">Nombre completo</label>
@@ -203,7 +203,7 @@ function Cart() {
                         </div>
                     </section>
 
-                    <section>
+                    <section className="bg-body-secondary rounded-3 p-3">
                         <h2 className="fs-6 fw-semibold border-bottom pb-2 mb-3">Medio de pago</h2>
                         <div className="d-flex gap-3">
                             <div className="form-check">
@@ -233,7 +233,7 @@ function Cart() {
                         </div>
                     </section>
 
-                    <section>
+                    <section className="bg-body-secondary rounded-3 p-3">
                         <h2 className="fs-6 fw-semibold border-bottom pb-2 mb-3">Entrega</h2>
                         <div className="d-flex gap-3 mb-3">
                             <div className="form-check">
@@ -281,7 +281,7 @@ function Cart() {
                             disabled={enviandoPedido}>
                             Volver
                         </button>
-                        <button type="button" className="btn btn-danger" onClick={handleRealizarPedido}
+                        <button type="button" className="btn btn-danger fw-bold px-4 shadow-sm" onClick={handleRealizarPedido}
                             disabled={enviandoPedido}>
                             {enviandoPedido ? 'Procesando...' : 'Realizar pedido'}
                         </button>
@@ -296,7 +296,7 @@ function Cart() {
                     <div className="modal-backdrop fade show" style={{ zIndex: 1050 }}></div>
                     <div className="modal fade show d-block" tabIndex="-1" style={{ zIndex: 1055 }} aria-modal="true" role="dialog">
                         <div className="modal-dialog modal-dialog-centered">
-                            <div className="modal-content border-0 shadow-lg rounded-4">
+                            <div className="modal-content border border-danger border-opacity-25 shadow-lg rounded-4">
                                 <div className="modal-header border-bottom-0 pb-0">
                                     <h5 className="modal-title fw-bold text-dark">Vaciar carrito</h5>
                                     <button type="button" className="btn-close" onClick={() => setShowClearCartModal(false)} aria-label="Cerrar"></button>
