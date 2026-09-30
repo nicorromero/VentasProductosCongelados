@@ -65,7 +65,14 @@ function Catalogo() {
 
     const scroll = (scrollOffset) => {
         if (scrollRef.current) {
-            scrollRef.current.scrollBy({ left: scrollOffset, behavior: 'smooth' });
+            const container = scrollRef.current;
+            const maxScrollLeft = container.scrollWidth - container.clientWidth;
+            let newScrollLeft = container.scrollLeft + scrollOffset;
+            
+            if (newScrollLeft > maxScrollLeft) newScrollLeft = maxScrollLeft;
+            if (newScrollLeft < 0) newScrollLeft = 0;
+            
+            container.scrollTo({ left: newScrollLeft, behavior: 'smooth' });
         }
     };
 
@@ -102,11 +109,11 @@ function Catalogo() {
                 
                 <div 
                     ref={scrollRef}
-                    className="d-flex gap-3 justify-content-between overflow-auto px-5 py-2 w-100 hide-scrollbar"
+                    className="d-flex gap-3 overflow-auto px-5 py-2 w-100 hide-scrollbar"
                     style={{ whiteSpace: 'nowrap' }}
                 >
                     <button 
-                        className={`btn d-flex align-items-center justify-content-center flex-fill rounded-pill px-4 py-2 fw-medium ${!categoria ? 'btn-dark shadow-sm' : 'btn-outline-dark border-2'}`}
+                        className={`btn d-flex align-items-center justify-content-center flex-shrink-0 rounded-pill px-4 py-2 fw-medium ${!categoria ? 'btn-dark shadow-sm' : 'btn-outline-dark border-2'}`}
                         onClick={() => navigate('/productos')}
                         style={{ whiteSpace: 'nowrap' }}
                     >
@@ -115,7 +122,7 @@ function Catalogo() {
                     {Array.isArray(categories) && categories.map((cat, idx) => (
                         <button 
                             key={cat._id || cat.name || idx}
-                            className={`btn d-flex align-items-center justify-content-center flex-fill rounded-pill px-4 py-2 fw-medium ${categoriaFiltro === (cat.name || '').toLowerCase() ? 'btn-dark shadow-sm' : 'btn-outline-dark border-2'}`}
+                            className={`btn d-flex align-items-center justify-content-center flex-shrink-0 rounded-pill px-4 py-2 fw-medium ${categoriaFiltro === (cat.name || '').toLowerCase() ? 'btn-dark shadow-sm' : 'btn-outline-dark border-2'}`}
                             onClick={() => navigate(`/catalogo/${cat.name}`)}
                             style={{ whiteSpace: 'nowrap' }}
                         >
