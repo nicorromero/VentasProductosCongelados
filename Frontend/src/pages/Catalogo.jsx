@@ -134,26 +134,6 @@ function Catalogo() {
                 </button>
             </div>
             <div className="row g-3">
-                {isAdmin && !categoriaFiltro && (
-                    <div className="col-12 col-sm-6 col-lg-3">
-                        <ProductCard
-                            isCreate={true}
-                            id="new"
-                            name=""
-                            details=""
-                            price=""
-                            image=""
-                            images={[]}
-                            stock=""
-                            category=""
-                            active={true}
-                            badge=""
-                            onCreateSuccess={(newProduct) => {
-                                setProducts([...products, newProduct]);
-                            }}
-                        />
-                    </div>
-                )}
                 {Array.isArray(productosFiltrados) && productosFiltrados.map((product) => (
                     <div className="col-12 col-sm-6 col-lg-3" key={product._id}>
                         <ProductCard

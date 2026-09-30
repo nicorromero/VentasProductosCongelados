@@ -1,8 +1,10 @@
-import { useRef, useCallback, useState } from 'react';
+import { useRef, useCallback, useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { useNavigate, useLocation, NavLink } from 'react-router-dom';
 import { FiShoppingCart, FiUser, FiLogOut } from 'react-icons/fi';
 
 import useCart from '../hooks/useCart';
+import InlineProductEdit from './InlineProductEdit';
 
 const API_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -25,6 +27,30 @@ function NavBar() {
     const isAdmin = tokenData?.role === 'admin';
 
     const [showLoginModal, setShowLoginModal] = useState(false);
+    const [showCreateModal, setShowCreateModal] = useState(false);
+
+    useEffect(() => {
+        if (!showCreateModal) return;
+        const handleKeyDown = (e) => {
+            if (e.key === 'Escape') {
+                setShowCreateModal(false);
+            }
+        };
+        const prevOverflow = document.body.style.overflow;
+        document.body.style.overflow = 'hidden';
+        window.addEventListener('keydown', handleKeyDown);
+
+        return () => {
+            document.body.style.overflow = prevOverflow;
+            window.removeEventListener('keydown', handleKeyDown);
+        };
+    }, [showCreateModal]);
+
+    const handleCreateSuccess = (newProduct) => {
+        setShowCreateModal(false);
+        window.dispatchEvent(new CustomEvent('product-created', { detail: newProduct }));
+        window.location.reload(); // Simple way to ensure the new product shows up everywhere
+    };
 
     const closeOffcanvas = useCallback(() => {
         const offcanvasEl = document.getElementById('userOffcanvas');
@@ -84,6 +110,7 @@ function NavBar() {
                     {/* PC Admin Options */}
                     {isAdmin && (
                         <div className="d-none d-lg-flex gap-2">
+                            <button className="btn btn-outline-light rounded-pill py-1 px-3 small" onClick={() => setShowCreateModal(true)} type="button">Crear Producto</button>
                             <button className="btn btn-outline-light rounded-pill py-1 px-3 small" onClick={() => navigate('/productos')} type="button">Productos</button>
                             <button className="btn btn-outline-light rounded-pill py-1 px-3 small" onClick={() => navigate('/pedidos')} type="button">Pedidos</button>
                         </div>
@@ -143,6 +170,7 @@ function NavBar() {
                             <button className="btn btn-outline-light rounded-pill py-2 fw-medium" onClick={() => handleNavClick('/productos')} type="button">Productos</button>
                             {isAdmin && (
                                 <>
+                                    <button className="btn btn-outline-light rounded-pill py-2 fw-medium" onClick={() => { closeOffcanvas(); setShowCreateModal(true); }} type="button">Crear Producto</button>
                                     <button className="btn btn-outline-light rounded-pill py-2 fw-medium" onClick={() => handleNavClick('/pedidos')} type="button">Pedidos</button>
                                 </>
                             )}
@@ -186,6 +214,51 @@ function NavBar() {
                     </div>
                 </div>
             </>
+        )}
+
+        {/* Modal para Crear Producto */}
+        {showCreateModal && typeof document !== 'undefined' && createPortal(
+            <div className="position-fixed top-0 start-0 w-100 h-100" style={{ zIndex: 1060 }}>
+                <style>{`
+                    @keyframes adminBackdropFadeIn { from { opacity: 0; } to { opacity: 1; } }
+                    @keyframes adminCardFlipEnlarge {
+                        0% { transform: perspective(1200px) rotateY(-180deg) scale(0.6); opacity: 0; }
+                        65% { transform: perspective(1200px) rotateY(6deg) scale(1.02); opacity: 1; }
+                        100% { transform: perspective(1200px) rotateY(0deg) scale(1); opacity: 1; }
+                    }
+                    @keyframes adminCardMobileIn {
+                        0% { transform: scale(0.9); opacity: 0; }
+                        100% { transform: scale(1); opacity: 1; }
+                    }
+                    .admin-edit-backdrop {
+                        background-color: rgba(15, 23, 42, 0.75);
+                        animation: adminBackdropFadeIn 0.2s ease-out forwards;
+                    }
+                    @media (min-width: 768px) {
+                        .admin-edit-backdrop { background-color: rgba(15, 23, 42, 0.6); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+                        .admin-edit-modal-card { animation: adminCardFlipEnlarge 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards !important; }
+                    }
+                    @media (max-width: 767.98px) {
+                        .admin-edit-backdrop { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
+                        .admin-edit-modal-card { animation: adminCardMobileIn 0.25s ease-out forwards !important; }
+                    }
+                `}</style>
+                <div className="position-absolute top-0 start-0 w-100 h-100 admin-edit-backdrop" onClick={() => setShowCreateModal(false)} />
+                <div className="position-relative w-100 h-100 d-flex align-items-center justify-content-center p-2 p-sm-3" style={{ pointerEvents: 'none' }}>
+                    <div className="card border-0 shadow-lg rounded-4 overflow-hidden admin-edit-modal-card bg-white" style={{ pointerEvents: 'auto', maxWidth: '580px', width: '100%', maxHeight: '92vh', overflowY: 'auto', WebkitOverflowScrolling: 'touch', transformOrigin: 'center center', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)' }}>
+                        <div className="card-body p-2 p-sm-3 p-md-4">
+                            <InlineProductEdit
+                                id="new"
+                                initialData={{}}
+                                isCreate={true}
+                                onCancel={() => setShowCreateModal(false)}
+                                onSuccess={handleCreateSuccess}
+                            />
+                        </div>
+                    </div>
+                </div>
+            </div>,
+            document.body
         )}
         </>
     );
