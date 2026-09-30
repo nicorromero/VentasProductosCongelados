@@ -1,17 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import axios from 'axios';
 import { toast } from 'react-toastify';
-
-const API_URL = import.meta.env.VITE_API_BASE_URL;
-
-function getRole() {
-    try {
-        const token = localStorage.getItem('token');
-        if (!token) return null;
-        return JSON.parse(atob(token.split('.')[1])).role;
-    } catch { return null; }
-}
+import axiosClient from '../api/axiosClient';
+import { getRole } from '../utils/auth';
 
 function EditUser() {
     const { id } = useParams();
@@ -23,10 +14,7 @@ function EditUser() {
         if (getRole() !== 'admin') { navigate('/usuarios'); return; }
         const fetchUser = async () => {
             try {
-                const token = localStorage.getItem('token');
-                const { data } = await axios.get(`${API_URL}/users/${id}`, {
-                    headers: { Authorization: `Bearer ${token}` }
-                });
+                const { data } = await axiosClient.get(`/users/${id}`);
                 setForm({ name: data.name || '', email: data.email || '', role: data.role || 'user', password: '' });
             } catch {
                 toast.error('Error al cargar el usuario');
@@ -35,7 +23,7 @@ function EditUser() {
             }
         };
         fetchUser();
-    }, [id]);
+    }, [id, navigate]);
 
     const handleSave = async (e) => {
         e.preventDefault();
@@ -43,10 +31,7 @@ function EditUser() {
         if (form.password) body.password = form.password;
 
         try {
-            const token = localStorage.getItem('token');
-            await axios.put(`${API_URL}/users/${id}`, body, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+            await axiosClient.put(`/users/${id}`, body);
             toast.success('Usuario actualizado');
             navigate('/usuarios');
         } catch (err) {

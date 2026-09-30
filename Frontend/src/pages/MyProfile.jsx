@@ -1,24 +1,15 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
 import { toast } from 'react-toastify';
+import axiosClient from '../api/axiosClient';
+import { getTokenData, removeToken } from '../utils/auth';
 import Form from '../components/Form';
-
-const API_URL = import.meta.env.VITE_API_BASE_URL;
-
-function getTokenData() {
-    try {
-        const token = localStorage.getItem('token');
-        if (!token) return null;
-        return JSON.parse(atob(token.split('.')[1]));
-    } catch { return null; }
-}
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 function doLogout(navigate) {
     setTimeout(() => {
-        localStorage.removeItem('token');
+        removeToken();
         navigate('/admin-login');
     }, 1500);
 }
@@ -35,10 +26,7 @@ function MyProfile() {
         if (!getTokenData()) { navigate('/admin-login'); return; }
         const fetchMe = async () => {
             try {
-                const token = localStorage.getItem('token');
-                const { data } = await axios.get(`${API_URL}/users/me`, {
-                    headers: { Authorization: `Bearer ${token}` }
-                });
+                const { data } = await axiosClient.get('/users/me');
                 setForm({ name: data.name, email: data.email });
                 setOriginalData({ name: data.name, email: data.email });
             } catch {
@@ -48,7 +36,7 @@ function MyProfile() {
             }
         };
         fetchMe();
-    }, []);
+    }, [navigate]);
 
     const handleSaveDatos = async (e) => {
         e.preventDefault();
@@ -64,11 +52,10 @@ function MyProfile() {
 
         try {
             const tokenData = getTokenData();
-            const token = localStorage.getItem('token');
-            await axios.put(`${API_URL}/users/${tokenData.id}`,
-                { name: form.name.trim(), email: form.email.trim() },
-                { headers: { Authorization: `Bearer ${token}` } }
-            );
+            await axiosClient.put(`/users/${tokenData.id}`, { 
+                name: form.name.trim(), 
+                email: form.email.trim() 
+            });
 
             if (form.email !== originalData.email) {
                 toast.success('Datos actualizados. Iniciá sesión nuevamente.');
@@ -97,11 +84,10 @@ function MyProfile() {
 
         try {
             const tokenData = getTokenData();
-            const token = localStorage.getItem('token');
-            await axios.put(`${API_URL}/users/${tokenData.id}`,
-                { password: passwords.newPass, currentPassword: passwords.current },
-                { headers: { Authorization: `Bearer ${token}` } }
-            );
+            await axiosClient.put(`/users/${tokenData.id}`, { 
+                password: passwords.newPass, 
+                currentPassword: passwords.current 
+            });
             toast.success('Contraseña actualizada. Iniciá sesión nuevamente.');
             doLogout(navigate);
         } catch (err) {

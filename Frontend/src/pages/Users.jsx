@@ -1,20 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
 import { toast } from 'react-toastify';
+import axiosClient from '../api/axiosClient';
+import { getRole } from '../utils/auth';
 import Form from '../components/Form';
-
-const API_URL = import.meta.env.VITE_API_BASE_URL;
-
-function getRole() {
-    try {
-        const token = localStorage.getItem('token');
-        if (!token) return null;
-        return JSON.parse(atob(token.split('.')[1])).role;
-    } catch {
-        return null;
-    }
-}
 
 function Users() {
     const [users, setUsers] = useState([]);
@@ -22,39 +11,33 @@ function Users() {
     const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
 
+    const fetchUsers = async () => {
+        try {
+            const { data } = await axiosClient.get('/users');
+            setUsers(data);
+        } catch {
+            toast.error('Error al cargar usuarios');
+        } finally {
+            setLoading(false);
+        }
+    };
+
     useEffect(() => {
         if (getRole() !== 'admin') {
             navigate('/');
             return;
         }
         fetchUsers();
-    }, []);
+    }, [navigate]);
 
     const handleDarDeBaja = async (id) => {
         if (!window.confirm('¿Dar de baja este usuario?')) return;
         try {
-            const token = localStorage.getItem('token');
-            await axios.delete(`${API_URL}/users/${id}`, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+            await axiosClient.delete(`/users/${id}`);
             setUsers((prev) => prev.filter((u) => u._id !== id));
             toast.success('Usuario dado de baja');
         } catch (err) {
             toast.error(err.response?.data?.error || 'Error al dar de baja');
-        }
-    };
-
-    const fetchUsers = async () => {
-        try {
-            const token = localStorage.getItem('token');
-            const { data } = await axios.get(`${API_URL}/users`, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            setUsers(data);
-        } catch {
-            toast.error('Error al cargar usuarios');
-        } finally {
-            setLoading(false);
         }
     };
 
@@ -65,10 +48,7 @@ function Users() {
             return;
         }
         try {
-            const token = localStorage.getItem('token');
-            await axios.post(`${API_URL}/users`, form, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+            await axiosClient.post('/users', form);
             toast.success('Usuario creado');
             setForm({ name: '', email: '', password: '', role: 'user' });
             fetchUsers();

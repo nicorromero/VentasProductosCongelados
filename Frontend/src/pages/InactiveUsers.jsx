@@ -1,19 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
 import { toast } from 'react-toastify';
-
-const API_URL = import.meta.env.VITE_API_BASE_URL;
-
-function getRole() {
-    try {
-        const token = localStorage.getItem('token');
-        if (!token) return null;
-        return JSON.parse(atob(token.split('.')[1])).role;
-    } catch {
-        return null;
-    }
-}
+import axiosClient from '../api/axiosClient';
+import { getRole } from '../utils/auth';
 
 function InactiveUsers() {
     const [users, setUsers] = useState([]);
@@ -27,10 +16,7 @@ function InactiveUsers() {
         }
         const fetchInactiveUsers = async () => {
             try {
-                const token = localStorage.getItem('token');
-                const { data } = await axios.get(`${API_URL}/users/inactive`, {
-                    headers: { Authorization: `Bearer ${token}` }
-                });
+                const { data } = await axiosClient.get('/users/inactive');
                 setUsers(data);
             } catch {
                 toast.error('Error al cargar usuarios inactivos');
@@ -39,15 +25,12 @@ function InactiveUsers() {
             }
         };
         fetchInactiveUsers();
-    }, []);
+    }, [navigate]);
 
     const handleReactivar = async (id) => {
         if (!window.confirm('¿Reactivar este usuario?')) return;
         try {
-            const token = localStorage.getItem('token');
-            await axios.patch(`${API_URL}/users/${id}/reactivate`, {}, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+            await axiosClient.patch(`/users/${id}/reactivate`);
             setUsers((prev) => prev.filter((u) => u._id !== id));
             toast.success('Usuario reactivado');
         } catch (err) {

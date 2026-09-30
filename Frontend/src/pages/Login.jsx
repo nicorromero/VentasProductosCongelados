@@ -1,11 +1,10 @@
 import { useState } from 'react';
 import { useNavigate, useSearchParams, Link } from 'react-router-dom';
-import axios from 'axios';
 import { toast } from 'react-toastify';
 import { jwtDecode } from 'jwt-decode';
+import axiosClient from '../api/axiosClient';
+import { setToken } from '../utils/auth';
 import Form from '../components/Form';
-
-const API_URL = import.meta.env.VITE_API_BASE_URL;
 
 function Login() {
     const [form, setForm] = useState({ email: '', password: '' });
@@ -22,8 +21,8 @@ function Login() {
         }
         setLoading(true);
         try {
-            const { data } = await axios.post(`${API_URL}/api/auth/login`, form);
-            localStorage.setItem('token', data.token);
+            const { data } = await axiosClient.post('/api/auth/login', form);
+            setToken(data.token);
             const decodedUser = jwtDecode(data.token);
             localStorage.setItem('user', JSON.stringify(decodedUser));
             toast.success('Sesión iniciada');
