@@ -10,6 +10,7 @@ import MyProfile from './pages/MyProfile';
 import EditUser from './pages/EditUser';
 import Cart from './pages/Cart';
 import Orders from './pages/Orders';
+import Ventas from './pages/Ventas';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
 import InactiveUsers from './pages/InactiveUsers';
@@ -42,6 +43,7 @@ function App() {
           {/* <Route path="/usuarios/editar/:id" element={<EditUser />} /> */}
           <Route path="/carrito" element={<Cart />} />
           <Route path="/pedidos" element={<Orders />} />
+          <Route path="/ventas" element={<Ventas />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password/:token" element={<ResetPassword />} />
           {/* <Route path="/usuarios/inactivos" element={<InactiveUsers />} /> */}

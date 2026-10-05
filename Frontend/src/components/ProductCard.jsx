@@ -34,8 +34,14 @@ function ProductCard({id, name, details, price, image, images = [], stock, categ
     const [isSelecting, setIsSelecting] = useState(false);
     const [isAdminSelectingStock, setIsAdminSelectingStock] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
+    const [isViewingDetail, setIsViewingDetail] = useState(false);
     const initialQtyRef = useRef(0);
     const initialStockRef = useRef(0);
+
+    const handleStartViewDetail = (e) => {
+        if (e) e.stopPropagation();
+        setIsViewingDetail(true);
+    };
 
     const initialImages = normalizeImages({ images, image });
     const [localData, setLocalData] = useState({
@@ -404,10 +410,84 @@ function ProductCard({id, name, details, price, image, images = [], stock, categ
     // ── NORMAL card (front) ──
     const isInactive = localData.active === false;
 
+    const cartControlUI = !isSelecting ? (
+        <button
+            type="button"
+            className={`btn ${isInactive ? 'btn-secondary opacity-50' : 'btn-dark rounded-pill fw-medium'} btn-sm w-100 mt-auto`}
+            onClick={(e) => { e.stopPropagation(); if(!isInactive) handleStartSelecting(e); }}
+            disabled={isInactive}
+        >
+            {isInactive ? 'No disponible' : 'Agregar al Carrito'}
+        </button>
+    ) : (
+        <div className="btn-group w-100 mt-auto rounded-3" onClick={(e) => e.stopPropagation()}>
+            <button type="button" className="btn btn-dark btn-sm" onClick={(e) => { e.stopPropagation(); handleUndo(); }} title="Deshacer"><FiRotateCcw size={14} /></button>
+            <button type="button" className="btn btn-dark btn-sm" onClick={handleDecrease} disabled={quantity <= 1}><FiMinus size={14} /></button>
+            <span className="btn btn-dark btn-sm disabled fw-bold">{quantity}</span>
+            <button type="button" className="btn btn-dark btn-sm" onClick={handleIncrease}><FiPlus size={14} /></button>
+            <button type="button" className="btn btn-success btn-sm px-3" onClick={handleConfirm}><FiCheck size={16} /></button>
+        </div>
+    );
+
+    const viewModal = isViewingDetail && !isAdmin && typeof document !== 'undefined' ? createPortal(
+        <div className="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center" style={{ zIndex: 1060 }}>
+            <div className="position-absolute top-0 start-0 w-100 h-100 bg-dark bg-opacity-75" onClick={() => setIsViewingDetail(false)} style={{ backdropFilter: 'blur(5px)', WebkitBackdropFilter: 'blur(5px)' }} />
+            
+            <div className="card border-0 shadow-lg overflow-hidden position-relative d-flex flex-column bg-white" style={{ maxWidth: '500px', width: '90%', maxHeight: '90vh', zIndex: 1061, animation: 'adminCardMobileIn 0.25s ease-out forwards' }}>
+                {/* Botón Cerrar */}
+                <button 
+                    className="btn btn-light rounded-circle position-absolute top-0 end-0 m-2 z-3 d-flex align-items-center justify-content-center p-0 shadow-sm"
+                    style={{ width: '32px', height: '32px', opacity: 0.9 }}
+                    onClick={(e) => { e.stopPropagation(); setIsViewingDetail(false); }}
+                >
+                    <span className="fs-5 fw-bold" style={{ lineHeight: 1 }}>&times;</span>
+                </button>
+
+                {/* Contenedor de Imagen (Grande) */}
+                <div className="position-relative bg-body-secondary overflow-hidden flex-shrink-0" style={{ height: '350px' }}>
+                    {/* Carousel controls */}
+                    {displayImages.length > 1 && (
+                        <>
+                            <button className="btn btn-dark btn-sm rounded-circle position-absolute start-0 top-50 translate-middle-y ms-2 z-3 d-flex align-items-center justify-content-center p-0 opacity-75 border-0 text-white shadow-sm" style={{ width: '32px', height: '32px' }} onClick={handlePrevImage}>
+                                <FiChevronLeft size={20} />
+                            </button>
+                            <button className="btn btn-dark btn-sm rounded-circle position-absolute end-0 top-50 translate-middle-y me-2 z-3 d-flex align-items-center justify-content-center p-0 opacity-75 border-0 text-white shadow-sm" style={{ width: '32px', height: '32px' }} onClick={handleNextImage}>
+                                <FiChevronRight size={20} />
+                            </button>
+                            {/* Dots */}
+                            <div className="position-absolute bottom-0 start-50 translate-middle-x mb-2 z-3 d-flex gap-1 align-items-center bg-dark bg-opacity-50 px-2 py-1 rounded-pill">
+                                {displayImages.map((_, idx) => (
+                                    <button key={idx} onClick={(e) => { e.stopPropagation(); setCurrentImageIndex(idx); }} className="border-0 p-0 rounded-pill" style={{ width: idx === safeImageIndex ? '14px' : '6px', height: '6px', backgroundColor: idx === safeImageIndex ? '#ffffff' : 'rgba(255,255,255,0.5)', transition: 'all 0.2s ease' }} />
+                                ))}
+                            </div>
+                        </>
+                    )}
+                    <img
+                        src={displayImages[safeImageIndex] || `https://placehold.co/500x500/e2e8f0/64748b?text=${encodeURIComponent(localData.name || 'Producto')}`}
+                        alt={localData.name}
+                        className="w-100 h-100 object-fit-contain bg-white"
+                        onError={(e) => { e.target.onerror = null; e.target.src = `https://placehold.co/500x500/e2e8f0/64748b?text=${encodeURIComponent(localData.name || 'Producto')}`; }}
+                    />
+                </div>
+
+                {/* Info y Controles */}
+                <div className="card-body p-4 d-flex flex-column overflow-auto">
+                    <h2 className="fs-4 fw-bold mb-2">{localData.name}</h2>
+                    <span className="fw-bold fs-3 text-success mb-4">${localData.price}</span>
+
+                    <div className="mt-auto pt-2">
+                        {cartControlUI}
+                    </div>
+                </div>
+            </div>
+        </div>,
+        document.body
+    ) : null;
+
     return (
         <>
             <article ref={cardRef} className={`card border-0 shadow-sm rounded-3 overflow-hidden h-100 ${isInactive && !isAdmin ? 'opacity-50' : ''}`}>
-            <div onClick={isAdmin ? handleStartEditing : undefined} role={isAdmin ? 'button' : undefined} className="d-flex flex-column h-100" style={{ pointerEvents: (isInactive && !isAdmin) ? 'none' : 'auto' }}>
+            <div onClick={isAdmin ? handleStartEditing : handleStartViewDetail} role="button" className="d-flex flex-column h-100" style={{ pointerEvents: (isInactive && !isAdmin) ? 'none' : 'auto' }}>
                 {/* Image container */}
                 <div className="position-relative bg-body-secondary overflow-hidden" style={{ height: '220px' }}>
                     <div className="position-absolute top-0 start-0 w-100 h-100" style={{ background: 'linear-gradient(to bottom, rgba(0,0,0,0.4) 0%, transparent 40%)', pointerEvents: 'none', zIndex: 1 }}></div>
@@ -550,60 +630,13 @@ function ProductCard({id, name, details, price, image, images = [], stock, categ
                             </div>
                         )
                     ) : (
-                        !isSelecting ? (
-                            <button
-                                type="button"
-                                className={`btn ${isInactive ? 'btn-secondary opacity-50' : 'btn-dark rounded-pill fw-medium'} btn-sm w-100 mt-auto`}
-                                onClick={isInactive ? undefined : handleStartSelecting}
-                                disabled={isInactive}
-                            >
-                                {isInactive ? 'No disponible' : 'Agregar al Carrito'}
-                            </button>
-                        ) : (
-                            /* Quantity control bar */
-                            <div className="btn-group w-100 mt-auto rounded-3" onClick={(e) => e.stopPropagation()}>
-                                <button
-                                    type="button"
-                                    className="btn btn-dark btn-sm"
-                                    onClick={(e) => { e.stopPropagation(); handleUndo(); }}
-                                    title="Deshacer"
-                                    aria-label="Deshacer"
-                                >
-                                    <FiRotateCcw size={14} />
-                                </button>
-                                <button
-                                    type="button"
-                                    className="btn btn-dark btn-sm"
-                                    onClick={handleDecrease}
-                                    disabled={quantity <= 1}
-                                    aria-label="Disminuir cantidad"
-                                >
-                                    <FiMinus size={14} />
-                                </button>
-                                <span className="btn btn-dark btn-sm disabled fw-bold">{quantity}</span>
-                                <button
-                                    type="button"
-                                    className="btn btn-dark btn-sm"
-                                    onClick={handleIncrease}
-                                    aria-label="Aumentar cantidad"
-                                >
-                                    <FiPlus size={14} />
-                                </button>
-                                <button
-                                    type="button"
-                                    className="btn btn-success btn-sm px-3"
-                                    onClick={handleConfirm}
-                                    aria-label="Confirmar"
-                                >
-                                    <FiCheck size={16} />
-                                </button>
-                            </div>
-                        )
+                        cartControlUI
                     )}
                 </div>
             </div>
         </article>
         {editModal}
+        {viewModal}
         </>
     );
 }

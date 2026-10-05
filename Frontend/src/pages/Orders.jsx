@@ -1,26 +1,26 @@
 import { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
 import axiosClient from '../api/axiosClient';
 import { getRole } from '../utils/auth';
 import { SeccionPedidos } from '../components/PedidoCard';
 import AdminOrdersSummary from '../components/Orders/AdminOrdersSummary';
-import UserOrderCard from '../components/Orders/UserOrderCard';
 
 function Orders() {
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [expandedPendientes, setExpandedPendientes] = useState(false);
-    const [expandedEntregados, setExpandedEntregados] = useState(false);
 
     const isAdmin = getRole() === 'admin';
-    const navigate = useNavigate();
+
+    if (!isAdmin) {
+        return <Navigate to="/" replace />;
+    }
 
     useEffect(() => {
         const fetchOrders = async () => {
             try {
-                const endpoint = isAdmin ? '/api/ordenes' : '/api/mis-ordenes';
-                const { data } = await axiosClient.get(endpoint);
+                const { data } = await axiosClient.get('/api/ordenes');
                 setOrders(data);
             } catch (err) {
                 setError(err.response?.data?.error || 'Error al cargar los pedidos');
@@ -29,7 +29,7 @@ function Orders() {
             }
         };
         fetchOrders();
-    }, [isAdmin]);
+    }, []);
 
     const handleUpdateOrder = (updatedOrder) => {
         setOrders(prev => prev.map(o => o._id === updatedOrder._id ? updatedOrder : o));
@@ -54,85 +54,53 @@ function Orders() {
         </div>
     );
 
-    if (orders.length === 0) {
-        return (
-            <div className="container py-5 text-center">
-                <p className="lead text-muted mb-4">
-                    {isAdmin ? 'No hay pedidos registrados.' : 'Aún no tenés pedidos.'}
-                </p>
-                {!isAdmin && (
-                    <Link to="/productos" className="btn btn-success">
-                        Empezar a comprar
-                    </Link>
-                )}
-            </div>
-        );
-    }
+    const pendientes = orders.filter(p => p.estado !== 'entregado');
 
-    if (isAdmin) {
-        const entregados = orders.filter(p => p.estado === 'entregado');
-        const pendientes = orders.filter(p => p.estado !== 'entregado');
+    const porViandaPendientes = pendientes.reduce((acc, p) => {
+        p.items.forEach(item => {
+            const key = item.product?.name || "Sin nombre";
+            acc[key] = (acc[key] || 0) + Number(item.quantity);
+        });
+        return acc;
+    }, {});
 
-        const porViandaPendientes = pendientes.reduce((acc, p) => {
-            p.items.forEach(item => {
-                const key = item.product?.name || "Sin nombre";
-                acc[key] = (acc[key] || 0) + Number(item.quantity);
-            });
-            return acc;
-        }, {});
-
-        const porViandaEntregados = entregados.reduce((acc, p) => {
-            p.items.forEach(item => {
-                const key = item.product?.name || "Sin nombre";
-                acc[key] = (acc[key] || 0) + Number(item.quantity);
-            });
-            return acc;
-        }, {});
-
+    if (pendientes.length === 0) {
         return (
             <main className="container-fluid px-3 px-lg-4 py-4 pb-5">
                 <AdminOrdersSummary 
                     porViandaPendientes={porViandaPendientes}
-                    porViandaEntregados={porViandaEntregados}
                     expandedPendientes={expandedPendientes}
                     setExpandedPendientes={setExpandedPendientes}
-                    expandedEntregados={expandedEntregados}
-                    setExpandedEntregados={setExpandedEntregados}
                 />
-
-                <div className="row g-4">
-                    <div className="col-12 col-lg-6">
-                        <SeccionPedidos
-                            titulo="PENDIENTES"
-                            orders={pendientes}
-                            done={false}
-                            onUpdate={handleUpdateOrder}
-                            onDelete={handleDeleteOrder}
-                        />
-                    </div>
-                    <div className="col-12 col-lg-6">
-                        <SeccionPedidos
-                            titulo="ENTREGADAS"
-                            orders={entregados}
-                            done={true}
-                            onUpdate={handleUpdateOrder}
-                            onDelete={handleDeleteOrder}
-                        />
-                    </div>
+                <div className="text-center py-5">
+                    <p className="lead text-muted mb-0">
+                        No hay pedidos pendientes.
+                    </p>
                 </div>
             </main>
         );
     }
 
     return (
-        <div className="container py-4" style={{ maxWidth: '860px' }}>
-            <h1 className="fs-4 fw-semibold mb-4 pb-3 border-bottom">🧾 Mis pedidos</h1>
-            <div className="row g-3">
-                {orders.map((order) => (
-                    <UserOrderCard key={order._id} order={order} />
-                ))}
+        <main className="container-fluid px-3 px-lg-4 py-4 pb-5">
+            <AdminOrdersSummary 
+                porViandaPendientes={porViandaPendientes}
+                expandedPendientes={expandedPendientes}
+                setExpandedPendientes={setExpandedPendientes}
+            />
+
+            <div className="row g-4">
+                <div className="col-12">
+                    <SeccionPedidos
+                        titulo="PENDIENTES"
+                        orders={pendientes}
+                        done={false}
+                        onUpdate={handleUpdateOrder}
+                        onDelete={handleDeleteOrder}
+                    />
+                </div>
             </div>
-        </div>
+        </main>
     );
 }
 

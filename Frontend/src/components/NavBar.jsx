@@ -113,6 +113,7 @@ function NavBar() {
                             <button className="btn btn-outline-light rounded-pill py-1 px-3 small" onClick={() => setShowCreateModal(true)} type="button">Crear Producto</button>
                             <button className="btn btn-outline-light rounded-pill py-1 px-3 small" onClick={() => navigate('/productos')} type="button">Productos</button>
                             <button className="btn btn-outline-light rounded-pill py-1 px-3 small" onClick={() => navigate('/pedidos')} type="button">Pedidos</button>
+                            <button className="btn btn-outline-light rounded-pill py-1 px-3 small" onClick={() => navigate('/ventas')} type="button">Ventas</button>
                         </div>
                     )}
                     
@@ -172,6 +173,7 @@ function NavBar() {
                                 <>
                                     <button className="btn btn-outline-light rounded-pill py-2 fw-medium" onClick={() => { closeOffcanvas(); setShowCreateModal(true); }} type="button">Crear Producto</button>
                                     <button className="btn btn-outline-light rounded-pill py-2 fw-medium" onClick={() => handleNavClick('/pedidos')} type="button">Pedidos</button>
+                                    <button className="btn btn-outline-light rounded-pill py-2 fw-medium" onClick={() => handleNavClick('/ventas')} type="button">Ventas</button>
                                 </>
                             )}
                             <button className="btn btn-outline-light rounded-pill py-2 fw-medium d-flex align-items-center justify-content-center gap-2" onClick={() => handleNavClick('/mi-perfil')} type="button">

@@ -22,10 +22,35 @@ import { toast } from 'react-toastify';
 const formatARS = (value) =>
     new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' }).format(value);
 
+const formatFecha = (dateString) => {
+    if (!dateString) return '';
+    return new Date(dateString).toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+};
+
 function PedidoCard({ order, done, onUpdate, onDelete, expandido, onToggle }) {
     const [editando, setEditando] = useState(false);
     const [confirmDelete, setConfirmDelete] = useState(false);
     const [cantidades, setCantidades] = useState({});
+    const [showConfirmModal, setShowConfirmModal] = useState(false);
+
+    const prevExpandido = useRef(expandido);
+    const tieneCambios = order.items.some(i => cantidades[i._id] !== undefined && cantidades[i._id] !== i.quantity);
+    const isOpen = expandido || editando;
+
+    useEffect(() => {
+        if (prevExpandido.current === true && expandido === false) {
+            if (editando) {
+                if (!tieneCambios) {
+                    setEditando(false);
+                    setCantidades({});
+                    setShowConfirmModal(false);
+                } else {
+                    setShowConfirmModal(true);
+                }
+            }
+        }
+        prevExpandido.current = expandido;
+    }, [expandido, editando, tieneCambios]);
 
     const esEnvio = order.metodoEntrega === "envio";
 
@@ -100,6 +125,7 @@ function PedidoCard({ order, done, onUpdate, onDelete, expandido, onToggle }) {
             onUpdate(data);
             setEditando(false);
             setCantidades({});
+            setShowConfirmModal(false);
             toast.success('Cantidades actualizadas');
         } catch (err) {
             toast.error(err.response?.data?.error || 'Error al actualizar las cantidades');
@@ -125,17 +151,43 @@ function PedidoCard({ order, done, onUpdate, onDelete, expandido, onToggle }) {
         ? [order.direccionEnvio.calle, order.direccionEnvio.numero, order.direccionEnvio.ciudad].filter(Boolean).join(', ')
         : order.facturacion?.domicilio;
 
+    const handleDiscard = (e) => {
+        if (e) e.stopPropagation();
+        setEditando(false);
+        setCantidades({});
+        setShowConfirmModal(false);
+    };
+
     return (
         <div
-            className={`bg-white border rounded-3 mb-2 overflow-hidden ${done ? 'opacity-75 border-secondary' : 'border-secondary'} ${expandido ? 'border-success shadow-sm' : ''}`}
+            className={`bg-white border rounded-3 mb-2 overflow-hidden position-relative ${done ? 'opacity-75 border-secondary' : 'border-secondary'} ${isOpen ? 'border-success shadow-sm' : ''}`}
             style={{ cursor: 'pointer', backgroundColor: done ? '#f8f9fa' : '#ffffff' }}
             onClick={() => !editando && onToggle()}
             role="button"
             tabIndex={0}
         >
+            {/* Modal de confirmación (inline overlay) */}
+            {showConfirmModal && (
+                <div className="position-absolute top-0 start-0 w-100 h-100 bg-white bg-opacity-75 d-flex align-items-center justify-content-center" style={{ zIndex: 10, backdropFilter: 'blur(2px)' }} onClick={e => e.stopPropagation()}>
+                    <div className="bg-white border shadow-sm rounded-3 p-3 text-center" style={{ maxWidth: '90%' }}>
+                        <p className="mb-3 fw-medium text-dark" style={{ fontSize: '0.9rem' }}>Hay cambios sin guardar. ¿Qué deseas hacer?</p>
+                        <div className="d-flex gap-2 justify-content-center">
+                            <button className="btn btn-outline-secondary btn-sm" onClick={handleDiscard}>
+                                Descartar
+                            </button>
+                            <button className="btn btn-success btn-sm" onClick={(e) => {
+                                handleGuardarEdit(e);
+                            }}>
+                                Guardar cambios
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             {/* ── Cabecera ── */}
-            <div className="d-flex align-items-center justify-content-between px-3 py-2" style={{ minHeight: '60px' }}>
-                <div className="d-flex flex-column" style={{ minWidth: 0, flex: 1 }}>
+            <div className="d-flex flex-column px-3 py-2 border-bottom" style={{ minHeight: '60px' }}>
+                <div className="d-flex align-items-center justify-content-between mb-1">
                     <div className="d-flex align-items-center gap-2">
                         <span className="fw-bold text-dark text-truncate" style={{ fontSize: '0.95rem' }}>
                             {cliente}
@@ -158,37 +210,50 @@ function PedidoCard({ order, done, onUpdate, onDelete, expandido, onToggle }) {
                             </span>
                         )}
                     </div>
-                    <span className="text-muted text-truncate" style={{ fontSize: '0.75rem', maxWidth: '300px' }}>
-                        {resumenViandas}
-                    </span>
+                    <div className="text-end flex-shrink-0">
+                        {order.numeroOrden && (
+                            <span className="d-block text-muted" style={{ fontSize: '0.75rem', lineHeight: 1 }}>
+                                #{order.numeroOrden}
+                            </span>
+                        )}
+                        <span className="text-muted" style={{ fontSize: '0.75rem' }}>
+                            {formatFecha(order.date)}
+                        </span>
+                    </div>
                 </div>
 
-                <div className="d-flex align-items-center gap-2 flex-shrink-0">
-                    <span className={`d-inline-flex align-items-center gap-1 px-2 py-1 rounded-pill text-uppercase fw-bold
-                        ${esEnvio
-                            ? "bg-success bg-opacity-10 text-success"
-                            : "bg-warning bg-opacity-10 text-warning"
-                        }`}
-                        style={{ fontSize: '0.68rem', letterSpacing: '0.05em' }}
-                    >
-                        {esEnvio
-                            ? <Bike size={11} color="currentColor" strokeWidth={2} />
-                            : <Store size={11} color="currentColor" strokeWidth={2} />
-                        }
-                        {esEnvio ? "Envío" : "Retira"}
+                <div className="d-flex align-items-center justify-content-between">
+                    <span className="text-muted text-truncate me-2" style={{ fontSize: '0.75rem', flex: 1 }}>
+                        {resumenViandas}
                     </span>
 
-                    <span className="text-secondary">
-                        {expandido
-                            ? <ChevronUp size={16} color="currentColor" />
-                            : <ChevronDown size={16} color="currentColor" />
-                        }
-                    </span>
+                    <div className="d-flex align-items-center gap-2 flex-shrink-0">
+                        <span className={`d-inline-flex align-items-center gap-1 px-2 py-1 rounded-pill text-uppercase fw-bold
+                            ${esEnvio
+                                ? "bg-success bg-opacity-10 text-success"
+                                : "bg-warning bg-opacity-10 text-warning"
+                            }`}
+                            style={{ fontSize: '0.68rem', letterSpacing: '0.05em' }}
+                        >
+                            {esEnvio
+                                ? <Bike size={11} color="currentColor" strokeWidth={2} />
+                                : <Store size={11} color="currentColor" strokeWidth={2} />
+                            }
+                            {esEnvio ? "Envío" : "Retira"}
+                        </span>
+
+                        <span className="text-secondary">
+                            {isOpen
+                                ? <ChevronUp size={16} color="currentColor" />
+                                : <ChevronDown size={16} color="currentColor" />
+                            }
+                        </span>
+                    </div>
                 </div>
             </div>
 
             {/* ── Detalle expandible ── */}
-            {expandido && (
+            {isOpen && (
                 <div
                     className="px-3 pb-3 border-top"
                     onClick={e => e.stopPropagation()}

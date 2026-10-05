@@ -130,16 +130,7 @@ const createOrder = async (req, res) => {
     }
 };
 
-const getMyOrders = async (req, res) => {
-    try {
-        const orders = await Sales.find({ user: req.usuario.id })
-            .populate('items.product', 'name image images price')
-            .sort({ date: -1 });
-        res.json(orders);
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-};
+
 
 const updateOrderStatus = async (req, res) => {
     try {
@@ -208,7 +199,6 @@ module.exports = {
     createSale,
     deleteSale,
     createOrder,
-    getMyOrders,
     updateOrderStatus,
     updateOrderItems
 };

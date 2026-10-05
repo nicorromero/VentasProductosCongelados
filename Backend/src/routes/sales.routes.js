@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 
-const { getSales, getSaleById, createSale, deleteSale, createOrder, getMyOrders, updateOrderStatus, updateOrderItems } =
+const { getSales, getSaleById, createSale, deleteSale, createOrder, updateOrderStatus, updateOrderItems } =
     require('../controllers/sales.controllers');
 
 const { authMiddleware, adminMiddleware } =
@@ -10,7 +10,6 @@ const { authMiddleware, adminMiddleware } =
 // Rutas específicas ANTES de los wildcards (/:id captura cualquier segmento)
 router.post('/ordenes', createOrder);
 router.get('/ordenes', authMiddleware, getSales);
-router.get('/mis-ordenes', authMiddleware, getMyOrders);
 router.patch('/ordenes/:id/estado', authMiddleware, adminMiddleware, updateOrderStatus);
 router.patch('/ordenes/:id/items', authMiddleware, adminMiddleware, updateOrderItems);
 router.delete('/ordenes/:id', authMiddleware, adminMiddleware, deleteSale);
