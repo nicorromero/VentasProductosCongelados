@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { Navigate } from 'react-router-dom';
 import axiosClient from '../api/axiosClient';
 import { getRole } from '../utils/auth';
+import WhatsAppButton from '../components/WhatsAppButton';
 import {
     TrendingUp,
     Package,
@@ -100,26 +101,12 @@ function VentaRow({ order, expanded, onToggle }) {
             {/* Header */}
             <div className="d-flex flex-column px-3 py-2 border-bottom" style={{ minHeight: '52px' }}>
                 <div className="d-flex align-items-center justify-content-between mb-1">
-                    <div className="d-flex align-items-center gap-2">
+                    <div className="d-flex align-items-center gap-2 flex-wrap">
                         <span className="fw-bold text-dark text-truncate" style={{ fontSize: '0.9rem' }}>
                             {cliente}
                         </span>
                         {celular && (
-                            <span className="d-flex align-items-center gap-1 flex-shrink-0 text-muted" style={{ fontSize: '0.8rem' }}>
-                                {celular}
-                                {wsNumber && (
-                                    <a
-                                        className="text-success d-inline-flex align-items-center ms-1"
-                                        href={`https://wa.me/${wsNumber}`}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        title="Enviar WhatsApp"
-                                        onClick={e => e.stopPropagation()}
-                                    >
-                                        <MessageCircle size={13} />
-                                    </a>
-                                )}
-                            </span>
+                            <WhatsAppButton celular={celular} isOpen={expanded} size="sm" />
                         )}
                     </div>
                     <div className="text-end flex-shrink-0">

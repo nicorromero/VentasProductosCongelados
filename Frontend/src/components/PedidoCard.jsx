@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import WhatsAppButton from './WhatsAppButton';
 
 const formatARS = (value) =>
     new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' }).format(value);
@@ -188,26 +189,12 @@ function PedidoCard({ order, done, onUpdate, onDelete, expandido, onToggle }) {
             {/* ── Cabecera ── */}
             <div className="d-flex flex-column px-3 py-2 border-bottom" style={{ minHeight: '60px' }}>
                 <div className="d-flex align-items-center justify-content-between mb-1">
-                    <div className="d-flex align-items-center gap-2">
+                    <div className="d-flex align-items-center gap-2 flex-wrap">
                         <span className="fw-bold text-dark text-truncate" style={{ fontSize: '0.95rem' }}>
                             {cliente}
                         </span>
                         {celular && (
-                            <span className="d-flex align-items-center gap-1 flex-shrink-0 text-muted" style={{ fontSize: '0.85rem' }}>
-                                {celular}
-                                {wsNumber && (
-                                    <a
-                                        className="text-success d-inline-flex align-items-center ms-1"
-                                        href={`https://wa.me/${wsNumber}`}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        title="Enviar WhatsApp"
-                                        onClick={e => e.stopPropagation()}
-                                    >
-                                        <MessageCircle size={14} />
-                                    </a>
-                                )}
-                            </span>
+                            <WhatsAppButton celular={celular} isOpen={isOpen} />
                         )}
                     </div>
                     <div className="text-end flex-shrink-0">
@@ -303,6 +290,7 @@ function PedidoCard({ order, done, onUpdate, onDelete, expandido, onToggle }) {
                             <span>{domicilio}</span>
                         </div>
                     )}
+
 
                     {/* Total */}
                     <div className="d-flex align-items-center gap-2 mt-2 pt-2 border-top border-secondary border-opacity-25 text-secondary" style={{ fontSize: '0.9rem' }}>
