@@ -99,8 +99,8 @@ function VentaRow({ order, expanded, onToggle }) {
             tabIndex={0}
         >
             {/* Header */}
-            <div className="d-flex flex-column px-3 py-2 border-bottom" style={{ minHeight: '52px' }}>
-                <div className="d-flex align-items-center justify-content-between mb-1">
+            <div className="d-flex flex-column px-3 py-2 border-bottom" style={{ minHeight: expanded ? 'auto' : '52px' }}>
+                <div className="d-flex align-items-center justify-content-between gap-2 mb-1">
                     <div className="d-flex align-items-center gap-2 flex-wrap">
                         <span className="fw-bold text-dark text-truncate" style={{ fontSize: '0.9rem' }}>
                             {cliente}
@@ -109,37 +109,28 @@ function VentaRow({ order, expanded, onToggle }) {
                             <WhatsAppButton celular={celular} isOpen={expanded} size="sm" />
                         )}
                     </div>
-                    <div className="text-end flex-shrink-0">
-                        {order.numeroOrden && (
-                            <span className="d-block text-muted" style={{ fontSize: '0.7rem', lineHeight: 1 }}>
-                                #{order.numeroOrden}
-                            </span>
-                        )}
+                    <div className="d-flex align-items-center gap-2 flex-shrink-0">
                         <span className="text-muted" style={{ fontSize: '0.7rem' }}>
                             {formatFecha(order.date)}
-                        </span>
-                    </div>
-                </div>
-                <div className="d-flex align-items-center justify-content-between">
-                    <span className="text-muted text-truncate me-2" style={{ fontSize: '0.72rem', flex: 1 }}>
-                        {resumen}
-                    </span>
-                    <div className="d-flex align-items-center gap-2 flex-shrink-0">
-                        <span className="fw-bold text-success" style={{ fontSize: '0.85rem' }}>
-                            {formatARS(order.total)}
-                        </span>
-                        <span className={`d-inline-flex align-items-center gap-1 px-2 py-1 rounded-pill text-uppercase fw-bold
-                            ${esEnvio ? 'bg-success bg-opacity-10 text-success' : 'bg-warning bg-opacity-10 text-warning'}`}
-                            style={{ fontSize: '0.62rem', letterSpacing: '0.05em' }}
-                        >
-                            {esEnvio ? <Bike size={10} strokeWidth={2} /> : <Store size={10} strokeWidth={2} />}
-                            {esEnvio ? 'Envío' : 'Retira'}
                         </span>
                         <span className="text-secondary">
                             {expanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
                         </span>
                     </div>
                 </div>
+
+                {!expanded && (
+                    <div className="d-flex align-items-center justify-content-between">
+                        <span className="text-muted text-truncate me-2" style={{ fontSize: '0.72rem', flex: 1 }}>
+                            {resumen}
+                        </span>
+                        <div className="d-flex align-items-center gap-2 flex-shrink-0">
+                            <span className="fw-bold text-success" style={{ fontSize: '0.85rem' }}>
+                                {formatARS(order.total)}
+                            </span>
+                        </div>
+                    </div>
+                )}
             </div>
 
             {/* Detail */}
@@ -159,10 +150,16 @@ function VentaRow({ order, expanded, onToggle }) {
                         ))}
                     </ul>
 
-                    {esEnvio && domicilio && (
+                    {/* Modalidad de entrega */}
+                    {esEnvio ? (
                         <div className="d-flex align-items-center gap-2 text-secondary mt-2 px-2 py-1 bg-light rounded border" style={{ fontSize: '0.78rem' }}>
                             <MapPin size={12} strokeWidth={2} />
-                            <span>{domicilio}</span>
+                            <span>{domicilio || 'Envío a domicilio'}</span>
+                        </div>
+                    ) : (
+                        <div className="d-flex align-items-center gap-2 text-secondary mt-2 px-2 py-1 bg-light rounded border" style={{ fontSize: '0.78rem' }}>
+                            <Store size={12} strokeWidth={2} />
+                            <span>Para retirar en el local</span>
                         </div>
                     )}
 

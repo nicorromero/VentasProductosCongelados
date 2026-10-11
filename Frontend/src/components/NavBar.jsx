@@ -82,8 +82,8 @@ function NavBar() {
 
     return (
         <>
-        <nav className="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
-            <div className="container-fluid px-3 px-lg-4 position-relative d-flex justify-content-between align-items-center" style={{ minHeight: '60px' }}>
+        <nav className="navbar navbar-expand-lg navbar-dark bg-dark sticky-top p-0 position-relative" style={{ zIndex: 1030, overflow: 'visible' }}>
+            <div className="container-fluid px-3 px-lg-4 d-flex justify-content-between align-items-center" style={{ minHeight: '60px' }}>
                 
                 {/* Left Actions */}
                 <div className="d-flex align-items-center">
@@ -96,12 +96,25 @@ function NavBar() {
 
                 {/* Brand */}
                 <NavLink 
-                    to="/productos" 
-                    className="navbar-brand position-absolute top-50 start-50 translate-middle m-0 fw-bold" 
-                    style={{ fontSize: '1.75rem', letterSpacing: '2px', textShadow: '2px 2px 4px rgba(0,0,0,0.6)', fontFamily: "'Bebas Neue', sans-serif" }}
+                    to="/" 
+                    className="position-absolute start-50 translate-middle-x m-0 p-0 text-decoration-none" 
+                    style={{ top: 0, zIndex: 1040 }}
                     onClick={closeOffcanvas}
                 >
-                    KE <span className="text-warning">·</span> PERNIL
+                    <img 
+                        src="/logoo.svg" 
+                        alt="KE PERNIL" 
+                        style={{ 
+                            height: '115px', 
+                            width: '115px', 
+                            borderRadius: '50%', 
+                            objectFit: 'cover',
+                            border: '3px solid #343a40',
+                            filter: 'drop-shadow(0 4px 10px rgba(0,0,0,0.5))',
+                            background: '#232427',
+                            display: 'block'
+                        }} 
+                    />
                 </NavLink>
 
                 {/* Right Actions */}
@@ -130,20 +143,29 @@ function NavBar() {
                     )}
 
                     {!isAdmin && (
-                        <button
-                            className="btn btn-danger rounded-pill position-relative d-flex align-items-center gap-1 gap-lg-2 py-1 px-3 small fw-medium"
-                            style={{ boxShadow: '0 2px 8px rgba(220,53,69,0.3)', transition: 'all 0.2s ease' }}
-                            onClick={() => navigate('/carrito')}
-                            type="button"
-                        >
-                            <FiShoppingCart size={16} />
-                            <span className="d-none d-lg-inline">Carrito</span>
-                            {cartQuantity > 0 && (
-                                <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-white text-danger" style={{ fontSize: '0.65rem' }}>
-                                    {cartQuantity}
-                                </span>
-                            )}
-                        </button>
+                        <>
+                            <button
+                                className="btn btn-outline-light rounded-pill py-1 px-3 small fw-medium"
+                                onClick={() => navigate('/productos')}
+                                type="button"
+                            >
+                                Menú
+                            </button>
+                            <button
+                                className="btn btn-danger rounded-pill position-relative d-flex align-items-center gap-1 gap-lg-2 py-1 px-3 small fw-medium"
+                                style={{ boxShadow: '0 2px 8px rgba(220,53,69,0.3)', transition: 'all 0.2s ease' }}
+                                onClick={() => navigate('/carrito')}
+                                type="button"
+                            >
+                                <FiShoppingCart size={16} />
+                                <span className="d-none d-lg-inline">Carrito</span>
+                                {cartQuantity > 0 && (
+                                    <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-white text-danger" style={{ fontSize: '0.65rem' }}>
+                                        {cartQuantity}
+                                    </span>
+                                )}
+                            </button>
+                        </>
                     )}
 
                     {/* Mobile Menu Toggler (For any logged-in user) */}

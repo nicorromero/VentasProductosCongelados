@@ -1,4 +1,5 @@
-import { Routes, Route, useLocation, Navigate } from 'react-router-dom';
+import { Routes, Route, useLocation } from 'react-router-dom';
+import Home from './pages/Home';
 import Contact from './pages/Contact';
 import Catalogo from './pages/Catalogo';
 import NavBar from './components/NavBar';
@@ -19,7 +20,6 @@ import InactiveProducts from './pages/InactiveProducts';
 function App() {
   const location = useLocation();
   const rutasFijasExactas = [
-    '/',
     '/admin-login',
     '/contacto',
     '/mi-perfil',
@@ -32,7 +32,7 @@ function App() {
       <NavBar />
       <main className={`flex-grow-1 ${esLayoutFijo ? 'overflow-auto' : ''}`}>
         <Routes>
-          <Route path="/" element={<Navigate to="/productos" />} />
+          <Route path="/" element={<Home />} />
           <Route path="/contacto" element={<Contact />} />
           <Route path="/catalogo/:categoria" element={<Catalogo />} />
           <Route path="/productos" element={<Catalogo />} />

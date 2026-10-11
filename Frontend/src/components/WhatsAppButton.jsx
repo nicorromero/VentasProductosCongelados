@@ -16,7 +16,8 @@ export default function WhatsAppButton({ celular, isOpen = false, size = 'sm', c
         );
     }
 
-    const showNotice = isHovered || isOpen;
+    const showEnviarText = isOpen || isHovered;
+    const displayText = showEnviarText ? 'Enviar WhatsApp' : celular;
 
     return (
         <a
@@ -35,23 +36,10 @@ export default function WhatsAppButton({ celular, isOpen = false, size = 'sm', c
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
             onClick={(e) => e.stopPropagation()}
-            title="Enviar WhatsApp"
+            title={showEnviarText ? `WhatsApp: ${celular}` : 'Enviar WhatsApp'}
         >
             <MessageCircle size={size === 'sm' ? 13 : 15} className="text-success flex-shrink-0" />
-            <span className="fw-medium text-dark">{celular}</span>
-            {showNotice && (
-                <span
-                    className="badge bg-success text-white fw-normal rounded-pill ms-1 d-inline-flex align-items-center"
-                    style={{
-                        fontSize: '0.68rem',
-                        padding: '0.18rem 0.45rem',
-                        lineHeight: 1.2,
-                        animation: 'fadeIn 0.15s ease-in',
-                    }}
-                >
-                    Enviar WhatsApp
-                </span>
-            )}
+            <span className="fw-medium text-dark">{displayText}</span>
         </a>
     );
 }

@@ -1,3 +1,5 @@
+import { FiTrash2 } from 'react-icons/fi';
+
 const formatARS = (value) =>
     new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' }).format(value);
 
@@ -24,8 +26,13 @@ export default function CartItem({ item, decreaseQty, increaseQty, removeFromCar
                 <button className="btn btn-light border btn-sm rounded-circle d-flex align-items-center justify-content-center" style={{ width: '30px', height: '30px' }} onClick={() => increaseQty(item._id)} aria-label="Aumentar cantidad">+</button>
             </div>
             <p className="fw-semibold text-nowrap mb-0">{formatARS(item.precio * item.quantity)}</p>
-            <button className="btn btn-outline-danger btn-sm px-2 py-1 rounded-3 ms-auto" onClick={() => removeFromCart(item._id)} aria-label="Eliminar producto">
-                🗑️
+            <button
+                className="btn btn-outline-danger btn-sm p-2 rounded-3 ms-auto d-inline-flex align-items-center justify-content-center"
+                onClick={() => removeFromCart(item._id)}
+                aria-label="Eliminar producto"
+                title="Eliminar producto"
+            >
+                <FiTrash2 size={16} />
             </button>
         </li>
     );

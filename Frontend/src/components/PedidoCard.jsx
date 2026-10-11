@@ -187,8 +187,8 @@ function PedidoCard({ order, done, onUpdate, onDelete, expandido, onToggle }) {
             )}
 
             {/* ── Cabecera ── */}
-            <div className="d-flex flex-column px-3 py-2 border-bottom" style={{ minHeight: '60px' }}>
-                <div className="d-flex align-items-center justify-content-between mb-1">
+            <div className="d-flex flex-column px-3 py-2 border-bottom" style={{ minHeight: isOpen ? 'auto' : '60px' }}>
+                <div className="d-flex align-items-center justify-content-between gap-2 mb-1">
                     <div className="d-flex align-items-center gap-2 flex-wrap">
                         <span className="fw-bold text-dark text-truncate" style={{ fontSize: '0.95rem' }}>
                             {cliente}
@@ -197,38 +197,10 @@ function PedidoCard({ order, done, onUpdate, onDelete, expandido, onToggle }) {
                             <WhatsAppButton celular={celular} isOpen={isOpen} />
                         )}
                     </div>
-                    <div className="text-end flex-shrink-0">
-                        {order.numeroOrden && (
-                            <span className="d-block text-muted" style={{ fontSize: '0.75rem', lineHeight: 1 }}>
-                                #{order.numeroOrden}
-                            </span>
-                        )}
+                    <div className="d-flex align-items-center gap-2 flex-shrink-0">
                         <span className="text-muted" style={{ fontSize: '0.75rem' }}>
                             {formatFecha(order.date)}
                         </span>
-                    </div>
-                </div>
-
-                <div className="d-flex align-items-center justify-content-between">
-                    <span className="text-muted text-truncate me-2" style={{ fontSize: '0.75rem', flex: 1 }}>
-                        {resumenViandas}
-                    </span>
-
-                    <div className="d-flex align-items-center gap-2 flex-shrink-0">
-                        <span className={`d-inline-flex align-items-center gap-1 px-2 py-1 rounded-pill text-uppercase fw-bold
-                            ${esEnvio
-                                ? "bg-success bg-opacity-10 text-success"
-                                : "bg-warning bg-opacity-10 text-warning"
-                            }`}
-                            style={{ fontSize: '0.68rem', letterSpacing: '0.05em' }}
-                        >
-                            {esEnvio
-                                ? <Bike size={11} color="currentColor" strokeWidth={2} />
-                                : <Store size={11} color="currentColor" strokeWidth={2} />
-                            }
-                            {esEnvio ? "Envío" : "Retira"}
-                        </span>
-
                         <span className="text-secondary">
                             {isOpen
                                 ? <ChevronUp size={16} color="currentColor" />
@@ -237,6 +209,14 @@ function PedidoCard({ order, done, onUpdate, onDelete, expandido, onToggle }) {
                         </span>
                     </div>
                 </div>
+
+                {!isOpen && (
+                    <div className="d-flex align-items-center justify-content-between">
+                        <span className="text-muted text-truncate" style={{ fontSize: '0.75rem', flex: 1 }}>
+                            {resumenViandas}
+                        </span>
+                    </div>
+                )}
             </div>
 
             {/* ── Detalle expandible ── */}
@@ -283,11 +263,16 @@ function PedidoCard({ order, done, onUpdate, onDelete, expandido, onToggle }) {
                         ))}
                     </ul>
 
-                    {/* Domicilio */}
-                    {esEnvio && domicilio && (
+                    {/* Modalidad de entrega */}
+                    {esEnvio ? (
                         <div className="d-flex align-items-center gap-2 text-secondary mt-2 px-2 py-1 bg-light rounded border" style={{ fontSize: '0.8rem' }}>
                             <MapPin size={13} color="currentColor" strokeWidth={2} />
-                            <span>{domicilio}</span>
+                            <span>{domicilio || 'Envío a domicilio'}</span>
+                        </div>
+                    ) : (
+                        <div className="d-flex align-items-center gap-2 text-secondary mt-2 px-2 py-1 bg-light rounded border" style={{ fontSize: '0.8rem' }}>
+                            <Store size={13} color="currentColor" strokeWidth={2} />
+                            <span>Para retirar en el local</span>
                         </div>
                     )}
 

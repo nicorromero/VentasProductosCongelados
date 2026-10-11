@@ -87,11 +87,11 @@ function Catalogo() {
         return <MdOutlineRestaurantMenu className="me-2 fs-5" />;
     };
 
-    if (loading) return <div className="text-center py-5">Cargando productos...</div>;
-    if (error) return <div className="text-center py-5 text-danger">{error}</div>;
+    if (loading) return <div className="text-center py-5" style={{ paddingTop: '80px' }}>Cargando productos...</div>;
+    if (error) return <div className="text-center py-5 text-danger" style={{ paddingTop: '80px' }}>{error}</div>;
 
     return (
-        <section className="container-fluid px-3 px-md-4 py-4">
+        <section className="container-fluid px-3 px-md-4 pb-4" style={{ paddingTop: '80px' }}>
             <style>{`
                 .hide-scrollbar::-webkit-scrollbar { display: none; }
                 .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }

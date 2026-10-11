@@ -410,23 +410,63 @@ function ProductCard({id, name, details, price, image, images = [], stock, categ
     // ── NORMAL card (front) ──
     const isInactive = localData.active === false;
 
-    const cartControlUI = !isSelecting ? (
+    const isInCart = quantity > 0;
+    const [isCartBtnHovered, setIsCartBtnHovered] = useState(false);
+
+    const handleToggleCart = (e) => {
+        e.stopPropagation();
+        if (isInactive) return;
+
+        if (isInCart) {
+            removeFromCart(id);
+            toast.info('Producto quitado del carrito');
+            setIsCartBtnHovered(false);
+            return;
+        }
+
+        if (localData.stock !== undefined && localData.stock !== null && localData.stock <= 0) {
+            toast.warning('Sin stock disponible');
+            return;
+        }
+
+        const displayImgs = normalizeImages(localData);
+        addToCart({ _id: id, nombre: localData.name, precio: localData.price, imagen: displayImgs[0] || localData.image, stock: localData.stock });
+        toast.success('Producto agregado al carrito');
+    };
+
+    const cartControlUI = (
         <button
             type="button"
-            className={`btn ${isInactive ? 'btn-secondary opacity-50' : 'btn-dark rounded-pill fw-medium'} btn-sm w-100 mt-auto`}
-            onClick={(e) => { e.stopPropagation(); if(!isInactive) handleStartSelecting(e); }}
+            className={`btn ${
+                isInactive 
+                    ? 'btn-secondary opacity-50' 
+                    : isInCart 
+                        ? (isCartBtnHovered ? 'btn-outline-danger' : 'btn-success') 
+                        : 'btn-dark'
+            } rounded-pill fw-medium btn-sm w-100 mt-auto d-flex align-items-center justify-content-center gap-1 transition-all`}
+            onClick={handleToggleCart}
+            onMouseEnter={() => isInCart && setIsCartBtnHovered(true)}
+            onMouseLeave={() => setIsCartBtnHovered(false)}
             disabled={isInactive}
+            title={isInCart ? 'Clic para quitar del carrito' : 'Agregar 1 unidad al carrito'}
+            style={{ transition: 'all 0.2s ease-in-out' }}
         >
-            {isInactive ? 'No disponible' : 'Agregar al Carrito'}
+            {isInactive ? (
+                'No disponible'
+            ) : isInCart ? (
+                isCartBtnHovered ? (
+                    <>
+                        <FiRotateCcw size={14} /> Quitar del carrito
+                    </>
+                ) : (
+                    <>
+                        <FiCheck size={14} /> Agregado al carrito
+                    </>
+                )
+            ) : (
+                'Agregar al Carrito'
+            )}
         </button>
-    ) : (
-        <div className="btn-group w-100 mt-auto rounded-3" onClick={(e) => e.stopPropagation()}>
-            <button type="button" className="btn btn-dark btn-sm" onClick={(e) => { e.stopPropagation(); handleUndo(); }} title="Deshacer"><FiRotateCcw size={14} /></button>
-            <button type="button" className="btn btn-dark btn-sm" onClick={handleDecrease} disabled={quantity <= 1}><FiMinus size={14} /></button>
-            <span className="btn btn-dark btn-sm disabled fw-bold">{quantity}</span>
-            <button type="button" className="btn btn-dark btn-sm" onClick={handleIncrease}><FiPlus size={14} /></button>
-            <button type="button" className="btn btn-success btn-sm px-3" onClick={handleConfirm}><FiCheck size={16} /></button>
-        </div>
     );
 
     const viewModal = isViewingDetail && !isAdmin && typeof document !== 'undefined' ? createPortal(
