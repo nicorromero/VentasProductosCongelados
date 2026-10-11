@@ -124,6 +124,7 @@ const createOrder = async (req, res) => {
         }
 
         const newOrder = await Sales.create(orderData);
+        await newOrder.populate('items.product', 'name image images price');
         res.status(201).json(newOrder);
     } catch (error) {
         res.status(500).json({ error: error.message });

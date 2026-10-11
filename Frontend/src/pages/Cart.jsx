@@ -54,9 +54,19 @@ function Cart() {
 
         setEnviandoPedido(true);
         try {
+            const itemsResumen = cartItems.map((item) => ({
+                _id: item._id,
+                nombre: item.nombre || item.name || 'Producto',
+                precio: item.precio || item.price || 0,
+                quantity: item.quantity,
+                subtotal: (item.precio || item.price || 0) * item.quantity
+            }));
             const { data } = await axiosClient.post('/api/ordenes', body);
             clearCart();
-            setOrdenCreada(data);
+            setOrdenCreada({
+                ...data,
+                items: itemsResumen
+            });
             setShowCheckout(false);
             toast.success('¡Pedido realizado con éxito!');
         } catch (err) {
