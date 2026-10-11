@@ -1,21 +1,55 @@
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import { 
   FiArrowRight, 
   FiClock, 
   FiHeart, 
   FiShoppingBag, 
-  FiCheckCircle, 
-  FiStar 
+  FiCheckCircle
 } from 'react-icons/fi';
-import { FaFire, FaBreadSlice } from 'react-icons/fa';
-import { MdFamilyRestroom } from 'react-icons/md';
+import { FaFire, FaPizzaSlice } from 'react-icons/fa';
+import { GiPieSlice, GiMeat } from 'react-icons/gi';
+import { MdOutlineKitchen } from 'react-icons/md';
+
+const API_URL = import.meta.env.VITE_API_BASE_URL;
 
 function Home() {
   const navigate = useNavigate();
+  const [catalogProducts, setCatalogProducts] = useState([]);
+
+  // Consultamos los productos reales del catálogo para utilizar sus fotos auténticas si existen
+  useEffect(() => {
+    let isMounted = true;
+    if (API_URL) {
+      axios.get(`${API_URL}/products`)
+        .then((res) => {
+          if (isMounted && Array.isArray(res.data)) {
+            setCatalogProducts(res.data);
+          }
+        })
+        .catch(() => {
+          // Si el servidor no responde o está offline, usa fotos locales auténticas de fallback
+        });
+    }
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  // Función auxiliar para obtener la imagen real del catálogo según categoría o fallback a foto real local
+  const getCategoryPhoto = (categoryKeyword, fallbackPhoto) => {
+    const found = catalogProducts.find((p) => {
+      const matchCat = p.category && p.category.toLowerCase().includes(categoryKeyword.toLowerCase());
+      const hasImg = p.image || (Array.isArray(p.images) && p.images[0]);
+      return matchCat && hasImg;
+    });
+    return found ? (found.image || found.images[0]) : fallbackPhoto;
+  };
 
   return (
     <div className="home-landing-page" style={{ backgroundColor: '#FAF7F2', color: '#232427' }}>
-      {/* Estilos específicos para la landing: paleta, tipografías y efectos sutiles */}
+      {/* Estilos específicos para la landing: paleta de marca, tipografías y sombras */}
       <style>{`
         .font-bebas {
           font-family: 'Bebas Neue', cursive, sans-serif;
@@ -50,6 +84,20 @@ function Home() {
           color: #ffffff;
           transform: translateY(-2px);
         }
+        .category-pill {
+          background-color: #ffffff;
+          color: #232427;
+          border: 1px solid rgba(182, 137, 73, 0.3);
+          transition: all 0.2s ease;
+          cursor: pointer;
+        }
+        .category-pill:hover {
+          background-color: #232427;
+          color: #ffffff;
+          border-color: #232427;
+          transform: translateY(-2px);
+          box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
         .feature-card {
           background: #ffffff;
           border-radius: 1.25rem;
@@ -60,22 +108,22 @@ function Home() {
           transform: translateY(-5px);
           box-shadow: 0 12px 28px rgba(35, 36, 39, 0.08) !important;
         }
-        .dish-card {
+        .menu-card {
           background: #ffffff;
           border-radius: 1.25rem;
           overflow: hidden;
           transition: transform 0.25s ease, box-shadow 0.25s ease;
           border: 1px solid rgba(0, 0, 0, 0.06);
         }
-        .dish-card:hover {
-          transform: translateY(-4px);
-          box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1) !important;
+        .menu-card:hover {
+          transform: translateY(-5px);
+          box-shadow: 0 14px 28px rgba(0, 0, 0, 0.1) !important;
         }
-        .dish-card img {
+        .menu-card img {
           transition: transform 0.4s ease;
         }
-        .dish-card:hover img {
-          transform: scale(1.04);
+        .menu-card:hover img {
+          transform: scale(1.05);
         }
         .quote-bubble {
           background-color: #ffffff;
@@ -84,30 +132,30 @@ function Home() {
       `}</style>
 
       {/* =========================================================================
-          1. HERO SECTION (Impacto visual, propuesta de valor y CTA primario)
+          1. HERO SECTION (Propuesta de valor completa: Pernil + Congelados)
           ========================================================================= */}
       <section className="position-relative overflow-hidden py-4 py-lg-5" style={{ background: 'linear-gradient(180deg, #FFFFFF 0%, #FAF7F2 100%)' }}>
         <div className="container py-3 py-lg-4">
           <div className="row align-items-center g-4 g-lg-5">
             
-            {/* Columna Izquierda: Copywriting persuasivo y llamada a la acción */}
+            {/* Columna Izquierda: Copywriting persuasivo sin emojis, con iconos vectoriales */}
             <div className="col-12 col-lg-6 text-center text-lg-start">
               
               {/* Badge de confianza */}
               <div className="d-inline-flex align-items-center gap-2 hero-badge px-3 py-1 rounded-pill mb-3 fw-medium small">
                 <FiHeart className="text-danger" />
-                <span>Cocinado en familia • Hecho con amor</span>
+                <span>Cocinado en familia • Hecho con dedicación</span>
               </div>
 
-              {/* Título Principal (H1) con gancho emocional y de practicidad */}
+              {/* Título Principal (H1) */}
               <h1 className="display-4 fw-bold font-bebas mb-3" style={{ color: '#232427', lineHeight: 1.08 }}>
-                COMIDA CASERA, RICA Y LISTA PARA DISFRUTAR EN TU HOGAR
+                COMIDA CASERA, RICA Y LISTA PARA TU DÍA A DÍA
               </h1>
 
-              {/* Subtítulo enfocado en la solución al dolor del cliente */}
+              {/* Subtítulo enfocado en la variedad del catálogo */}
               <p className="lead fs-5 text-secondary mb-4" style={{ maxWidth: '540px' }}>
                 ¿Ganas de comer rico y casero sin pasar horas en la cocina? 
-                En <strong>Kepernil</strong> cocinamos perniles tiernos a fuego lento, panes esponjosos y opciones prácticas listas para calentar en minutos.
+                En <strong>Kepernil</strong> cocinamos para vos: desde nuestros clásicos <strong>perniles a fuego lento</strong> hasta <strong>milanesas tiernas, pizzas caseras y tarteletas frescas</strong>. Listas para calentar y disfrutar en minutos.
               </p>
 
               {/* Acciones principales (CTAs) */}
@@ -118,50 +166,89 @@ function Home() {
                   type="button"
                 >
                   <FiShoppingBag size={20} />
-                  <span>Ver Catálogo y Pedir</span>
+                  <span>Explorar Todo el Catálogo</span>
                   <FiArrowRight size={20} />
                 </button>
                 <a 
-                  href="#historia"
+                  href="#menu-completo"
                   className="btn btn-brand-secondary btn-lg rounded-pill px-4 py-3 fw-semibold w-100 w-sm-auto text-center text-decoration-none"
                 >
-                  Conocé Nuestra Historia
+                  Ver Opciones del Menú
                 </a>
               </div>
 
-              {/* Micro-copys de seguridad y confianza rápida */}
-              <div className="d-flex flex-wrap justify-content-center justify-content-lg-start gap-3 text-muted small pt-2">
+              {/* Accesos rápidos a categorías clave con iconos vectoriales limpios */}
+              <div className="pt-2">
+                <span className="text-muted small fw-medium d-block mb-2">Explorá directo por categoría:</span>
+                <div className="d-flex flex-wrap justify-content-center justify-content-lg-start gap-2">
+                  <button 
+                    onClick={() => navigate('/productos')} 
+                    className="btn btn-sm category-pill rounded-pill px-3 py-1 fw-medium d-inline-flex align-items-center gap-1"
+                    type="button"
+                  >
+                    <FaFire className="text-danger" size={13} />
+                    <span>Pernil & Combos</span>
+                  </button>
+                  <button 
+                    onClick={() => navigate('/catalogo/Milanesas')} 
+                    className="btn btn-sm category-pill rounded-pill px-3 py-1 fw-medium d-inline-flex align-items-center gap-1"
+                    type="button"
+                  >
+                    <GiMeat style={{ color: '#C0392B' }} size={14} />
+                    <span>Milanesas</span>
+                  </button>
+                  <button 
+                    onClick={() => navigate('/catalogo/Pizzas')} 
+                    className="btn btn-sm category-pill rounded-pill px-3 py-1 fw-medium d-inline-flex align-items-center gap-1"
+                    type="button"
+                  >
+                    <FaPizzaSlice style={{ color: '#E67E22' }} size={13} />
+                    <span>Pizzas</span>
+                  </button>
+                  <button 
+                    onClick={() => navigate('/catalogo/Tarteletas')} 
+                    className="btn btn-sm category-pill rounded-pill px-3 py-1 fw-medium d-inline-flex align-items-center gap-1"
+                    type="button"
+                  >
+                    <GiPieSlice className="text-success" size={14} />
+                    <span>Tarteletas</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Micro-copys de seguridad y practicidad */}
+              <div className="d-flex flex-wrap justify-content-center justify-content-lg-start gap-3 text-muted small pt-4">
                 <div className="d-flex align-items-center gap-1">
                   <FiCheckCircle className="text-success" />
                   <span>Sin registros obligatorios</span>
                 </div>
                 <div className="d-flex align-items-center gap-1">
                   <FiCheckCircle className="text-success" />
-                  <span>Panes y salsas caseras</span>
+                  <span>Directo a tu freezer o mesa</span>
                 </div>
                 <div className="d-flex align-items-center gap-1">
                   <FiCheckCircle className="text-success" />
-                  <span>Listos para calentar</span>
+                  <span>Listo en 5 a 10 minutos</span>
                 </div>
               </div>
 
             </div>
 
-            {/* Columna Derecha: Collage visual apetitoso con imágenes reales */}
+            {/* Columna Derecha: Fotos 100% auténticas y reales del negocio */}
             <div className="col-12 col-lg-6">
               <div className="position-relative mx-auto" style={{ maxWidth: '520px' }}>
                 
-                {/* Imagen principal: La mesa servida (foto1.png) */}
+                {/* Imagen principal: Mesa servida con pernil, figacitas y salsas (foto1.png) */}
                 <div className="shadow-lg rounded-4 overflow-hidden border border-2 border-white" style={{ maxHeight: '420px' }}>
                   <img 
                     src="/foto1.png" 
-                    alt="Pernil casero con panes esponjosos y salsas artesanales" 
+                    alt="Pernil casero con panes esponjosos y salsas artesanales de Kepernil" 
                     className="w-100 h-100 object-fit-cover"
                     style={{ minHeight: '340px' }}
                   />
                 </div>
 
-                {/* Tarjeta flotante 1: Horno a fuego lento (foto3.png) */}
+                {/* Tarjeta flotante 1: Horno a leña y cocción lenta real (foto3.png) */}
                 <div 
                   className="position-absolute bg-white rounded-3 shadow p-2 d-none d-sm-flex align-items-center gap-2 border border-light"
                   style={{ top: '-15px', right: '-15px', zIndex: 2, maxWidth: '220px' }}
@@ -178,7 +265,7 @@ function Home() {
                   </div>
                 </div>
 
-                {/* Tarjeta flotante 2: Bandeja lista (foto4.png) */}
+                {/* Tarjeta flotante 2: Bandeja lista de pernil desmechado (foto4.png) */}
                 <div 
                   className="position-absolute bg-white rounded-4 shadow-lg p-3 d-flex align-items-center gap-3 border border-light"
                   style={{ bottom: '-20px', left: '-15px', zIndex: 2, maxWidth: '260px' }}
@@ -188,7 +275,7 @@ function Home() {
                   </div>
                   <div>
                     <div className="fw-bold text-dark small">¡Listo en 5 Minutos!</div>
-                    <small className="text-secondary" style={{ fontSize: '0.78rem' }}>Calentás, armás y a disfrutar</small>
+                    <small className="text-secondary" style={{ fontSize: '0.78rem' }}>Calentás, servís y a disfrutar</small>
                   </div>
                 </div>
 
@@ -207,54 +294,54 @@ function Home() {
         <div className="container">
           <div className="row g-4 justify-content-center">
             
-            {/* Pilar 1 */}
+            {/* Pilar 1: Cocción lenta y pernil */}
             <div className="col-12 col-sm-6 col-lg-3">
               <div className="feature-card p-4 h-100 shadow-sm text-center text-sm-start d-flex flex-column align-items-center align-items-sm-start">
                 <div className="rounded-3 p-3 mb-3 d-inline-flex" style={{ backgroundColor: '#FAF2E6', color: '#B68949' }}>
                   <FaFire size={24} />
                 </div>
-                <h3 className="fs-5 fw-bold mb-2">Cocción Tradicional</h3>
+                <h3 className="fs-5 fw-bold mb-2">Pernil a Fuego Lento</h3>
                 <p className="text-secondary small mb-0">
-                  Horas de cocción paciente para lograr carne tierna que se deshace sola y un dorado crocante irresistible.
+                  Horas de cocción paciente para una carne tierna y jugosa con panes esponjosos y salsas artesanales.
                 </p>
               </div>
             </div>
 
-            {/* Pilar 2 */}
-            <div className="col-12 col-sm-6 col-lg-3">
-              <div className="feature-card p-4 h-100 shadow-sm text-center text-sm-start d-flex flex-column align-items-center align-items-sm-start">
-                <div className="rounded-3 p-3 mb-3 d-inline-flex" style={{ backgroundColor: '#EBF5FB', color: '#2980B9' }}>
-                  <FiClock size={24} />
-                </div>
-                <h3 className="fs-5 fw-bold mb-2">Rápido y Práctico</h3>
-                <p className="text-secondary small mb-0">
-                  Ideal para cuando volvés cansado o tenés invitados sorpresa. Calentás unos minutos y la comida está lista.
-                </p>
-              </div>
-            </div>
-
-            {/* Pilar 3 */}
+            {/* Pilar 2: Milanesas y carnes caseras */}
             <div className="col-12 col-sm-6 col-lg-3">
               <div className="feature-card p-4 h-100 shadow-sm text-center text-sm-start d-flex flex-column align-items-center align-items-sm-start">
                 <div className="rounded-3 p-3 mb-3 d-inline-flex" style={{ backgroundColor: '#FDEDEC', color: '#C0392B' }}>
-                  <FaBreadSlice size={24} />
+                  <GiMeat size={24} />
                 </div>
-                <h3 className="fs-5 fw-bold mb-2">Panes y Salsas Caseras</h3>
+                <h3 className="fs-5 fw-bold mb-2">Milanesas de Primera</h3>
                 <p className="text-secondary small mb-0">
-                  Acompañado por pancitos recién horneados y salsas artesanales de albahaca, morrón o perejil y ajo.
+                  De carne seleccionada y pollo tierno, rebozadas a mano para resolver tus almuerzos y cenas al toque.
                 </p>
               </div>
             </div>
 
-            {/* Pilar 4 */}
+            {/* Pilar 3: Pizzas y Tarteletas caseras */}
+            <div className="col-12 col-sm-6 col-lg-3">
+              <div className="feature-card p-4 h-100 shadow-sm text-center text-sm-start d-flex flex-column align-items-center align-items-sm-start">
+                <div className="rounded-3 p-3 mb-3 d-inline-flex" style={{ backgroundColor: '#EBF5FB', color: '#2980B9' }}>
+                  <FaPizzaSlice size={24} />
+                </div>
+                <h3 className="fs-5 fw-bold mb-2">Pizzas & Tarteletas</h3>
+                <p className="text-secondary small mb-0">
+                  Masas caseras y vegetales frescos picados a mano. Comidas completas, ricas y listas para el horno.
+                </p>
+              </div>
+            </div>
+
+            {/* Pilar 4: Freezer lleno y practicidad */}
             <div className="col-12 col-sm-6 col-lg-3">
               <div className="feature-card p-4 h-100 shadow-sm text-center text-sm-start d-flex flex-column align-items-center align-items-sm-start">
                 <div className="rounded-3 p-3 mb-3 d-inline-flex" style={{ backgroundColor: '#EAFAF1', color: '#27AE60' }}>
-                  <MdFamilyRestroom size={24} />
+                  <MdOutlineKitchen size={24} />
                 </div>
-                <h3 className="fs-5 fw-bold mb-2">Hecho en Familia</h3>
+                <h3 className="fs-5 fw-bold mb-2">Práctico para el Freezer</h3>
                 <p className="text-secondary small mb-0">
-                  Elaborado con dedicación y recetas caseras de verdad, sin aditivos ni conservantes industriales.
+                  Stockeá tu cocina con comida casera real. Cero conservantes artificiales y máxima practicidad.
                 </p>
               </div>
             </div>
@@ -265,109 +352,152 @@ function Home() {
 
 
       {/* =========================================================================
-          3. SECCIÓN DE ESPECIALIDADES / VISTA PREVIA DEL CATÁLOGO
+          3. SECCIÓN DEL MENÚ COMPLETO: PERNIL, MILANESAS, PIZZAS Y TARTELETAS
+          (Utiliza fotos 100% reales del negocio y fotos reales del catálogo)
           ========================================================================= */}
-      <section className="py-5" style={{ backgroundColor: '#FAF7F2' }}>
+      <section id="menu-completo" className="py-5" style={{ backgroundColor: '#FAF7F2' }}>
         <div className="container py-3">
           
           <div className="text-center mb-5">
             <span className="text-uppercase fw-bold small" style={{ color: '#B68949', letterSpacing: '2px' }}>
-              Nuestras Propuestas
+              Todo lo que Preparamos
             </span>
             <h2 className="display-5 fw-bold font-bebas mt-1 mb-2">
-              LO QUE SALE DEL HORNO DE KEPERNIL
+              NUESTRAS ESPECIALIDADES CASERAS
             </h2>
-            <p className="text-secondary mx-auto" style={{ maxWidth: '600px' }}>
-              Desde nuestro clásico pernil hasta opciones congeladas prácticas para tener en casa. Elegí lo que más te guste y pedilo al instante.
+            <p className="text-secondary mx-auto" style={{ maxWidth: '620px' }}>
+              Desde el clásico pernil para compartir hasta milanesas, pizzas y tarteletas para tener siempre una opción rica en casa.
             </p>
           </div>
 
           <div className="row g-4">
             
-            {/* Especialidad 1: Pernil Desmechado Listo */}
-            <div className="col-12 col-md-6 col-lg-4">
-              <div className="dish-card h-100 d-flex flex-column shadow-sm">
-                <div className="overflow-hidden position-relative" style={{ height: '220px' }}>
+            {/* Opción 1: Pernil Desmechado & Combos (Foto real /foto4.png) */}
+            <div className="col-12 col-md-6 col-lg-3">
+              <div className="menu-card h-100 d-flex flex-column shadow-sm">
+                <div className="overflow-hidden position-relative" style={{ height: '200px' }}>
                   <img 
-                    src="/foto4.png" 
-                    alt="Pernil desmechado listo para servir" 
+                    src={getCategoryPhoto('Pernil', '/foto4.png')} 
+                    alt="Pernil desmechado listo con pimientos y verdeo" 
                     className="w-100 h-100 object-fit-cover"
                   />
-                  <span className="position-absolute top-0 end-0 m-3 badge rounded-pill bg-danger px-3 py-2 fw-medium shadow-sm">
-                    El Más Pedido
+                  <span className="position-absolute top-0 end-0 m-3 badge rounded-pill bg-danger px-3 py-1 fw-medium shadow-sm small">
+                    La Especialidad
                   </span>
                 </div>
-                <div className="p-4 d-flex flex-column flex-grow-1">
-                  <h4 className="fw-bold mb-2">Pernil Desmechado Listo</h4>
+                <div className="p-3 p-xl-4 d-flex flex-column flex-grow-1">
+                  <div className="d-flex align-items-center gap-2 mb-2">
+                    <FaFire className="text-danger" />
+                    <h4 className="fs-5 fw-bold mb-0">Pernil & Sándwiches</h4>
+                  </div>
                   <p className="text-secondary small flex-grow-1">
-                    Carne tierna y jugosa con pimientos y cebollita de verdeo. Viene en bandeja lista para calentar al horno o microondas y armar tremendos sándwiches.
+                    Carne tierna y desmechada con verdeo y morrón. Disponible en bandeja lista o en combo con figacitas caseras y 3 salsas artesanales para armar sándwiches increíbles.
                   </p>
                   <button 
                     onClick={() => navigate('/productos')}
-                    className="btn btn-outline-dark rounded-pill w-100 fw-semibold d-flex align-items-center justify-content-center gap-2 mt-3"
+                    className="btn btn-outline-dark rounded-pill w-100 fw-semibold d-flex align-items-center justify-content-center gap-2 mt-3 small"
                     type="button"
                   >
-                    <span>Ver en el Catálogo</span>
+                    <span>Ver Perniles</span>
                     <FiArrowRight />
                   </button>
                 </div>
               </div>
             </div>
 
-            {/* Especialidad 2: Combo Fiesta con Panes y Salsas */}
-            <div className="col-12 col-md-6 col-lg-4">
-              <div className="dish-card h-100 d-flex flex-column shadow-sm">
-                <div className="overflow-hidden position-relative" style={{ height: '220px' }}>
+            {/* Opción 2: Milanesas Caseras (Foto real del catálogo o foto artesanal de mesa) */}
+            <div className="col-12 col-md-6 col-lg-3">
+              <div className="menu-card h-100 d-flex flex-column shadow-sm">
+                <div className="overflow-hidden position-relative" style={{ height: '200px', backgroundColor: '#FAF2E6' }}>
                   <img 
-                    src="/foto1.png" 
-                    alt="Panes caseros y salsas artesanales" 
+                    src={getCategoryPhoto('Milanesas', '/foto1.png')} 
+                    alt="Milanesas caseras y preparaciones de Kepernil" 
                     className="w-100 h-100 object-fit-cover"
                   />
-                  <span className="position-absolute top-0 end-0 m-3 badge rounded-pill px-3 py-2 fw-medium shadow-sm" style={{ backgroundColor: '#B68949', color: '#fff' }}>
-                    Combo Completo
+                  <span className="position-absolute top-0 end-0 m-3 badge rounded-pill bg-dark text-white px-3 py-1 fw-medium shadow-sm small">
+                    Para Todos los Días
                   </span>
                 </div>
-                <div className="p-4 d-flex flex-column flex-grow-1">
-                  <h4 className="fw-bold mb-2">Panes Caseros & Salsas</h4>
+                <div className="p-3 p-xl-4 d-flex flex-column flex-grow-1">
+                  <div className="d-flex align-items-center gap-2 mb-2">
+                    <GiMeat style={{ color: '#C0392B' }} />
+                    <h4 className="fs-5 fw-bold mb-0">Milanesas Caseras</h4>
+                  </div>
                   <p className="text-secondary small flex-grow-1">
-                    Figacitas esponjosas recién horneadas y 3 salsas artesanales (albahaca fresca, mayonesa al morrón y perejil con ajo). La combinación perfecta.
+                    Supremas de pollo, milanesas de carne seleccionada, medallones y bocaditos rebozados a mano. Tiernas, crocantes y listas para tu sartén o bandeja de horno.
                   </p>
                   <button 
-                    onClick={() => navigate('/productos')}
-                    className="btn btn-outline-dark rounded-pill w-100 fw-semibold d-flex align-items-center justify-content-center gap-2 mt-3"
+                    onClick={() => navigate('/catalogo/Milanesas')}
+                    className="btn btn-outline-dark rounded-pill w-100 fw-semibold d-flex align-items-center justify-content-center gap-2 mt-3 small"
                     type="button"
                   >
-                    <span>Ver en el Catálogo</span>
+                    <span>Ver Milanesas</span>
                     <FiArrowRight />
                   </button>
                 </div>
               </div>
             </div>
 
-            {/* Especialidad 3: Masas, Pizzas y Congelados Caseros */}
-            <div className="col-12 col-md-6 col-lg-4">
-              <div className="dish-card h-100 d-flex flex-column shadow-sm">
-                <div className="overflow-hidden position-relative" style={{ height: '220px' }}>
+            {/* Opción 3: Pizzas & Empanadas (Foto real de horno /foto3.png o foto real del catálogo) */}
+            <div className="col-12 col-md-6 col-lg-3">
+              <div className="menu-card h-100 d-flex flex-column shadow-sm">
+                <div className="overflow-hidden position-relative" style={{ height: '200px', backgroundColor: '#FDF2E9' }}>
                   <img 
-                    src="/foto6 (2).png" 
-                    alt="Ingredientes frescos y preparaciones caseras" 
+                    src={getCategoryPhoto('Pizzas', '/foto3.png')} 
+                    alt="Cocción al horno y masas caseras" 
                     className="w-100 h-100 object-fit-cover"
                   />
-                  <span className="position-absolute top-0 end-0 m-3 badge rounded-pill bg-dark text-white px-3 py-2 fw-medium shadow-sm">
+                  <span className="position-absolute top-0 end-0 m-3 badge rounded-pill px-3 py-1 fw-medium shadow-sm small" style={{ backgroundColor: '#B68949', color: '#fff' }}>
+                    Masa Artesanal
+                  </span>
+                </div>
+                <div className="p-3 p-xl-4 d-flex flex-column flex-grow-1">
+                  <div className="d-flex align-items-center gap-2 mb-2">
+                    <FaPizzaSlice style={{ color: '#E67E22' }} />
+                    <h4 className="fs-5 fw-bold mb-0">Pizzas & Empanadas</h4>
+                  </div>
+                  <p className="text-secondary small flex-grow-1">
+                    Pizzas grandes de muzzarella, napolitana, prepizzas esponjosas y empanadas con rellenos abundantes. El comodín infalible para tus fines de semana.
+                  </p>
+                  <button 
+                    onClick={() => navigate('/catalogo/Pizzas')}
+                    className="btn btn-outline-dark rounded-pill w-100 fw-semibold d-flex align-items-center justify-content-center gap-2 mt-3 small"
+                    type="button"
+                  >
+                    <span>Ver Pizzas</span>
+                    <FiArrowRight />
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Opción 4: Tarteletas & Vegetales Frescos (Foto real /foto6 (2).png de vegetales frescos picados) */}
+            <div className="col-12 col-md-6 col-lg-3">
+              <div className="menu-card h-100 d-flex flex-column shadow-sm">
+                <div className="overflow-hidden position-relative" style={{ height: '200px' }}>
+                  <img 
+                    src={getCategoryPhoto('Tarteletas', '/foto6 (2).png')} 
+                    alt="Vegetales frescos picados para tarteletas y preparaciones" 
+                    className="w-100 h-100 object-fit-cover"
+                  />
+                  <span className="position-absolute top-0 end-0 m-3 badge rounded-pill bg-success text-white px-3 py-1 fw-medium shadow-sm small">
                     100% Fresco
                   </span>
                 </div>
-                <div className="p-4 d-flex flex-column flex-grow-1">
-                  <h4 className="fw-bold mb-2">Comidas Caseras & Congelados</h4>
+                <div className="p-3 p-xl-4 d-flex flex-column flex-grow-1">
+                  <div className="d-flex align-items-center gap-2 mb-2">
+                    <GiPieSlice className="text-success" />
+                    <h4 className="fs-5 fw-bold mb-0">Tarteletas & Tartas</h4>
+                  </div>
                   <p className="text-secondary small flex-grow-1">
-                    Pizzas caseras, tartas, empanadas y milanesas preparadas con vegetales seleccionados a mano. Prácticas para tener en el freezer y salvar tu almuerzo o cena.
+                    Rellenos generosos de verduras frescas (choclo cremoso, espinaca salteada, mix de pimientos y cebollita). Masa tierna y crocante, ideales para comer rico y liviano.
                   </p>
                   <button 
-                    onClick={() => navigate('/productos')}
-                    className="btn btn-outline-dark rounded-pill w-100 fw-semibold d-flex align-items-center justify-content-center gap-2 mt-3"
+                    onClick={() => navigate('/catalogo/Tarteletas')}
+                    className="btn btn-outline-dark rounded-pill w-100 fw-semibold d-flex align-items-center justify-content-center gap-2 mt-3 small"
                     type="button"
                   >
-                    <span>Ver en el Catálogo</span>
+                    <span>Ver Tarteletas</span>
                     <FiArrowRight />
                   </button>
                 </div>
@@ -383,7 +513,7 @@ function Home() {
               className="btn btn-brand-primary btn-lg rounded-pill px-5 py-3 fw-bold shadow-sm d-inline-flex align-items-center gap-2"
               type="button"
             >
-              <span>Explorar Todo el Menú y Precios</span>
+              <span>Ver Precios y Armar Mi Pedido</span>
               <FiArrowRight size={20} />
             </button>
           </div>
@@ -399,13 +529,13 @@ function Home() {
         <div className="container py-4">
           <div className="row align-items-center g-4 g-lg-5">
             
-            {/* Foto de la familia cocinando (foto6.png) */}
+            {/* Foto real de la familia cocinando juntos con cofia (foto6.png) */}
             <div className="col-12 col-lg-5 text-center">
               <div className="position-relative d-inline-block">
                 <div className="rounded-4 overflow-hidden shadow-lg border border-3 border-white" style={{ maxWidth: '400px' }}>
                   <img 
                     src="/foto6.png" 
-                    alt="Familia de Kepernil amasando y cocinando con amor" 
+                    alt="Familia de Kepernil amasando y cocinando con dedicación" 
                     className="w-100 h-100 object-fit-cover"
                     style={{ minHeight: '380px' }}
                   />
@@ -421,7 +551,7 @@ function Home() {
               </div>
             </div>
 
-            {/* Texto de la historia (Integra perfectamente las frases base del usuario) */}
+            {/* Texto de la historia (Integra perfectamente las frases base del negocio) */}
             <div className="col-12 col-lg-7 pt-4 pt-lg-0">
               <span className="text-uppercase fw-bold small" style={{ color: '#B68949', letterSpacing: '2px' }}>
                 Nuestra Historia
@@ -438,7 +568,7 @@ function Home() {
               </div>
 
               <p className="text-secondary mb-4" style={{ lineHeight: '1.7' }}>
-                Creemos que el momento de comer tiene que ser una pausa linda del día, no un motivo de estrés. Por eso creamos distintas opciones de comidas caseras, prácticas y listas para disfrutar, y vamos incorporando nuevas propuestas para acompañarte en cada momento.
+                Creemos que el momento de comer tiene que ser una pausa linda del día, no un motivo de estrés. Por eso tenemos distintas opciones de comidas caseras, prácticas y listas para disfrutar, y vamos incorporando nuevas propuestas para acompañarte en cada momento: desde un pernil inolvidable para compartir con amigos hasta milanesas, pizzas y tarteletas para tener siempre a mano en tu freezer.
               </p>
 
               {/* Valores diferenciales */}
@@ -446,7 +576,7 @@ function Home() {
                 <div className="col-12 col-sm-6">
                   <div className="d-flex align-items-start gap-2">
                     <FiCheckCircle className="text-success mt-1 flex-shrink-0" size={18} />
-                    <span className="small text-dark fw-medium">Ingredientes frescos y seleccionados cada día</span>
+                    <span className="small text-dark fw-medium">Ingredientes frescos y seleccionados cada mañana</span>
                   </div>
                 </div>
                 <div className="col-12 col-sm-6">
@@ -458,13 +588,13 @@ function Home() {
                 <div className="col-12 col-sm-6">
                   <div className="d-flex align-items-start gap-2">
                     <FiCheckCircle className="text-success mt-1 flex-shrink-0" size={18} />
-                    <span className="small text-dark fw-medium">Recetas caseras probadas que le gustan a todos</span>
+                    <span className="small text-dark fw-medium">Recetas caseras probadas que le gustan a grandes y chicos</span>
                   </div>
                 </div>
                 <div className="col-12 col-sm-6">
                   <div className="d-flex align-items-start gap-2">
                     <FiCheckCircle className="text-success mt-1 flex-shrink-0" size={18} />
-                    <span className="small text-dark fw-medium">Solución real para no cocinar y comer rico</span>
+                    <span className="small text-dark fw-medium">La solución perfecta para no cocinar y comer rico</span>
                   </div>
                 </div>
               </div>
@@ -474,7 +604,7 @@ function Home() {
                 className="btn btn-outline-dark rounded-pill px-4 py-2 fw-semibold d-inline-flex align-items-center gap-2"
                 type="button"
               >
-                <span>Conocé Nuestros Platos</span>
+                <span>Conocé Todo Nuestro Menú</span>
                 <FiArrowRight />
               </button>
             </div>
@@ -497,7 +627,7 @@ function Home() {
               ¿CÓMO PEDIR EN KEPERNIL?
             </h2>
             <p className="text-secondary mx-auto" style={{ maxWidth: '540px' }}>
-              En tan solo 3 pasos tenés la comida casera lista en tu mesa sin complicaciones.
+              En tan solo 3 pasos tenés tu comida casera lista en tu mesa sin complicaciones.
             </p>
           </div>
 
@@ -512,9 +642,9 @@ function Home() {
                 >
                   1
                 </div>
-                <h4 className="fw-bold mb-2">Elegís en el Menú</h4>
+                <h4 className="fw-bold mb-2">Elegís en el Catálogo</h4>
                 <p className="text-secondary small mb-0">
-                  Entrás a nuestro catálogo, seleccionás tus productos preferidos y armás tu pedido sin necesidad de registrarte.
+                  Explorás nuestros perniles, milanesas, pizzas o tarteletas, agregás tus favoritos al carrito sin trámites ni registros.
                 </p>
               </div>
             </div>
@@ -530,7 +660,7 @@ function Home() {
                 </div>
                 <h4 className="fw-bold mb-2">Confirmás tu Pedido</h4>
                 <p className="text-secondary small mb-0">
-                  Revisás tu carrito, completás tus datos de entrega o retiro y coordinamos el horario para que llegue fresco.
+                  Completás tus datos de entrega o retiro y coordinamos el horario para que recibas todo fresco y en su punto justo.
                 </p>
               </div>
             </div>
@@ -546,7 +676,7 @@ function Home() {
                 </div>
                 <h4 className="fw-bold mb-2">Calentás y Disfrutás</h4>
                 <p className="text-secondary small mb-0">
-                  Solo te queda calentar unos minutos, servir en la mesa y disfrutar el verdadero sabor casero con quienes más querés.
+                  Unos minutitos de horno o microondas, y tenés un banquete casero servido en la mesa con sabor auténtico de hogar.
                 </p>
               </div>
             </div>
@@ -557,72 +687,7 @@ function Home() {
 
 
       {/* =========================================================================
-          6. PRUEBA SOCIAL / SATISFACCIÓN (Generar confianza inmediata)
-          ========================================================================= */}
-      <section className="py-5 bg-white border-top border-light">
-        <div className="container py-2">
-          <div className="text-center mb-5">
-            <div className="d-flex justify-content-center gap-1 text-warning mb-2 fs-5">
-              <FiStar fill="#ffc107" />
-              <FiStar fill="#ffc107" />
-              <FiStar fill="#ffc107" />
-              <FiStar fill="#ffc107" />
-              <FiStar fill="#ffc107" />
-            </div>
-            <h2 className="display-6 fw-bold font-bebas mb-2">
-              LO QUE DICEN QUIENES YA PROBARON KEPERNIL
-            </h2>
-            <p className="text-secondary small">Opiniones de clientes y familias que disfrutan de nuestros platos</p>
-          </div>
-
-          <div className="row g-4 justify-content-center">
-            
-            {/* Opinión 1 */}
-            <div className="col-12 col-md-4">
-              <div className="p-4 rounded-4 bg-light h-100 shadow-sm border border-light d-flex flex-column">
-                <div className="d-flex text-warning mb-2 small">
-                  {'★★★★★'}
-                </div>
-                <p className="text-secondary small fst-italic flex-grow-1">
-                  &ldquo;El pernil es increíble, súper tierno y jugoso. Los pancitos una delicia total y las salsas le dan el toque exacto. Nos salvó un cumpleaños de 20 personas sin cocinar nada.&rdquo;
-                </p>
-                <div className="fw-bold small text-dark mt-2">— Martín R.</div>
-              </div>
-            </div>
-
-            {/* Opinión 2 */}
-            <div className="col-12 col-md-4">
-              <div className="p-4 rounded-4 bg-light h-100 shadow-sm border border-light d-flex flex-column">
-                <div className="d-flex text-warning mb-2 small">
-                  {'★★★★★'}
-                </div>
-                <p className="text-secondary small fst-italic flex-grow-1">
-                  &ldquo;Tener las bandejas en el freezer es la salvación de la semana. Llegás tarde del laburo, calentás 5 minutos y comés como en un restaurante casero. 100% recomendado.&rdquo;
-                </p>
-                <div className="fw-bold small text-dark mt-2">— Florencia G.</div>
-              </div>
-            </div>
-
-            {/* Opinión 3 */}
-            <div className="col-12 col-md-4">
-              <div className="p-4 rounded-4 bg-light h-100 shadow-sm border border-light d-flex flex-column">
-                <div className="d-flex text-warning mb-2 small">
-                  {'★★★★★'}
-                </div>
-                <p className="text-secondary small fst-italic flex-grow-1">
-                  &ldquo;Se nota que está hecho en familia y con amor. Todo fresco, impecable la presentación y la atención es súper cálida. Ya somos clientes fijos.&rdquo;
-                </p>
-                <div className="fw-bold small text-dark mt-2">— Lucas & Camila</div>
-              </div>
-            </div>
-
-          </div>
-        </div>
-      </section>
-
-
-      {/* =========================================================================
-          7. FINAL CTA BANNER (Conversion Closer)
+          6. FINAL CTA BANNER (Conversion Closer)
           ========================================================================= */}
       <section className="py-5" style={{ backgroundColor: '#232427', color: '#ffffff' }}>
         <div className="container py-4 text-center">
@@ -631,10 +696,10 @@ function Home() {
               ¡HOY NO COCINES!
             </span>
             <h2 className="display-4 fw-bold font-bebas mb-3" style={{ color: '#ffffff' }}>
-              LLEVÁ EL VERDADERO SABOR CASERO A TU MESA
+              LLENÁ TU FREEZER Y TU MESA CON VERDADERO SABOR CASERO
             </h2>
             <p className="lead text-light opacity-75 mb-4 fs-5">
-              Hacé tu pedido en un par de clics y disfrutá de comida casera, rica y hecha con dedicación.
+              Pernil a fuego lento, milanesas caseras, pizzas y tarteletas. Hacé tu pedido en un par de clics y disfrutá en familia.
             </p>
             <button 
               onClick={() => navigate('/productos')}
