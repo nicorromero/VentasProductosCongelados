@@ -534,7 +534,7 @@ function Home() {
               <div className="position-relative d-inline-block">
                 <div className="rounded-4 overflow-hidden shadow-lg border border-3 border-white" style={{ maxWidth: '400px' }}>
                   <img
-                    src="/foto6.png"
+                    src="/foto.jpeg"
                     alt="Familia de Kepernil amasando y cocinando con dedicación"
                     className="w-100 h-100 object-fit-cover"
                     style={{ minHeight: '380px' }}
