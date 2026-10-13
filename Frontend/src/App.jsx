@@ -30,7 +30,7 @@ function App() {
   return (
     <div className={`d-flex flex-column ${esLayoutFijo ? 'vh-100 overflow-hidden' : 'min-vh-100'}`}>
       <NavBar />
-      <main className={`flex-grow-1 ${esLayoutFijo ? 'overflow-auto' : ''}`}>
+      <main className={`flex-grow-1 ${esLayoutFijo ? 'overflow-auto' : ''}`} style={{ paddingTop: '80px' }}>
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/contacto" element={<Contact />} />

@@ -34,7 +34,6 @@ const SaleSchema = new mongoose.Schema({
 
     facturacion: {
         nombreCompleto: { type: String },
-        celular: { type: String },
         domicilio: { type: String }
     },
 

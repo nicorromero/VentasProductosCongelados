@@ -37,10 +37,6 @@ export default function OrderSuccess({ ordenCreada }) {
         mensaje += `\n *Cliente:* ${ordenCreada.facturacion.nombreCompleto}`;
     }
 
-    if (ordenCreada.facturacion?.celular) {
-        mensaje += `\n *Teléfono:* ${ordenCreada.facturacion.celular}`;
-    }
-
     const whatsappUrl = `https://wa.me/${adminPhone}?text=${encodeURIComponent(mensaje)}`;
 
     return (

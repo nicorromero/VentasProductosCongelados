@@ -14,11 +14,9 @@ import {
     Minus,
     Plus,
     Check,
-    MessageCircle,
 } from "lucide-react";
 import axios from 'axios';
 import { toast } from 'react-toastify';
-import WhatsAppButton from './WhatsAppButton';
 
 const formatARS = (value) =>
     new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' }).format(value);
@@ -146,9 +144,7 @@ function PedidoCard({ order, done, onUpdate, onDelete, expandido, onToggle }) {
     );
 
     const cliente = order.facturacion?.nombreCompleto || order.user?.name || 'Desconocido';
-    const celular = order.facturacion?.celular || '';
-    const wsNumber = celular.replace(/[^0-9]/g, '');
-    const domicilio = order.direccionEnvio 
+    const domicilio = order.direccionEnvio
         ? [order.direccionEnvio.calle, order.direccionEnvio.numero, order.direccionEnvio.ciudad].filter(Boolean).join(', ')
         : order.facturacion?.domicilio;
 
@@ -193,9 +189,6 @@ function PedidoCard({ order, done, onUpdate, onDelete, expandido, onToggle }) {
                         <span className="fw-bold text-dark text-truncate" style={{ fontSize: '0.95rem' }}>
                             {cliente}
                         </span>
-                        {celular && (
-                            <WhatsAppButton celular={celular} isOpen={isOpen} />
-                        )}
                     </div>
                     <div className="d-flex align-items-center gap-2 flex-shrink-0">
                         <span className="text-muted" style={{ fontSize: '0.75rem' }}>

@@ -20,32 +20,6 @@ export default function CheckoutForm({
                         placeholder="Juan Pérez"
                     />
                 </div>
-                <div className="mb-3">
-                    <label className="form-label">Celular</label>
-                    <div className="d-flex gap-2">
-                        <input
-                            type="text"
-                            className="form-control rounded-3 text-center bg-light"
-                            value="+54"
-                            disabled
-                            style={{ width: '60px' }}
-                        />
-                        <input
-                            type="text"
-                            className="form-control rounded-3 text-center bg-light"
-                            value="3442"
-                            disabled
-                            style={{ width: '80px' }}
-                        />
-                        <input
-                            type="text"
-                            className="form-control rounded-3 flex-grow-1"
-                            value={facturacion.celular}
-                            onChange={(e) => setFacturacion({ ...facturacion, celular: e.target.value })}
-                            placeholder="65872"
-                        />
-                    </div>
-                </div>
             </section>
 
             <section className="bg-body-secondary rounded-3 p-3">

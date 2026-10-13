@@ -16,7 +16,7 @@ function Cart() {
     const { cartItems, increaseQty, decreaseQty, removeFromCart, clearCart, cartTotal } = useCart();
 
     const [showCheckout, setShowCheckout] = useState(false);
-    const [facturacion, setFacturacion] = useState({ nombreCompleto: '', celular: '', domicilio: '' });
+    const [facturacion, setFacturacion] = useState({ nombreCompleto: '', domicilio: '' });
     const [medioPago, setMedioPago] = useState('efectivo');
     const [metodoEntrega, setMetodoEntrega] = useState('retiro');
     const [enviandoPedido, setEnviandoPedido] = useState(false);
@@ -32,8 +32,8 @@ function Cart() {
     }
 
     async function handleRealizarPedido() {
-        if (!facturacion.nombreCompleto || !facturacion.celular) {
-            toast.error('Completá tus datos personales');
+        if (!facturacion.nombreCompleto) {
+            toast.error('Completá tu nombre');
             return;
         }
         if (metodoEntrega === 'envio' && !facturacion.domicilio) {
@@ -47,7 +47,6 @@ function Cart() {
             metodoEntrega,
             facturacion: {
                 nombreCompleto: facturacion.nombreCompleto,
-                celular: `+54 3442 ${facturacion.celular}`,
                 domicilio: metodoEntrega === 'envio' ? facturacion.domicilio : ''
             }
         };
