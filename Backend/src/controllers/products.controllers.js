@@ -154,6 +154,76 @@ const reactivateProduct = async (req, res) => {
     }
 };
 
+
+/**
+ * Confirma el precio sugerido por el Excel:
+ * Copia `suggestedPrice` → `price` y limpia los campos de sugerencia.
+ * Requiere rol admin (protegido en la ruta).
+ */
+const confirmSuggestedPrice = async (req, res) => {
+    try {
+        const product = await Product.findById(req.params.id);
+        if (!product) {
+            return res.status(404).json({ error: 'Producto no encontrado' });
+        }
+        if (product.suggestedPrice == null) {
+            return res.status(400).json({ error: 'Este producto no tiene un precio sugerido pendiente' });
+        }
+
+        product.price              = product.suggestedPrice;
+        product.suggestedPrice     = null;
+        product.suggestedPriceDate = null;
+        await product.save();
+
+        res.json({ message: 'Precio actualizado correctamente', product });
+    } catch (error) {
+        if (error.name === 'CastError') {
+            return res.status(400).json({ error: 'ID de producto inválido' });
+        }
+        res.status(500).json({ message: error.message });
+    }
+};
+
+/**
+ * Disparador manual para leer precios sugeridos de Excel (Solo Admin).
+ */
+const syncExcelPricesManual = async (req, res) => {
+    try {
+        const { leerPreciosSugeridos } = require('../services/excelSync.service');
+        const resultado = await leerPreciosSugeridos();
+        res.json({
+            message: 'Sincronización de precios completada',
+            actualizados: resultado.actualizados,
+            totalRevisados: resultado.totalRevisados
+        });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+/**
+ * Disparador manual para cierre de caja hacia Excel (Solo Admin).
+ */
+const syncExcelSalesManual = async (req, res) => {
+    try {
+        const { escribirVentasEnExcel } = require('../services/excelSync.service');
+        const ahora = new Date();
+        const inicioDia = new Date(ahora.toLocaleString('en-US', { timeZone: 'America/Argentina/Buenos_Aires' }));
+        inicioDia.setHours(0, 0, 0, 0);
+        const finDia = new Date(ahora.toLocaleString('en-US', { timeZone: 'America/Argentina/Buenos_Aires' }));
+        finDia.setHours(23, 59, 59, 999);
+
+        const resultado = await escribirVentasEnExcel(inicioDia, finDia);
+        res.json({
+            message: 'Cierre de caja exportado al Excel exitosamente',
+            productosActualizados: resultado.productosActualizados,
+            totalUnidades: resultado.totalUnidades
+        });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
 module.exports = {
     getProducts,
     getProductById,
@@ -162,5 +232,8 @@ module.exports = {
     updateProduct,
     toggleActive,
     getInactiveProducts,
-    reactivateProduct
+    reactivateProduct,
+    confirmSuggestedPrice,
+    syncExcelPricesManual,
+    syncExcelSalesManual
 };

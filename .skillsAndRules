@@ -1,42 +1,419 @@
----
-trigger: global
-description: Comportamiento de mentoría pedagógica para Programación IV
----
-
-1. ROL DEL AGENTE:
-   Actúa exclusivamente como un Mentor y Profesor Adjunto de Cátedra. Tu tarea principal es la docencia, guiando al alumno mediante el método socrático. [cite_start]No generes soluciones terminadas[cite: 7, 39].
-
-2. CONSERVACIÓN DE CRÉDITOS Y TOKENS:
-   Las respuestas deben ser ultra-concisas. Evitá introducciones largas, saludos redundantes o conclusiones obvias que consuman tokens innecesariamente. [cite_start]Priorizá el uso de tablas comparativas y viñetas para la claridad inmediata[cite: 10, 11].
-
-3. RESTRICCIÓN DE CÓDIGO (APRENDER, NO COPIAR):
-   Está estrictamente prohibido generar archivos completos, componentes enteros de React o controladores de Express terminados. Si una explicación requiere código, limítate a un máximo de 5 líneas consecutivas o usá pseudocódigo. [cite_start]El alumno debe encargarse de la construcción final[cite: 8, 9].
-
-4. VALIDACIÓN CON DESAFÍOS CONCEPTUALES:
-   [cite_start]Antes de dar una respuesta masticada o avanzar en el flujo, cerrá tu intervención planteando una pregunta teórica o un pequeño desafío de código lineal (por ejemplo, pedirle al alumno que escriba una cláusula de guarda o una condición if específica) para asegurar la comprensión de la lógica[cite: 12, 18].
+# .skillsAndRules — VentasProductosCongelados
+> Última actualización: 14/10/2026 — Módulo de Reportes Excel (node-cron + ExcelJS + Nodemailer) agregado.
+> Archivo de directivas para IA. Generado por auditoría automática del repositorio.
+> Cualquier IA que trabaje en este proyecto DEBE leer y respetar estas reglas antes de escribir una sola línea de código.
 
 ---
-SKILLS_MATRIX:
-  - name: Line-by-Line Breakdown (Desglose Semántico)
-    [cite_start]description: Aplicar cuando el alumno pregunte por código nativo, hooks o lógica de librerías[cite: 13].
-    instruction: |
-      Desarmá el código en partes anatómicas. No reescribas el código; explicá el "por qué" de cada elemento.
-      Por ejemplo, si se analiza una función flecha anónima en un evento, explicá que sirve para frenar la ejecución inmediata y encapsular la acción[cite: 14].
 
-  - name: Architectural Mapping (Maquetado de Circuitos)
-    [cite_start]description: Aplicar antes de modificar o crear archivos en la arquitectura Fullstack[cite: 15].
-    instruction: |
-      Antes de sugerir cualquier cambio, presentá un mapa textual o una tabla que describa el flujo de los datos.
-      Explicá el puente entre componentes (Frontend) y controladores/modelos (Backend), detallando puertos, peticiones HTTP y estados involucrados[cite: 16].
+## 1. Project Context & Tech Stack
 
-  - name: Pedagogical Exception Control (Control de Errores Guiado)
-    description: Aplicar cuando el alumno presente un bug o error de consola.
-    instruction: |
-      Clasificá el error conceptualmente. Explicá qué significa la firma del error (ej. la diferencia entre ValidationError de Mongoose y CastError por formato de ID).
-      Guía al alumno a resolverlo usando el patrón de Early Return (Cláusulas de Guarda) en lugar de darle el bloque reparado[cite: 17].
+### Descripción del Proyecto
+E-commerce de productos congelados con panel de administración integrado. Permite a clientes navegar el catálogo, agregar productos al carrito, realizar pedidos (con selección de medio de pago y método de entrega) y a administradores gestionar productos, categorías, usuarios y ventas.
 
-  - name: Socratic Discovery (Fomento de Autonomía)
-    description: Aplicar para la resolución de problemas lógicos o configuraciones faltantes.
-    instruction: |
-      No des la respuesta digerida[cite: 18]. Si falta una ruta en App.jsx o un parámetro en el backend, guialo para que note el "espacio en blanco"[cite: 19].
-      Cerrá siempre exigiendo que el alumno escriba una única línea estratégica o responda una pregunta teórica antes de continuar.
+### Stack Detectado
+
+| Capa | Tecnología | Versión |
+|---|---|---|
+| Runtime | Node.js | 20 (Alpine en Docker) |
+| Framework Backend | Express | ^5.2.1 |
+| Base de Datos | MongoDB + Mongoose | ^9.3.1 |
+| Autenticación | JWT (jsonwebtoken) | ^9.0.3 |
+| Hashing | bcrypt | ^6.0.0 |
+| Email | Nodemailer | ^9.0.0 |
+| Logging | Winston + Morgan | ^3.19.0 / ^1.12.1 |
+| Seguridad | helmet, express-rate-limit, express-mongo-sanitize | — |
+| Frontend Framework | React | ^19.2.5 |
+| Build Tool | Vite | ^8.0.9 |
+| Routing | React Router DOM | ^7.14.2 |
+| HTTP Client | Axios (instancia centralizada) | ^1.15.2 |
+| UI Components | Bootstrap 5 + lucide-react + react-icons | — |
+| Notificaciones | react-toastify | ^11.1.0 |
+| Auth Frontend | jwt-decode | ^4.0.0 |
+| Containerización | Docker (multi-stage: node:20-alpine / nginx) | — |
+| Servidor Estático | Nginx (SPA fallback configurado) | — |
+| Deploy Frontend | Vercel | — |
+| Linting | ESLint 9 (flat config) | — |
+
+### Variables de Entorno Críticas (Backend)
+```
+PORT, MONGO_URI, JWT_SECRET, SMTP_HOST, SMTP_PORT, SMTP_SECURE,
+SMTP_USER, SMTP_PASS, MAIL_FROM, FRONTEND_URL, NODE_ENV, LOG_LEVEL
+```
+
+---
+
+## 2. AI Core Directives — Reglas Fundamentales de la IA
+
+> Estas son reglas de comportamiento, NO sugerencias. Deben cumplirse sin excepción.
+
+### 2.1 Antes de Escribir Código
+- **SIEMPRE** analizar el archivo relevante existente antes de proponer cambios. No asumir estructuras.
+- **NUNCA** proponer instalar una dependencia nueva si ya existe una en `package.json` que resuelve el mismo problema (ej. no instalar `axios` si ya existe, no instalar `dayjs` si `Date` nativo es suficiente).
+- **SIEMPRE** verificar si el endpoint o componente ya existe antes de crearlo desde cero.
+- **NUNCA** romper código que ya funciona. Si un cambio implica refactorizar código existente, explicarlo claramente y pedir confirmación.
+
+### 2.2 Operaciones de Alto Riesgo — Requieren Advertencia Explícita
+La IA DEBE advertir al usuario con `⚠️ OPERACIÓN DESTRUCTIVA` antes de proponer cualquier código que:
+- Ejecute `deleteMany()`, `drop()`, `findByIdAndDelete()` o equivalentes en la BD.
+- Modifique el schema de Mongoose de un modelo existente de forma incompatible.
+- Sobrescriba o elimine archivos de datos en `Backend/src/data/`.
+- Cambie la estructura del JWT payload (puede invalidar todos los tokens activos).
+- Modifique las rutas de autenticación (`/api/auth`).
+- Cambie el valor del campo `active` en masa (usuarios o productos).
+
+### 2.3 Principio de Mínima Intervención
+- Proponer el cambio más pequeño posible que resuelva el problema.
+- Si la solución requiere tocar más de 3 archivos, presentar un plan antes de ejecutar.
+- Preservar todos los comentarios en español existentes en el código.
+
+### 2.4 Idioma y Comunicación
+- El proyecto usa **español** en comentarios, mensajes de error de API, y UI. Mantener este idioma en todo código nuevo.
+- Variables y funciones en **inglés** (camelCase). Mensajes y strings de UI en **español argentino**.
+
+---
+
+## 3. Architecture & File Structure
+
+### Estructura Canónica del Proyecto
+```
+VentasProductosCongelados/
+├── Backend/
+│   ├── scripts/              # Seeds y migraciones one-shot (NO lógica de negocio)
+│   ├── src/
+│   │   ├── config/           # Conexiones externas (DB, Mailer). Un archivo por servicio.
+│   │   ├── controllers/      # Lógica de negocio. Un archivo por entidad.
+│   │   ├── data/             # JSON de datos de referencia (solo lectura en producción)
+│   │   ├── middlewares/      # Middlewares reutilizables (auth, logger)
+│   │   ├── models/           # Schemas de Mongoose. Un archivo por modelo.
+│   │   ├── routes/           # Definición de rutas. Un archivo por entidad.
+│   │   ├── app.js            # Configuración de Express (middlewares globales, rutas)
+│   │   └── server.js         # Arranque del servidor (connectDB + listen)
+│   ├── Dockerfile
+│   └── package.json
+│
+└── Frontend/
+    ├── public/               # Assets estáticos (imágenes, SVG del logo)
+    ├── src/
+    │   ├── api/              # Instancia de Axios y funciones de fetch. NO lógica de UI.
+    │   ├── assets/           # Assets importados por JS/CSS
+    │   ├── components/       # Componentes reutilizables. Subcarpetas por dominio.
+    │   │   ├── Cart/
+    │   │   └── Orders/
+    │   ├── context/          # Context API: un archivo Context.js + un Provider.jsx por dominio
+    │   ├── hooks/            # Custom hooks (useCart, etc.)
+    │   ├── pages/            # Una página = un archivo .jsx en raíz de pages/
+    │   ├── utils/            # Funciones utilitarias puras (sin side effects de React)
+    │   ├── App.jsx           # Solo enrutamiento y layout shell
+    │   └── main.jsx          # Entry point. Solo providers y ReactDOM.render
+    ├── nginx.conf
+    ├── Dockerfile
+    └── package.json
+```
+
+### Reglas de Ubicación
+- **Nuevo modelo Mongoose** → `Backend/src/models/<entidad>.model.js`
+- **Nuevo controlador** → `Backend/src/controllers/<entidad>.controllers.js`
+- **Nuevas rutas** → `Backend/src/routes/<entidad>.routes.js` + registrar en `app.js`
+- **Nuevo servicio externo** (ej. SMS, S3) → `Backend/src/config/<servicio>.js`
+- **Nuevo componente React reutilizable** → `Frontend/src/components/<NombreComponente>.jsx` (o subcarpeta si es dominio propio)
+- **Nueva página** → `Frontend/src/pages/<NombrePagina>.jsx` + agregar `<Route>` en `App.jsx`
+- **Nueva llamada a API** → función en `Frontend/src/api/` usando `axiosClient`
+- **Nuevo custom hook** → `Frontend/src/hooks/use<NombreHook>.js`
+- **NUNCA** poner lógica de negocio directamente en rutas o en `app.js`.
+- **NUNCA** hacer llamadas `fetch`/`axios` directas en componentes. Usar `axiosClient` desde `src/api/`.
+
+---
+
+## 4. Coding Standards
+
+### 4.1 JavaScript General (Backend — CommonJS)
+- Módulos con `require` / `module.exports` (CommonJS). El backend NO usa ESModules.
+- ES6+ obligatorio: arrow functions, destructuring, template literals, spread operator, optional chaining (`?.`), nullish coalescing (`??`).
+- **Prohibido:** `var`. Usar `const` por defecto, `let` solo si hay reasignación.
+- **Prohibido:** callbacks anidados (callback hell). Usar `async/await`.
+- **Prohibido:** `console.log` en producción. Usar el logger Winston (`logger.info`, `logger.error`, etc.).
+
+### 4.2 JavaScript General (Frontend — ESModules)
+- El frontend usa `"type": "module"`. Usar `import`/`export` ES6.
+- Usar `async/await` para todas las llamadas a la API.
+- **Prohibido:** `var`.
+
+### 4.3 Nomenclatura
+
+| Elemento | Convención | Ejemplo |
+|---|---|---|
+| Variables / funciones | camelCase | `getProductById`, `cartItems` |
+| Clases / Modelos Mongoose | PascalCase | `Product`, `Sale`, `User` |
+| Componentes React | PascalCase | `ProductCard`, `NavBar` |
+| Archivos de modelos | kebab-case + `.model.js` | `product.model.js` |
+| Archivos de controladores | kebab-case + `.controllers.js` | `products.controllers.js` |
+| Archivos de rutas | kebab-case + `.routes.js` | `products.routes.js` |
+| Archivos de páginas React | PascalCase + `.jsx` | `Catalogo.jsx` |
+| Archivos de componentes React | PascalCase + `.jsx` | `ProductCard.jsx` |
+| Hooks | `use` + PascalCase | `useCart.js` |
+| Constantes de entorno | UPPER_SNAKE_CASE | `JWT_SECRET`, `MONGO_URI` |
+
+### 4.4 Anti-patrones Prohibidos
+- **No código espagueti:** Máximo 3 niveles de anidación. Extraer en funciones auxiliares si se supera.
+- **No funciones de más de 40 líneas** sin justificación. Dividir en helpers.
+- **No números mágicos:** Extraer a constantes nombradas (ej. `const MAX_IMAGES = 5`).
+- **No duplicación:** Si la misma lógica aparece 2+ veces, extraer a función/helper.
+
+---
+
+## 5. Backend & Database Rules
+
+### 5.1 Express 5
+- Este proyecto usa **Express 5**. Express 5 maneja errores async automáticamente: los `throw` dentro de async handlers son capturados por el error handler global. Sin embargo, mantener `try/catch` explícito para errores de negocio controlados.
+- Usar `return res.status(X).json(...)` para cortar la ejecución del handler (Express 5 no lanza "headers already sent" pero es buena práctica).
+
+### 5.2 Respuestas de API Estandarizadas
+Toda respuesta JSON de la API DEBE seguir este esquema:
+
+```javascript
+// Éxito con datos
+res.status(200).json({ /* objeto o array directo */ });
+res.status(201).json(nuevoRecurso);
+
+// Éxito sin cuerpo relevante
+res.status(200).json({ message: 'Descripción de la acción en español' });
+
+// Error del cliente (4xx) — usar siempre la clave "error"
+res.status(400).json({ error: 'Descripción del error en español' });
+res.status(401).json({ error: 'Token requerido' });
+res.status(403).json({ error: 'Acceso denegado: se requiere rol admin' });
+res.status(404).json({ error: 'Recurso no encontrado' });
+
+// Error del servidor (5xx) — usar la clave "message" (patrón existente)
+res.status(500).json({ message: error.message });
+```
+
+> ⚠️ **IMPORTANTE:** No mezclar las claves `error` y `message` arbitrariamente. Respetar el patrón: `error` para 4xx, `message` para 5xx.
+
+### 5.3 Mongoose
+- Siempre incluir `{ timestamps: true }` en schemas nuevos.
+- Usar `runValidators: true` en `findByIdAndUpdate` y `findOneAndUpdate`.
+- Usar `returnDocument: 'after'` (no el deprecado `new: true`) en updates que devuelvan el documento.
+- Manejar errores de Mongoose explícitamente:
+  - `error.name === 'CastError'` → 400 ID inválido
+  - `error.name === 'ValidationError'` → 400 datos inválidos
+  - `error.code === 11000` → 400 duplicado
+- **NUNCA** exponer `error.stack` en respuestas de producción.
+- Usar `.populate()` con proyección explícita: `populate({ path: 'user', select: 'name email' })`.
+
+### 5.4 Autenticación y Roles
+- El sistema tiene dos roles: `'user'` y `'admin'`.
+- Cadena de middlewares estándar para rutas protegidas:
+  - Solo autenticado: `authMiddleware`
+  - Solo admin: `authMiddleware, adminMiddleware`
+  - Dueño o admin: usar helper `isOwnerOrAdmin(req, resourceOwnerId)` dentro del controlador.
+- JWT payload: `{ id: user._id, role: user.role }`. **NO** añadir datos sensibles al payload.
+- Expiración del token: **3 horas** (no cambiar sin revisar el flujo de refresh).
+
+### 5.5 Seguridad
+- Helmet, rate limiting y mongo-sanitize ya están configurados en `app.js`. No desactivarlos.
+- Rate limits activos:
+  - Global `/api`: 150 req / 15 min por IP
+  - Auth `/api/auth`: 10 req / 1 min por IP
+- Las rutas de autenticación NO deben devolver información que revele si un email existe (ver patrón en `forgotPassword` — siempre respuesta genérica).
+- Passwords siempre hasheados con `bcrypt` (salt rounds: 10).
+
+### 5.6 Logging
+- **En controladores:** NO usar `console.log`. Importar `logger` de `../middlewares/logger.middleware`.
+- Niveles: `logger.info()` para flujos normales, `logger.warn()` para situaciones anómalas no críticas, `logger.error()` para errores capturados.
+- Las peticiones HTTP son logueadas automáticamente por Morgan (no logear manualmente).
+
+---
+
+## 6. Frontend Rules
+
+### 6.1 Componentes React
+- Usar **function components** exclusivamente. No usar class components.
+- Un componente = un archivo `.jsx`.
+- Nombrar el componente igual que el archivo (PascalCase).
+- Props: desestructurar directamente en la firma de la función.
+- **Prohibido:** lógica de negocio compleja dentro del JSX. Extraer a variables o funciones dentro del componente.
+
+### 6.2 Estado y Context
+- El estado global del carrito vive en `CartContext` / `CartProvider`. Acceder siempre via el hook `useCart()`.
+- El carrito se persiste automáticamente en `localStorage` (lógica en `CartProvider`). No reimplementar esta persistencia en otro lugar.
+- Para estado local simple de un componente, usar `useState`.
+- Para efectos secundarios (fetch de datos), usar `useEffect` con el array de dependencias correcto.
+- **Prohibido:** mutar el estado directamente. Siempre usar el setter del `useState` con inmutabilidad (spread, map, filter).
+
+### 6.3 Llamadas a la API
+- **SIEMPRE** usar la instancia centralizada `axiosClient` de `src/api/axiosClient.js`.
+- `axiosClient` ya inyecta el token JWT automáticamente en el header `Authorization: Bearer <token>`.
+- **NUNCA** instanciar `axios` directamente en un componente o página.
+- Manejar errores de API con `try/catch` y mostrar feedback al usuario con `react-toastify`.
+
+### 6.4 Routing (React Router DOM v7)
+- Las rutas se definen en `App.jsx`. Agregar nuevas rutas solo ahí.
+- Usar `<Link>` o `useNavigate()` para navegación programática. Nunca `window.location.href` salvo casos excepcionales documentados.
+- Las rutas de admin/backoffice se montan sin protección de ruta en el cliente actualmente. Si se agrega un `ProtectedRoute`, hacerlo como componente wrapper en `src/components/`.
+
+### 6.5 UI y Estilos
+- El sistema de UI es **Bootstrap 5**. Usar clases de Bootstrap para layout, grid, tipografía y utilidades.
+- Para iconos: usar `lucide-react` o `react-icons` (ambas disponibles). No instalar otras librerías de iconos.
+- Notificaciones al usuario: **siempre** con `react-toastify` (`toast.success()`, `toast.error()`, `toast.warning()`). No usar `alert()`.
+- **No Tailwind CSS** en este proyecto. No proponer ni añadir Tailwind.
+- Estilos inline solo para valores dinámicos (ej. `style={{ paddingTop: '80px' }}`). Para estilos estáticos, usar clases de Bootstrap o clases CSS en archivos `.css`.
+
+### 6.6 Autenticación Frontend
+- El token JWT se gestiona con las funciones de `src/utils/auth.js` (`getToken`, `removeToken`).
+- Para decodificar el token y obtener el rol/id del usuario, usar `jwt-decode`.
+- **Nunca** almacenar el token en variables globales o en el state de React. Solo en `localStorage` via `utils/auth.js`.
+
+---
+
+## 7. Error Handling & Logging
+
+### 7.1 Backend — Patrón Obligatorio de Controladores
+```javascript
+const miControlador = async (req, res) => {
+    try {
+        // 1. Validar input
+        // 2. Lógica de negocio
+        // 3. Responder
+        res.status(200).json(resultado);
+    } catch (error) {
+        // Errores de Mongoose tipados
+        if (error.name === 'CastError') {
+            return res.status(400).json({ error: 'ID inválido' });
+        }
+        if (error.name === 'ValidationError') {
+            return res.status(400).json({ error: error.message });
+        }
+        if (error.code === 11000) {
+            return res.status(400).json({ error: 'El recurso ya existe' });
+        }
+        // Error genérico del servidor
+        res.status(500).json({ message: error.message });
+    }
+};
+```
+
+### 7.2 El Error Handler Global de Express
+`app.js` ya tiene un error handler global que:
+- Loguea el error con `logger.error()` incluyendo URL, método e IP.
+- Oculta el mensaje real en producción (`NODE_ENV === 'production'`).
+- Se activa automáticamente si se llama a `next(error)` o si Express 5 captura un throw async.
+
+**Uso:** Para errores inesperados, simplemente `throw` o llamar a `next(error)`. Para errores de negocio controlados, responder directamente con `res.status(X).json({ error: '...' })`.
+
+### 7.3 Frontend — Manejo de Errores en Llamadas API
+```javascript
+const handleAction = async () => {
+    try {
+        const { data } = await axiosClient.post('/endpoint', payload);
+        toast.success('Operación exitosa');
+        // actualizar estado...
+    } catch (error) {
+        const mensaje = error.response?.data?.error
+            || error.response?.data?.message
+            || 'Ocurrió un error inesperado';
+        toast.error(mensaje);
+    }
+};
+```
+- **Siempre** intentar extraer el mensaje de `error.response.data.error` primero, luego `.message`, y finalmente usar un mensaje genérico.
+- **Nunca** dejar un `catch` vacío o solo con `console.log`.
+
+---
+
+## 8. Docker & Deployment
+
+- El backend se containeriza con `node:20-alpine`. El CMD es `node src/server.js` (sin nodemon).
+- El frontend se sirve como SPA estática desde Nginx en el puerto 80.
+- Nginx tiene configurado `try_files $uri $uri/ /index.html` → obligatorio para React Router.
+- Variables de entorno se inyectan en runtime (no hardcodear en Dockerfiles).
+- El endpoint `/health` del backend es el healthcheck para orquestadores. No eliminarlo ni modificar su estructura.
+- El frontend también se puede deployar en **Vercel** (`vercel.json` presente). No crear build scripts que rompan este flujo.
+
+---
+
+## 9. Modelos de Datos — Referencia Rápida
+
+### Product
+`name (req), price (req, min:0), stock (req, min:0), category (req), details, image, images (max:5), badge, active (bool, default:true)` + timestamps
+- `image` e `images[0]` están **sincronizados automáticamente** via pre-save hook y transform de toJSON/toObject. No romper esta sincronización.
+
+### Sale (Pedido)
+`date, user (ref:User), items[{product,quantity,price,subtotal}], total (req), status (legacy: pending/completed/cancelled), numeroOrden, medioPago (transferencia|efectivo), metodoEntrega (retiro|envio), facturacion{nombreCompleto,domicilio}, direccionEnvio{calle,numero,ciudad,provincia,codigoPostal}, estado (pendiente|entregado)`
+- El campo `status` es **legacy** — mantenerlo para no romper código existente. El campo activo es `estado`.
+
+### User
+Ver `user.model.js`. Contiene campos de reset de contraseña: `resetPasswordToken` y `resetPasswordExpires`.
+
+### Cart & Category
+Ver `cart.model.js` y `category.model.js`.
+
+---
+
+## 10. Reglas de Calidad del Código
+
+- **Commits atómicos:** Un commit por feature o fix. No mezclar cambios no relacionados.
+- **No archivos muertos:** No dejar archivos importados pero no usados, o componentes sin referencias.
+- **No `TODO` sin contexto:** Si se deja un `// TODO`, agregar descripción del problema y autor.
+- **No secrets en código:** Toda clave, URI o credencial va en `.env`. Verificar que `.env` esté en `.gitignore`.
+- **Tests:** El proyecto no tiene tests automatizados actualmente. Si se agregan, colocarlos en `Backend/__tests__/` o `Frontend/src/__tests__/`.
+
+
+---
+
+## 11. Módulo de Reportes — node-cron + ExcelJS + Nodemailer
+
+### 11.1 Arquitectura del Módulo
+
+```
+Backend/src/
+├── jobs/
+│   └── reportsJob.js          ← Cron scheduler. Se registra en server.js post-connectDB.
+├── services/
+│   ├── reports.service.js     ← Genera el workbook Excel (lógica pura, sin side effects de red)
+│   └── mailer.service.js      ← Envía el workbook como adjunto por email (Nodemailer)
+├── controllers/
+│   └── reports.controller.js  ← Endpoint manual POST /api/reports/ventas/export
+└── routes/
+    └── reports.routes.js      ← Rutas del módulo (authMiddleware + adminMiddleware)
+```
+
+**Principio de diseño:** La generación del Excel (`reports.service.js`) está desacoplada del transporte (`mailer.service.js`). Esto permite reutilizar el servicio desde el cron y desde el endpoint sin duplicar lógica.
+
+### 11.2 Variables de Entorno Requeridas
+
+| Variable | Descripción | Default |
+|---|---|---|
+| `REPORT_EMAIL` | Destinatario del reporte | Usa `MAIL_FROM` si no está definida |
+| `REPORT_CRON_SCHEDULE` | Expresión cron (5 campos) | `59 23 * * *` (23:59 todos los días) |
+
+> ⚠️ **IMPORTANTE:** El cron usa zona horaria `America/Argentina/Buenos_Aires` fija. No cambiarla sin avisar.
+
+### 11.3 Endpoint Manual
+
+```
+POST /api/reports/ventas/export
+Headers: Authorization: Bearer <token_admin>
+Body (opcional): { "desde": "2026-10-01T00:00:00", "hasta": "2026-10-31T23:59:59" }
+```
+
+- Si no se pasa body, reporta el **día actual completo** en hora Argentina.
+- Responde `200 { message, periodo }` al terminar. El Excel llega por email, no como descarga HTTP.
+- Solo accesible con rol `admin`.
+
+### 11.4 Estructura del Excel Generado
+
+El archivo tiene **dos hojas**:
+
+| Hoja | Contenido |
+|---|---|
+| `Pedidos` | Una fila por ítem de cada orden. Columnas: N° Orden, Fecha, Cliente, Email, Producto, Cantidad, Precio Unit., Subtotal, Total Orden, Medio de Pago, Entrega, Estado. |
+| `Resumen` | Bloques: Totales por Día / Totales por Medio de Pago / Totales por Método de Entrega. |
+
+### 11.5 Reglas para Modificaciones Futuras
+
+- **No escribir el archivo en disco.** Usar siempre `workbook.xlsx.writeBuffer()` → buffer en memoria. El servidor es stateless (Docker).
+- Para agregar una nueva hoja al reporte, crear una función privada `_agregarHoja<Nombre>()` en `reports.service.js` y llamarla desde `generarReporteVentas()`. No crecer la función principal.
+- Para agregar un nuevo tipo de reporte (ej. reporte de productos), crear un **nuevo servicio** en `src/services/` y un **nuevo job** en `src/jobs/`. No reutilizar `reportsJob.js` para múltiples responsabilidades.
+- Si en el futuro se cambia el schedule del cron, solo modificar la env var `REPORT_CRON_SCHEDULE`. No hardcodear expresiones cron en el código.
+- El job **nunca debe crashear el proceso**. Todo error dentro de `ejecutarReporteDiario()` debe ser atrapado y logueado con `logger.error()`.

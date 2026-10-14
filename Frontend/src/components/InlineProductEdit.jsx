@@ -230,6 +230,43 @@ function InlineProductEdit({ id, initialData, onCancel, onSuccess, isCreate, onT
         }
     };
 
+    const hasSuggestedPrice =
+        !isCreate &&
+        form.suggestedPrice != null &&
+        Number(form.suggestedPrice) !== Number(form.price);
+
+    const handleConfirmSuggestedPrice = async (e) => {
+        if (e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+        if (!hasSuggestedPrice) return;
+        setLoading(true);
+        try {
+            const token = localStorage.getItem('token');
+            const { data } = await axios.patch(
+                `${API_URL}/products/${id}/confirm-price`,
+                {},
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+            const nuevoPrecio = data.product?.price ?? form.suggestedPrice;
+            setForm(prev => ({
+                ...prev,
+                price: nuevoPrecio,
+                suggestedPrice: null,
+                suggestedPriceDate: null
+            }));
+            toast.success(`Precio actualizado a $${nuevoPrecio} según Excel`);
+            if (onSuccess) {
+                onSuccess(data.product || { ...form, price: nuevoPrecio, suggestedPrice: null });
+            }
+        } catch (err) {
+            toast.error(err.response?.data?.error || 'Error al confirmar precio de Excel');
+        } finally {
+            setLoading(false);
+        }
+    };
+
     return (
         <form className="d-flex flex-column gap-1 position-relative h-100" onSubmit={handleSave} onClick={(e) => e.stopPropagation()}>
             <div className="d-flex justify-content-between align-items-center mb-1 pb-1 border-bottom">
@@ -243,6 +280,38 @@ function InlineProductEdit({ id, initialData, onCancel, onSuccess, isCreate, onT
                 />
             </div>
 
+            {/* — Alerta Visual: Precio Sugerido por Excel — */}
+            {hasSuggestedPrice && (
+                <div className="alert alert-warning p-2 mb-2 rounded-3 border border-warning shadow-sm" role="alert">
+                    <div className="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                        <div className="d-flex align-items-center gap-2 flex-wrap">
+                            <span className="fw-bold text-dark" style={{ fontSize: '0.9rem' }}>
+                                ${form.price}
+                            </span>
+                            <span
+                                className="badge bg-warning text-dark border border-warning-subtle fw-semibold"
+                                style={{ fontSize: '0.75rem' }}
+                            >
+                                Según Excel: ${form.suggestedPrice}
+                            </span>
+                        </div>
+                        <button
+                            type="button"
+                            className="btn btn-warning btn-sm py-1 px-2 rounded-2 fw-semibold shadow-sm d-flex align-items-center gap-1"
+                            style={{ fontSize: '0.75rem' }}
+                            onClick={handleConfirmSuggestedPrice}
+                            disabled={loading}
+                            title="Confirmar y reemplazar precio actual con el calculado en Excel"
+                        >
+                            <FiCheck size={13} /> Confirmar Actualización
+                        </button>
+                    </div>
+                    <div className="text-muted mt-1" style={{ fontSize: '0.68rem' }}>
+                        La planilla de costos calculó un precio sugerido diferente al actual.
+                    </div>
+                </div>
+            )}
+
             {/* — Datos del producto — */}
             <div className="row g-2">
                 <div className="col-12">
@@ -251,7 +320,14 @@ function InlineProductEdit({ id, initialData, onCancel, onSuccess, isCreate, onT
                 </div>
 
                 <div className="col-6">
-                    <label className="form-label small text-muted mb-1 fw-medium">Precio ($)</label>
+                    <div className="d-flex justify-content-between align-items-center mb-1">
+                        <label className="form-label small text-muted mb-0 fw-medium">Precio ($)</label>
+                        {hasSuggestedPrice && (
+                            <span className="text-warning fw-semibold" style={{ fontSize: '0.68rem' }}>
+                                Excel: ${form.suggestedPrice}
+                            </span>
+                        )}
+                    </div>
                     <input required className="form-control form-control-sm rounded-3" type="number" placeholder="0" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} />
                 </div>
 

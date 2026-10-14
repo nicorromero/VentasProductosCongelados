@@ -54,6 +54,8 @@ function Catalogo() {
                             stock={product.stock}
                             badge={product.badge}
                             active={product.active}
+                            suggestedPrice={product.suggestedPrice}
+                            suggestedPriceDate={product.suggestedPriceDate}
                         />
                     </div>
                 ))}

@@ -10,6 +10,7 @@ const cartsRoutes = require('./routes/carts.routes');
 const authRoutes = require('./routes/auth.routes');
 const contactRoutes = require('./routes/contact.routes');
 const categoriesRoutes = require('./routes/categories.routes');
+const reportsRoutes    = require('./routes/reports.routes');
 const { httpLogger, logger } = require('./middlewares/logger.middleware');
 const cors = require('cors');
 const app = express();
@@ -75,6 +76,7 @@ app.use('/carts', cartsRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/contact', contactRoutes);
 app.use('/categories', categoriesRoutes);
+app.use('/api/reports', reportsRoutes);
 
 // Manejo Global de Errores (Error Handler)
 // Atrapa cualquier error no controlado y evita que crashee la app de Express

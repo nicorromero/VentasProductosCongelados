@@ -25,7 +25,7 @@ function normalizeImages(data) {
     return [];
 }
 
-function ProductCard({id, name, details, price, image, images = [], stock, category, active, badge, isCreate, onCreateSuccess}) {
+function ProductCard({id, name, details, price, image, images = [], stock, category, active, badge, suggestedPrice = null, suggestedPriceDate = null, isCreate, onCreateSuccess}) {
     const { cartItems, addToCart, removeFromCart, increaseQty, decreaseQty, updateQty } = useCart();
     const isAdmin = getRole() === 'admin';
 
@@ -53,7 +53,9 @@ function ProductCard({id, name, details, price, image, images = [], stock, categ
         stock,
         category,
         active,
-        badge
+        badge,
+        suggestedPrice,
+        suggestedPriceDate
     });
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
@@ -69,9 +71,11 @@ function ProductCard({id, name, details, price, image, images = [], stock, categ
             stock,
             category,
             active,
-            badge
+            badge,
+            suggestedPrice,
+            suggestedPriceDate
         });
-    }, [name, details, price, image, images, stock, category, active, badge]);
+    }, [name, details, price, image, images, stock, category, active, badge, suggestedPrice, suggestedPriceDate]);
 
     const cartItem = cartItems?.find((item) => item._id === id);
     const quantity = cartItem ? cartItem.quantity : 0;
@@ -615,7 +619,18 @@ function ProductCard({id, name, details, price, image, images = [], stock, categ
                 <div className="card-body p-3 d-flex flex-column">
                     <p className="text-muted small text-uppercase mb-1" style={{ letterSpacing: '1px', fontSize: '0.7rem' }}>{localData.category}</p>
                     <h3 className="fs-6 fw-medium mb-1">{localData.name}</h3>
-                    <span className="fw-medium mb-2 fs-5">${localData.price}</span>
+                    <div className="d-flex align-items-center flex-wrap gap-2 mb-2">
+                        <span className="fw-medium fs-5">${localData.price}</span>
+                        {isAdmin && localData.suggestedPrice != null && Number(localData.suggestedPrice) !== Number(localData.price) && (
+                            <span
+                                className="badge bg-warning text-dark border border-warning-subtle fw-semibold"
+                                style={{ fontSize: '0.72rem' }}
+                                title="Precio sugerido por la planilla de costos de Excel"
+                            >
+                                Según Excel: ${localData.suggestedPrice}
+                            </span>
+                        )}
+                    </div>
 
                     {isAdmin ? (
                         /* Admin stock control */

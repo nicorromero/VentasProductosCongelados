@@ -10,7 +10,10 @@ const {
     updateProduct,
     toggleActive,
     getInactiveProducts,
-    reactivateProduct
+    reactivateProduct,
+    confirmSuggestedPrice,
+    syncExcelPricesManual,
+    syncExcelSalesManual
 } = require('../controllers/products.controllers');
 
 router.get('/', getProducts);
@@ -21,5 +24,9 @@ router.put('/:id', authMiddleware, adminMiddleware, updateProduct);
 router.delete('/:id', authMiddleware, adminMiddleware, deleteProduct);
 router.patch('/:id/toggle-active', authMiddleware, adminMiddleware, toggleActive);
 router.patch('/:id/reactivate', authMiddleware, adminMiddleware, reactivateProduct);
+// ── Excel Sync: confirmar precio sugerido y disparadores manuales ─────────────
+router.patch('/:id/confirm-price', authMiddleware, adminMiddleware, confirmSuggestedPrice);
+router.post('/sync-excel-prices', authMiddleware, adminMiddleware, syncExcelPricesManual);
+router.post('/sync-excel-sales', authMiddleware, adminMiddleware, syncExcelSalesManual);
 
 module.exports = router;
