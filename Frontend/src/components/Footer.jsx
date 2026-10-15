@@ -1,9 +1,6 @@
-import { useState } from 'react';
 import { FaWhatsapp, FaRocket, FaLaptopCode, FaCogs, FaArrowRight, FaChevronDown } from 'react-icons/fa';
 
 function Footer() {
-    const [isHovered, setIsHovered] = useState(false);
-
     const whatsappNumber = '5493442654872';
     const whatsappMessage = encodeURIComponent(
         '¡Hola! Vi el cartel en tu web y me gustaría consultar sobre una página web, software de gestión o automatizaciones para mi negocio.'
@@ -12,6 +9,57 @@ function Footer() {
 
     return (
         <footer className="bg-dark text-center py-4 mt-auto" style={{ borderTop: '3px solid #dc3545' }}>
+            <style>{`
+                .footer-promo-card {
+                    background: linear-gradient(135deg, rgba(28, 32, 37, 0.95) 0%, rgba(220, 53, 69, 0.08) 100%);
+                    border: 1px solid rgba(255, 255, 255, 0.14);
+                    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+                    transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+                }
+
+                /* En computadoras (>= 768px): Colapsado por defecto, se despliega suavemente al pasar el mouse */
+                @media (min-width: 768px) {
+                    .footer-promo-card:hover {
+                        background: linear-gradient(135deg, rgba(28, 32, 37, 0.98) 0%, rgba(25, 135, 84, 0.18) 100%) !important;
+                        border: 2px solid #25D366 !important;
+                        box-shadow: 0 10px 25px -5px rgba(37, 211, 102, 0.3), 0 0 15px rgba(37, 211, 102, 0.2) !important;
+                        transform: translateY(-3px);
+                    }
+                    .footer-promo-collapse {
+                        max-height: 0;
+                        opacity: 0;
+                        overflow: hidden;
+                        margin-top: 0;
+                        transition: max-height 0.4s ease, opacity 0.35s ease, margin-top 0.3s ease;
+                    }
+                    .footer-promo-card:hover .footer-promo-collapse {
+                        max-height: 520px;
+                        opacity: 1;
+                        margin-top: 0.85rem;
+                    }
+                    .footer-promo-chevron {
+                        transition: transform 0.3s ease;
+                    }
+                    .footer-promo-card:hover .footer-promo-chevron {
+                        transform: rotate(180deg);
+                    }
+                }
+
+                /* En celulares (< 768px): SIEMPRE desplegado para que el usuario pueda ver toda la información de inmediato */
+                @media (max-width: 767.98px) {
+                    .footer-promo-card {
+                        background: linear-gradient(135deg, rgba(28, 32, 37, 0.98) 0%, rgba(25, 135, 84, 0.14) 100%);
+                        border: 1.5px solid rgba(37, 211, 102, 0.5);
+                    }
+                    .footer-promo-collapse {
+                        max-height: none !important;
+                        opacity: 1 !important;
+                        overflow: visible !important;
+                        margin-top: 0.85rem !important;
+                    }
+                }
+            `}</style>
+
             <div className="container d-flex justify-content-center mb-3">
                 <a
                     href={whatsappUrl}
@@ -23,24 +71,9 @@ function Footer() {
                         width: '100%',
                         cursor: 'pointer',
                     }}
-                    onMouseEnter={() => setIsHovered(true)}
-                    onMouseLeave={() => setIsHovered(false)}
                     aria-label="Contacto por WhatsApp para desarrollo web y software de gestión"
                 >
-                    <div
-                        className="rounded-4 p-3 text-start position-relative shadow-sm"
-                        style={{
-                            background: isHovered
-                                ? 'linear-gradient(135deg, rgba(28, 32, 37, 0.98) 0%, rgba(25, 135, 84, 0.16) 100%)'
-                                : 'linear-gradient(135deg, rgba(28, 32, 37, 0.92) 0%, rgba(220, 53, 69, 0.08) 100%)',
-                            border: isHovered ? '2px solid #25D366' : '1px solid rgba(255, 255, 255, 0.14)',
-                            boxShadow: isHovered
-                                ? '0 10px 25px -5px rgba(37, 211, 102, 0.3), 0 0 15px rgba(37, 211, 102, 0.2)'
-                                : '0 4px 12px rgba(0, 0, 0, 0.3)',
-                            transform: isHovered ? 'translateY(-3px)' : 'translateY(0)',
-                            transition: 'all 0.35s cubic-bezier(0.4, 0, 0.2, 1)',
-                        }}
-                    >
+                    <div className="footer-promo-card rounded-4 p-3 text-start position-relative shadow-sm">
                         {/* Cabecera principal llamativa */}
                         <div className="d-flex align-items-center justify-content-between gap-2 flex-wrap">
                             <div className="d-flex align-items-center gap-3">
@@ -51,10 +84,7 @@ function Footer() {
                                         height: '44px',
                                         background: 'linear-gradient(135deg, #25D366 0%, #128C7E 100%)',
                                         color: '#fff',
-                                        boxShadow: isHovered
-                                            ? '0 0 16px rgba(37, 211, 102, 0.7)'
-                                            : '0 0 10px rgba(37, 211, 102, 0.4)',
-                                        transition: 'box-shadow 0.3s ease',
+                                        boxShadow: '0 0 12px rgba(37, 211, 102, 0.5)',
                                     }}
                                 >
                                     <FaWhatsapp size={24} />
@@ -67,35 +97,26 @@ function Footer() {
                                         </span>
                                     </h6>
                                     <span className="text-secondary small">
-                                        Tocá aquí para chatear directo al <strong className="text-light"></strong>
+                                        Tocá aquí para chatear directo al <strong className="text-light">3442 654872</strong>
                                     </span>
                                 </div>
                             </div>
 
                             <div className="d-flex align-items-center gap-2 ms-auto">
-                                <span className="badge rounded-pill bg-dark border border-secondary text-light small px-3 py-1 d-none d-sm-inline-flex align-items-center gap-1">
-                                    <span style={{ color: '#25D366' }}>●</span> {isHovered ? '¡Hacé clic para enviar WhatsApp!' : 'Pasa el mouse para ver más'}
+                                {/* Indicador para pantallas de escritorio */}
+                                <span className="badge rounded-pill bg-dark border border-secondary text-light small px-3 py-1 d-none d-md-inline-flex align-items-center gap-1">
+                                    <span style={{ color: '#25D366' }}>●</span> Pasa el mouse para ver más
                                 </span>
-                                <FaChevronDown
-                                    className="text-muted"
-                                    style={{
-                                        transform: isHovered ? 'rotate(180deg)' : 'rotate(0deg)',
-                                        transition: 'transform 0.3s ease',
-                                    }}
-                                />
+                                {/* Indicador para pantallas de celular */}
+                                <span className="badge rounded-pill bg-success text-white small px-2 py-1 d-inline-flex d-md-none align-items-center gap-1">
+                                    ● ¡Tocá para chatear!
+                                </span>
+                                <FaChevronDown className="footer-promo-chevron text-muted d-none d-md-inline-block" />
                             </div>
                         </div>
 
-                        {/* Contenido desplegable con información llamativa */}
-                        <div
-                            style={{
-                                maxHeight: isHovered ? '480px' : '0px',
-                                opacity: isHovered ? 1 : 0,
-                                overflow: 'hidden',
-                                transition: 'max-height 0.4s ease, opacity 0.35s ease, margin-top 0.3s ease',
-                                marginTop: isHovered ? '0.85rem' : '0rem',
-                            }}
-                        >
+                        {/* Contenido: desplegable en escritorio, fijo/abierto en celular */}
+                        <div className="footer-promo-collapse">
                             <hr className="border-secondary my-2 opacity-25" />
 
                             <div
@@ -112,7 +133,7 @@ function Footer() {
                             </div>
 
                             <p className="text-light small mb-2 fw-semibold">
-                                Llevá tu negocio al siguiente nivel tecnológico:
+                                🚀 Llevá tu negocio al siguiente nivel tecnológico:
                             </p>
 
                             <div className="row g-2 mb-3">
@@ -164,7 +185,7 @@ function Footer() {
 
                             <div className="d-flex justify-content-between align-items-center flex-wrap gap-2 pt-1">
                                 <span className="text-white-50 small" style={{ fontSize: '0.8rem' }}>
-                                    <em>Soluciones personalizadas pensadas para hacer crecer tu emprendimiento.</em>
+                                    💡 <em>Soluciones personalizadas pensadas para hacer crecer tu emprendimiento.</em>
                                 </span>
                                 <span className="btn btn-sm btn-success fw-bold px-3 py-1 rounded-pill d-inline-flex align-items-center gap-1 shadow-sm">
                                     Enviar WhatsApp <FaArrowRight size={12} />
