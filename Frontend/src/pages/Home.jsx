@@ -287,68 +287,7 @@ function Home() {
       </section>
 
 
-      {/* =========================================================================
-          2. TRUST BAR: BENEFICIOS CLAVE (Los 4 pilares de valor)
-          ========================================================================= */}
-      <section className="py-5 bg-white border-top border-bottom border-light">
-        <div className="container">
-          <div className="row g-4 justify-content-center">
 
-            {/* Pilar 1: Cocción lenta y pernil */}
-            <div className="col-12 col-sm-6 col-lg-3">
-              <div className="feature-card p-4 h-100 shadow-sm text-center text-sm-start d-flex flex-column align-items-center align-items-sm-start">
-                <div className="rounded-3 p-3 mb-3 d-inline-flex" style={{ backgroundColor: '#FAF2E6', color: '#B68949' }}>
-                  <FaFire size={24} />
-                </div>
-                <h3 className="fs-5 fw-bold mb-2">Pernil a Fuego Lento</h3>
-                <p className="text-secondary small mb-0">
-                  Horas de cocción paciente para una carne tierna y jugosa con panes esponjosos y salsas artesanales.
-                </p>
-              </div>
-            </div>
-
-            {/* Pilar 2: Milanesas y carnes caseras */}
-            <div className="col-12 col-sm-6 col-lg-3">
-              <div className="feature-card p-4 h-100 shadow-sm text-center text-sm-start d-flex flex-column align-items-center align-items-sm-start">
-                <div className="rounded-3 p-3 mb-3 d-inline-flex" style={{ backgroundColor: '#FDEDEC', color: '#C0392B' }}>
-                  <GiMeat size={24} />
-                </div>
-                <h3 className="fs-5 fw-bold mb-2">Milanesas de Primera</h3>
-                <p className="text-secondary small mb-0">
-                  De carne seleccionada y pollo tierno, rebozadas a mano para resolver tus almuerzos y cenas al toque.
-                </p>
-              </div>
-            </div>
-
-            {/* Pilar 3: Pizzas y Tarteletas caseras */}
-            <div className="col-12 col-sm-6 col-lg-3">
-              <div className="feature-card p-4 h-100 shadow-sm text-center text-sm-start d-flex flex-column align-items-center align-items-sm-start">
-                <div className="rounded-3 p-3 mb-3 d-inline-flex" style={{ backgroundColor: '#EBF5FB', color: '#2980B9' }}>
-                  <FaPizzaSlice size={24} />
-                </div>
-                <h3 className="fs-5 fw-bold mb-2">Pizzas & Tarteletas</h3>
-                <p className="text-secondary small mb-0">
-                  Masas caseras y vegetales frescos picados a mano. Comidas completas, ricas y listas para el horno.
-                </p>
-              </div>
-            </div>
-
-            {/* Pilar 4: Freezer lleno y practicidad */}
-            <div className="col-12 col-sm-6 col-lg-3">
-              <div className="feature-card p-4 h-100 shadow-sm text-center text-sm-start d-flex flex-column align-items-center align-items-sm-start">
-                <div className="rounded-3 p-3 mb-3 d-inline-flex" style={{ backgroundColor: '#EAFAF1', color: '#27AE60' }}>
-                  <MdOutlineKitchen size={24} />
-                </div>
-                <h3 className="fs-5 fw-bold mb-2">Práctico para el Freezer</h3>
-                <p className="text-secondary small mb-0">
-                  Stockeá tu cocina con comida casera real. Cero conservantes artificiales y máxima practicidad.
-                </p>
-              </div>
-            </div>
-
-          </div>
-        </div>
-      </section>
 
 
       {/* =========================================================================
@@ -563,7 +502,7 @@ function Home() {
               <div className="quote-bubble p-4 rounded-3 shadow-sm mb-4">
                 <p className="fs-5 mb-0 fst-italic" style={{ color: '#232427', lineHeight: '1.6' }}>
                   &ldquo;Somos una familia que disfruta hacer comida casera, rica y hecha con amor.
-                  Trabajamos en familia y ponemos dedicación en cada cosa que preparamos.&rdquo;
+                  Trabajamos desde casa y ponemos dedicación en cada cosa que preparamos.&rdquo;
                 </p>
               </div>
 
