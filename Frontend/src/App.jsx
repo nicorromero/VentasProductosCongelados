@@ -1,4 +1,4 @@
-import { Routes, Route, useLocation } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 import Home from './pages/Home';
 import Contact from './pages/Contact';
 import Catalogo from './pages/Catalogo';
@@ -18,19 +18,10 @@ import InactiveUsers from './pages/InactiveUsers';
 import InactiveProducts from './pages/InactiveProducts';
 
 function App() {
-  const location = useLocation();
-  const rutasFijasExactas = [
-    '/admin-login',
-    '/contacto',
-    '/mi-perfil',
-    '/forgot-password',
-  ];
-  const esLayoutFijo = rutasFijasExactas.includes(location.pathname);
-
   return (
-    <div className={`d-flex flex-column ${esLayoutFijo ? 'vh-100 overflow-hidden' : 'min-vh-100'}`}>
+    <div className="d-flex flex-column min-vh-100">
       <NavBar />
-      <main className={`flex-grow-1 ${esLayoutFijo ? 'overflow-auto' : ''}`} style={{ paddingTop: '80px' }}>
+      <main className="flex-grow-1" style={{ paddingTop: '80px' }}>
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/contacto" element={<Contact />} />
