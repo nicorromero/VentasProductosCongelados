@@ -17,6 +17,13 @@ const API_URL = import.meta.env.VITE_API_BASE_URL;
 function Home() {
   const navigate = useNavigate();
   const [catalogProducts, setCatalogProducts] = useState([]);
+  const [heroSlide, setHeroSlide] = useState(0);
+
+  // Auto-cicla el carrusel del hero cada 4 segundos
+  useEffect(() => {
+    const timer = setInterval(() => setHeroSlide(s => (s + 1) % 2), 4000);
+    return () => clearInterval(timer);
+  }, []);
 
   // Consultamos los productos reales del catálogo para utilizar sus fotos auténticas si existen
   useEffect(() => {
@@ -234,54 +241,67 @@ function Home() {
 
             </div>
 
-            {/* Columna Derecha: Fotos 100% auténticas y reales del negocio */}
+            {/* Columna Derecha: Carrusel de fotos auténticas del negocio */}
             <div className="col-12 col-lg-6">
               <div className="position-relative mx-auto" style={{ maxWidth: '520px' }}>
 
-                {/* Imagen principal: Mesa servida con pernil, figacitas y salsas (foto1.png) */}
-                <div className="shadow-lg rounded-4 overflow-hidden border border-2 border-white" style={{ maxHeight: '420px' }}>
-                  <img
-                    src="/foto1.png"
-                    alt="Pernil casero con panes esponjosos y salsas artesanales de Kepernil"
-                    className="w-100 h-100 object-fit-cover"
-                    style={{ minHeight: '340px' }}
-                  />
-                </div>
-
-                {/* Tarjeta flotante 1: Horno a leña y cocción lenta real (foto3.png) */}
-                <div
-                  className="position-absolute bg-white rounded-3 shadow p-2 d-none d-sm-flex align-items-center gap-2 border border-light"
-                  style={{ top: '-15px', right: '-15px', zIndex: 2, maxWidth: '220px' }}
-                >
-                  <img
-                    src="/foto3.png"
-                    alt="Cocción lenta en horno"
-                    className="rounded-2 object-fit-cover"
-                    style={{ width: '54px', height: '54px' }}
-                  />
-                  <div>
-                    <div className="fw-bold small" style={{ color: '#232427' }}>Cocción Lenta</div>
-                    <small className="text-muted" style={{ fontSize: '0.75rem' }}>Dorado y jugoso</small>
-                  </div>
-                </div>
-
-                {/* Tarjeta flotante 2: Bandeja lista de pernil desmechado (foto4.png) */}
-                <div
-                  className="position-absolute bg-white rounded-4 shadow-lg p-3 d-flex align-items-center gap-3 border border-light"
-                  style={{ bottom: '-20px', left: '-15px', zIndex: 2, maxWidth: '260px' }}
-                >
-                  <div className="rounded-circle p-2 d-flex align-items-center justify-content-center" style={{ backgroundColor: '#FAF2E6', color: '#B68949' }}>
-                    <FiClock size={24} />
-                  </div>
-                  <div>
-                    <div className="fw-bold text-dark small">¡Listo en 5 Minutos!</div>
-                    <small className="text-secondary" style={{ fontSize: '0.78rem' }}>Calentás, servís y a disfrutar</small>
-                  </div>
-                </div>
-
+                {/* Carrusel: foto1.png y foto3.png */}
+                {(() => {
+                  const heroImages = [
+                    { src: '/foto1.png', alt: 'Pernil casero con panes esponjosos y salsas artesanales de Kepernil' },
+                    { src: '/foto3.png', alt: 'Horno a leña y cocción lenta — Kepernil' },
+                  ];
+                  return (
+                    <div className="position-relative shadow-lg rounded-4 overflow-hidden border border-2 border-white" style={{ maxHeight: '420px' }}>
+                      {heroImages.map((img, idx) => (
+                        <img
+                          key={img.src}
+                          src={img.src}
+                          alt={img.alt}
+                          className="w-100 h-100 object-fit-cover"
+                          style={{
+                            minHeight: '340px',
+                            display: heroSlide === idx ? 'block' : 'none',
+                          }}
+                        />
+                      ))}
+                      {/* Flechas de navegación */}
+                      <button
+                        onClick={() => setHeroSlide(s => (s === 0 ? heroImages.length - 1 : s - 1))}
+                        className="position-absolute top-50 start-0 translate-middle-y btn btn-sm btn-dark bg-opacity-50 rounded-circle ms-2 d-flex align-items-center justify-content-center"
+                        style={{ width: 36, height: 36, zIndex: 2, border: 'none', opacity: 0.75 }}
+                        aria-label="Foto anterior"
+                      >
+                        &#8592;
+                      </button>
+                      <button
+                        onClick={() => setHeroSlide(s => (s === heroImages.length - 1 ? 0 : s + 1))}
+                        className="position-absolute top-50 end-0 translate-middle-y btn btn-sm btn-dark bg-opacity-50 rounded-circle me-2 d-flex align-items-center justify-content-center"
+                        style={{ width: 36, height: 36, zIndex: 2, border: 'none', opacity: 0.75 }}
+                        aria-label="Foto siguiente"
+                      >
+                        &#8594;
+                      </button>
+                      {/* Indicadores de puntos */}
+                      <div className="position-absolute bottom-0 start-50 translate-middle-x mb-2 d-flex gap-2" style={{ zIndex: 2 }}>
+                        {heroImages.map((_, idx) => (
+                          <button
+                            key={idx}
+                            onClick={() => setHeroSlide(idx)}
+                            style={{
+                              width: 10, height: 10, borderRadius: '50%', border: 'none', padding: 0,
+                              backgroundColor: heroSlide === idx ? '#ffffff' : 'rgba(255,255,255,0.45)',
+                              cursor: 'pointer',
+                            }}
+                            aria-label={`Ir a foto ${idx + 1}`}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })()}
               </div>
             </div>
-
           </div>
         </div>
       </section>
