@@ -55,6 +55,8 @@ const allowedOrigins = [
   "http://localhost:5173",
   "http://localhost:5174",
   "https://programacioniv.vercel.app",
+  "https://ke-pernil.vercel.app",
+  "https://ventas-productos-congelados.vercel.app",
   process.env.FRONTEND_URL,
 ].filter(Boolean);
 app.use(cors({ origin: allowedOrigins, credentials: true }));
