@@ -252,7 +252,28 @@ function ProductCard({id, name, details, price, image, images = [], stock, categ
         setLocalData(prev => ({ ...prev, stock: newStock }));
     };
 
-    const handleConfirmAdminStock = async (e) => {
+    const handleConfirmPrice = async (e) => {
+  e.stopPropagation();
+  try {
+    const token = localStorage.getItem('token');
+    await axios.put(`${import.meta.env.VITE_API_BASE_URL}/products/${id}/confirm-price`, {}, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    toast.success('Precio confirmado');
+    // actualizar estado local
+    setLocalData(prev => ({
+      ...prev,
+      price: prev.suggestedPrice,
+      suggestedPrice: null,
+      suggestedPriceDate: null,
+      needsPriceConfirmation: false,
+    }));
+    // notificar a otros componentes
+    window.dispatchEvent(new CustomEvent('product-updated', { detail: { ...localData, price: localData.suggestedPrice } }));
+  } catch (err) {
+    toast.error(err.response?.data?.error || 'Error al confirmar precio');
+  }
+};
         if (e) e.stopPropagation();
         const newStock = Number(localData.stock || 0);
         setIsAdminSelectingStock(false);
@@ -622,14 +643,25 @@ function ProductCard({id, name, details, price, image, images = [], stock, categ
                     <div className="d-flex align-items-center flex-wrap gap-2 mb-2">
                         <span className="fw-medium fs-5">${localData.price}</span>
                         {isAdmin && localData.suggestedPrice != null && Number(localData.suggestedPrice) !== Number(localData.price) && (
-                            <span
-                                className="badge bg-warning text-dark border border-warning-subtle fw-semibold"
-                                style={{ fontSize: '0.72rem' }}
-                                title="Precio sugerido por la planilla de costos de Excel"
-                            >
-                                Según Excel: ${localData.suggestedPrice}
-                            </span>
-                        )}
+    <>
+        <span
+            className="badge bg-warning text-dark border border-warning-subtle fw-semibold"
+            style={{ fontSize: '0.72rem' }}
+            title="Precio sugerido por la planilla de costos de Excel"
+        >
+            Según Excel: ${localData.suggestedPrice}
+        </span>
+        {/* Botón de confirmación */}
+        <button
+            type="button"
+            className="btn btn-sm btn-success ms-2"
+            onClick={handleConfirmPrice}
+            title="Confirmar precio sugerido"
+        >
+            Confirmar Cambio
+        </button>
+    </>
+)}
                     </div>
 
                     {isAdmin ? (

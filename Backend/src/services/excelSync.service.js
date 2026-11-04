@@ -368,6 +368,7 @@ async function leerPreciosSugeridos() {
             if (prod.suggestedPrice !== precioRedondeado) {
                 prod.suggestedPrice = precioRedondeado;
                 prod.suggestedPriceDate = ahora;
+                prod.needsPriceConfirmation = true;
                 await prod.save();
                 actualizados++;
                 logger.info(`[GoogleSheetsSync] Nueva sugerencia para "${prod.name}": Actual=$${prod.price} -> Google Sheets=$${precioRedondeado}`);

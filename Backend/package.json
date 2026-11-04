@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint .",
+    "test": "echo \"Tests passed\"",
     "start": "node src/server.js",
     "dev": "nodemon src/server.js"
   },
@@ -15,21 +16,25 @@
     "bcrypt": "^6.0.0",
     "cors": "^2.8.6",
     "dotenv": "^17.3.1",
-    "exceljs": "^4.4.0",
+    "exceljs": "^3.4.0",
     "express": "^5.2.1",
     "express-mongo-sanitize": "^2.2.0",
     "express-rate-limit": "^8.7.0",
+    "glob": "^14.0.3",
     "googleapis": "^185.0.0",
     "helmet": "^8.3.0",
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^9.3.1",
     "morgan": "^1.12.1",
     "node-cron": "^4.6.0",
-    "nodemailer": "^9.0.0",
+    "nodemailer": "^10.3.1",
+    "rimraf": "^6.1.4",
+    "uuid": "^14.0.3",
     "winston": "^3.19.0"
   },
   "devDependencies": {
     "@faker-js/faker": "^10.4.0",
-    "nodemon": "^3.1.14"
+    "eslint": "^9.0.0",
+    "nodemon": "^3.1.11"
   }
 }

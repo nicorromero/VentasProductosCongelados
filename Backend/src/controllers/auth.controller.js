@@ -4,9 +4,12 @@ const bcrypt = require('bcrypt');
 const User   = require('../models/user.model');
 const { sendPasswordResetEmail } = require('../config/mailer');
 
+const { logger } = require('../middlewares/logger.middleware');
+
 const login = async (req, res) => {
     try {
         const { email, password } = req.body;
+        logger.info(`Intento de login para email: ${email}`);
 
         if (!email || !password) {
             return res.status(400).json({ error: 'Email y contraseña son requeridos' });
@@ -43,6 +46,7 @@ const forgotPassword = async (req, res) => {
 
     try {
         const { email } = req.body;
+        logger.info(`Solicitud de recuperación de contraseña para: ${email}`);
         if (!email) {
             return res.status(400).json({ error: 'Email requerido' });
         }
@@ -64,6 +68,7 @@ const forgotPassword = async (req, res) => {
         const resetLink = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
 
         try {
+            logger.info(`Enviando email de recuperación para: ${email}`);
             await sendPasswordResetEmail(user.email, resetLink);
         } catch (mailErr) {
             console.error('Error al enviar email de recuperación:', mailErr.message);
@@ -79,6 +84,7 @@ const resetPassword = async (req, res) => {
     try {
         const { token } = req.params;
         const { password } = req.body;
+        logger.info('Intento de reseteo de contraseña');
 
         if (!token) {
             return res.status(400).json({ error: 'Token requerido' });
@@ -102,6 +108,8 @@ const resetPassword = async (req, res) => {
         user.resetPasswordToken   = null;
         user.resetPasswordExpires = null;
         await user.save();
+
+        logger.info(`Contraseña actualizada para email: ${user.email}`);
 
         res.status(200).json({ message: 'Contraseña actualizada correctamente' });
     } catch (error) {

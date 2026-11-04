@@ -8,6 +8,14 @@ const getProducts = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
+const getPriceAlerts = async (req, res) => {
+    try {
+        const products = await Product.find({ needsPriceConfirmation: true });
+        res.json(products);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
 
 const getProductById = async (req, res) => {
     try {
@@ -235,5 +243,6 @@ module.exports = {
     reactivateProduct,
     confirmSuggestedPrice,
     syncExcelPricesManual,
-    syncExcelSalesManual
+    syncExcelSalesManual,
+    getPriceAlerts
 };

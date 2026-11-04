@@ -24,7 +24,8 @@ const productSchema = new mongoose.Schema({
     // Precio calculado por el Excel (hoja Delivery / Presupuesto).
     // NO reemplaza `price` automáticamente: el admin debe confirmarlo.
     suggestedPrice:     { type: Number, default: null },
-    suggestedPriceDate: { type: Date,   default: null }
+    suggestedPriceDate: { type: Date,   default: null },
+    needsPriceConfirmation: { type: Boolean, default: false },
 }, {
     timestamps: true,
     toJSON: {

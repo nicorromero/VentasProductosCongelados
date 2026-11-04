@@ -3,6 +3,7 @@ const router = express.Router();
 const { authMiddleware, adminMiddleware } = require('../middlewares/auth.middleware');
 
 const {
+    getPriceAlerts,
     getProducts,
     getProductById,
     createProduct,
@@ -16,7 +17,7 @@ const {
     syncExcelSalesManual
 } = require('../controllers/products.controllers');
 
-router.get('/', getProducts);
+router.get('/price-alerts', authMiddleware, adminMiddleware, getPriceAlerts);
 router.get('/inactive', authMiddleware, adminMiddleware, getInactiveProducts);
 router.get('/:id', getProductById);
 router.post('/', authMiddleware, adminMiddleware, createProduct);
