@@ -13,11 +13,8 @@ function Orders() {
 
     const isAdmin = getRole() === 'admin';
 
-    if (!isAdmin) {
-        return <Navigate to="/" replace />;
-    }
-
     useEffect(() => {
+        if (!isAdmin) return;
         const fetchOrders = async () => {
             try {
                 const { data } = await axiosClient.get('/api/ordenes');
@@ -29,7 +26,11 @@ function Orders() {
             }
         };
         fetchOrders();
-    }, []);
+    }, [isAdmin]);
+
+    if (!isAdmin) {
+        return <Navigate to="/" replace />;
+    }
 
     const handleUpdateOrder = (updatedOrder) => {
         setOrders(prev => prev.map(o => o._id === updatedOrder._id ? updatedOrder : o));

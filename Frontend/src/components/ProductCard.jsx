@@ -26,7 +26,7 @@ function normalizeImages(data) {
 }
 
 function ProductCard({id, name, details, price, image, images = [], stock, category, active, badge, suggestedPrice = null, suggestedPriceDate = null, isCreate, onCreateSuccess}) {
-    const { cartItems, addToCart, removeFromCart, increaseQty, decreaseQty, updateQty } = useCart();
+    const { cartItems, addToCart, removeFromCart, updateQty } = useCart();
     const isAdmin = getRole() === 'admin';
 
     const cardRef = useRef(null);
@@ -43,6 +43,7 @@ function ProductCard({id, name, details, price, image, images = [], stock, categ
         setIsViewingDetail(true);
     };
 
+    const [isCartBtnHovered, setIsCartBtnHovered] = useState(false);
     const initialImages = normalizeImages({ images, image });
     const [localData, setLocalData] = useState({
         name,
@@ -145,51 +146,10 @@ function ProductCard({id, name, details, price, image, images = [], stock, categ
         };
     }, [isEditing]);
 
-    const handleStartSelecting = (e) => {
-        e.stopPropagation();
-        if (localData.stock !== undefined && localData.stock !== null && localData.stock <= 0) {
-            toast.warning('Sin stock disponible');
-            return;
-        }
-
-        window.dispatchEvent(new CustomEvent('product-card-activate', { detail: { id } }));
-
-        const currentQtyInCart = cartItem ? cartItem.quantity : 0;
-        initialQtyRef.current = currentQtyInCart;
-
-        const displayImages = normalizeImages(localData);
-        if (currentQtyInCart === 0) {
-            addToCart({ _id: id, nombre: localData.name, precio: localData.price, imagen: displayImages[0] || localData.image, stock: localData.stock });
-        }
-        setIsSelecting(true);
-    };
-
     const handleStartEditing = (e) => {
         e.stopPropagation();
         window.dispatchEvent(new CustomEvent('product-card-activate', { detail: { id } }));
         setIsEditing(true);
-    };
-
-    const handleConfirm = (e) => {
-        e.stopPropagation();
-        setIsSelecting(false);
-        toast.success('Producto agregado al carrito');
-    };
-
-    const handleIncrease = (e) => {
-        e.stopPropagation();
-        if (localData.stock !== undefined && localData.stock !== null && quantity >= localData.stock) {
-            toast.warning('No hay más stock disponible');
-            return;
-        }
-        increaseQty(id);
-    };
-
-    const handleDecrease = (e) => {
-        e.stopPropagation();
-        if (quantity > 1) {
-            decreaseQty(id);
-        }
     };
 
     const handleEditSuccess = (updatedData) => {
@@ -438,7 +398,6 @@ function ProductCard({id, name, details, price, image, images = [], stock, categ
     const isInactive = localData.active === false;
 
     const isInCart = quantity > 0;
-    const [isCartBtnHovered, setIsCartBtnHovered] = useState(false);
 
     const handleToggleCart = (e) => {
         e.stopPropagation();

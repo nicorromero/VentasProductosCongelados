@@ -27,7 +27,10 @@ function Users() {
             navigate('/');
             return;
         }
-        fetchUsers();
+        const timer = setTimeout(() => {
+            fetchUsers();
+        }, 0);
+        return () => clearTimeout(timer);
     }, [navigate]);
 
     const handleDarDeBaja = async (id) => {

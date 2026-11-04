@@ -81,7 +81,6 @@ function VentaRow({ order, expanded, onToggle }) {
     const esEnvio = order.metodoEntrega === 'envio';
     const cliente = order.facturacion?.nombreCompleto || order.user?.name || 'Desconocido';
     const celular = order.facturacion?.celular || '';
-    const wsNumber = celular.replace(/[^0-9]/g, '');
     const domicilio = order.direccionEnvio
         ? [order.direccionEnvio.calle, order.direccionEnvio.numero, order.direccionEnvio.ciudad].filter(Boolean).join(', ')
         : order.facturacion?.domicilio;
@@ -186,11 +185,8 @@ function Ventas() {
 
     const isAdmin = getRole() === 'admin';
 
-    if (!isAdmin) {
-        return <Navigate to="/" replace />;
-    }
-
     useEffect(() => {
+        if (!isAdmin) return;
         const fetchOrders = async () => {
             try {
                 const { data } = await axiosClient.get('/api/ordenes');
@@ -202,9 +198,10 @@ function Ventas() {
             }
         };
         fetchOrders();
-    }, []);
+    }, [isAdmin]);
 
     const entregados = useMemo(() => {
+        if (!isAdmin) return [];
         let filtrados = orders.filter(p => p.estado === 'entregado');
 
         if (periodoFiltro !== 'todo') {
@@ -225,9 +222,10 @@ function Ventas() {
         }
 
         return filtrados;
-    }, [orders, periodoFiltro]);
+    }, [orders, periodoFiltro, isAdmin]);
 
     const stats = useMemo(() => {
+        if (!isAdmin) return { totalVentas: 0, totalPedidos: 0, totalProductos: 0, promedioTicket: 0 };
         const totalVentas = entregados.reduce((sum, o) => sum + (o.total || 0), 0);
         const totalPedidos = entregados.length;
         const totalProductos = entregados.reduce(
@@ -236,9 +234,10 @@ function Ventas() {
         const promedioTicket = totalPedidos > 0 ? totalVentas / totalPedidos : 0;
 
         return { totalVentas, totalPedidos, totalProductos, promedioTicket };
-    }, [entregados]);
+    }, [entregados, isAdmin]);
 
     const productoRanking = useMemo(() => {
+        if (!isAdmin) return [];
         const mapa = {};
         entregados.forEach(o => {
             o.items.forEach(item => {
@@ -251,7 +250,11 @@ function Ventas() {
         return Object.entries(mapa)
             .map(([name, data]) => ({ name, ...data }))
             .sort((a, b) => b.quantity - a.quantity);
-    }, [entregados]);
+    }, [entregados, isAdmin]);
+
+    if (!isAdmin) {
+        return <Navigate to="/" replace />;
+    }
 
     const maxQuantity = productoRanking.length > 0 ? productoRanking[0].quantity : 0;
 

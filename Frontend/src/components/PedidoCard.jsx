@@ -40,11 +40,17 @@ function PedidoCard({ order, done, onUpdate, onDelete, expandido, onToggle }) {
         if (prevExpandido.current === true && expandido === false) {
             if (editando) {
                 if (!tieneCambios) {
-                    setEditando(false);
-                    setCantidades({});
-                    setShowConfirmModal(false);
+                    const timer = setTimeout(() => {
+                        setEditando(false);
+                        setCantidades({});
+                        setShowConfirmModal(false);
+                    }, 0);
+                    return () => clearTimeout(timer);
                 } else {
-                    setShowConfirmModal(true);
+                    const timer = setTimeout(() => {
+                        setShowConfirmModal(true);
+                    }, 0);
+                    return () => clearTimeout(timer);
                 }
             }
         }

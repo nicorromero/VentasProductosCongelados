@@ -1,4 +1,4 @@
-import { useRef, useCallback, useState, useEffect } from 'react';
+import { useCallback, useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { useNavigate, useLocation, NavLink } from 'react-router-dom';
 import { FiShoppingCart, FiUser, FiLogOut } from 'react-icons/fi';

@@ -39,7 +39,7 @@ function InactiveProducts() {
             }
         };
         fetchInactiveProducts();
-    }, []);
+    }, [navigate]);
 
     const handleReactivar = async (id) => {
         if (!window.confirm('¿Reactivar este producto?')) return;
