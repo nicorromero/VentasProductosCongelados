@@ -14,8 +14,6 @@ jobs:
       packages: write
     env:
       DOCKER_REGISTRY: ghcr.io
-      IMAGE_NAME_BACKEND: ${{ github.repository }}-backend
-      IMAGE_NAME_FRONTEND: ${{ github.repository }}-frontend
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -24,6 +22,11 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22'
+
+      - name: Set lower case repository name
+        run: |
+          echo "IMAGE_NAME_BACKEND=$(echo '${{ github.repository }}-backend' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
+          echo "IMAGE_NAME_FRONTEND=$(echo '${{ github.repository }}-frontend' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
 
       # Backend
       - name: Install backend dependencies
