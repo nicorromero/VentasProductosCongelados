@@ -17,6 +17,7 @@ const {
     syncExcelSalesManual
 } = require('../controllers/products.controllers');
 
+router.get('/', getProducts);
 router.get('/price-alerts', authMiddleware, adminMiddleware, getPriceAlerts);
 router.get('/inactive', authMiddleware, adminMiddleware, getInactiveProducts);
 router.get('/:id', getProductById);
@@ -27,6 +28,7 @@ router.patch('/:id/toggle-active', authMiddleware, adminMiddleware, toggleActive
 router.patch('/:id/reactivate', authMiddleware, adminMiddleware, reactivateProduct);
 // ── Excel Sync: confirmar precio sugerido y disparadores manuales ─────────────
 router.patch('/:id/confirm-price', authMiddleware, adminMiddleware, confirmSuggestedPrice);
+router.put('/:id/confirm-price', authMiddleware, adminMiddleware, confirmSuggestedPrice);
 router.post('/sync-excel-prices', authMiddleware, adminMiddleware, syncExcelPricesManual);
 router.post('/sync-excel-sales', authMiddleware, adminMiddleware, syncExcelSalesManual);
 

@@ -274,6 +274,8 @@ function ProductCard({id, name, details, price, image, images = [], stock, categ
     toast.error(err.response?.data?.error || 'Error al confirmar precio');
   }
 };
+
+    const handleConfirmAdminStock = async (e) => {
         if (e) e.stopPropagation();
         const newStock = Number(localData.stock || 0);
         setIsAdminSelectingStock(false);
