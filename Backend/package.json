@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "lint": "eslint .",
-    "test": "echo \"Tests passed\"",
+    "test": "jest --runInBand",
     "start": "node src/server.js",
     "dev": "nodemon src/server.js"
   },
@@ -35,6 +35,8 @@
   "devDependencies": {
     "@faker-js/faker": "^10.4.0",
     "eslint": "^9.0.0",
-    "nodemon": "^3.1.11"
+    "jest": "^30.5.2",
+    "nodemon": "^3.1.11",
+    "supertest": "^7.3.1"
   }
 }

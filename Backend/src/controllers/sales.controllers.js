@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 
 const Product = require('../models/product.model');
+const Sales = require('../models/sale.model');
 
 const getSales = async (req, res) => {
     try {
@@ -77,58 +78,87 @@ const deleteSale = async (req, res) => {
 
 
 const createOrder = async (req, res) => {
+    let session;
     try {
         const { items, medioPago, metodoEntrega, facturacion, direccionEnvio } = req.body;
 
-        if (!items || items.length === 0) {
+        if (!Array.isArray(items) || items.length === 0) {
             return res.status(400).json({ error: 'La orden debe tener al menos un producto' });
         }
 
-        // Validar stock y construir items de la orden
-        const orderItems = [];
-        for (const entry of items) {
-            const product = await Product.findById(entry.product);
-            if (!product) {
-                return res.status(404).json({ error: `Producto ${entry.product} no encontrado` });
+        if (items.some(entry => !Number.isInteger(entry.quantity) || entry.quantity <= 0)) {
+            return res.status(400).json({ error: 'Las cantidades deben ser números enteros positivos' });
+        }
+
+        session = await mongoose.startSession();
+        let newOrder;
+
+        await session.withTransaction(async () => {
+            const orderItems = [];
+            for (const entry of items) {
+                const product = await Product.findById(entry.product).session(session);
+                if (!product) {
+                    const error = new Error(`Producto ${entry.product} no encontrado`);
+                    error.statusCode = 404;
+                    throw error;
+                }
+                if (product.stock < entry.quantity) {
+                    const error = new Error(`Stock insuficiente para ${product.name}`);
+                    error.statusCode = 400;
+                    throw error;
+                }
+
+                const stockUpdate = await Product.updateOne(
+                    { _id: entry.product, stock: { $gte: entry.quantity } },
+                    { $inc: { stock: -entry.quantity } },
+                    { session }
+                );
+                if (stockUpdate.modifiedCount !== 1) {
+                    const error = new Error(`Stock insuficiente para ${product.name}`);
+                    error.statusCode = 400;
+                    throw error;
+                }
+
+                orderItems.push({
+                    product:  product._id,
+                    quantity: entry.quantity,
+                    price:    product.price,
+                    subtotal: product.price * entry.quantity
+                });
             }
-            if (product.stock < entry.quantity) {
-                return res.status(400).json({ error: `Stock insuficiente para ${product.name}` });
+
+            const total = orderItems.reduce((sum, i) => sum + i.subtotal, 0);
+
+            const orderData = {
+                user:          req.usuario ? req.usuario.id : undefined,
+                items:         orderItems,
+                total,
+                medioPago,
+                metodoEntrega,
+                facturacion,
+                estado:        'pendiente',
+                numeroOrden:   Date.now()
+            };
+
+            if (metodoEntrega === 'envio' && direccionEnvio) {
+                orderData.direccionEnvio = direccionEnvio;
             }
-            orderItems.push({
-                product:  product._id,
-                quantity: entry.quantity,
-                price:    product.price,
-                subtotal: product.price * entry.quantity
+
+            [newOrder] = await Sales.create([orderData], { session });
+            await newOrder.populate({
+                path: 'items.product',
+                select: 'name image images price',
+                options: { session }
             });
-        }
+        });
 
-        const total = orderItems.reduce((sum, i) => sum + i.subtotal, 0);
-
-        // Descontar stock
-        for (const entry of items) {
-            await Product.findByIdAndUpdate(entry.product, { $inc: { stock: -entry.quantity } });
-        }
-
-        const orderData = {
-            user:          req.usuario ? req.usuario.id : undefined,
-            items:         orderItems,
-            total,
-            medioPago,
-            metodoEntrega,
-            facturacion,
-            estado:        'pendiente',
-            numeroOrden:   Date.now()
-        };
-
-        if (metodoEntrega === 'envio' && direccionEnvio) {
-            orderData.direccionEnvio = direccionEnvio;
-        }
-
-        const newOrder = await Sales.create(orderData);
-        await newOrder.populate('items.product', 'name image images price');
         res.status(201).json(newOrder);
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        res.status(error.statusCode || 500).json({ error: error.message });
+    } finally {
+        if (session) {
+            await session.endSession();
+        }
     }
 };
 

@@ -181,6 +181,7 @@ const confirmSuggestedPrice = async (req, res) => {
         product.price              = product.suggestedPrice;
         product.suggestedPrice     = null;
         product.suggestedPriceDate = null;
+        product.needsPriceConfirmation = false;
         await product.save();
 
         res.json({ message: 'Precio actualizado correctamente', product });
