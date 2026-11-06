@@ -55,7 +55,6 @@ function Home() {
   useEffect(() => {
     let isMounted = true;
     if (!API_URL) {
-      setLoading(false);
       return undefined;
     }
 
