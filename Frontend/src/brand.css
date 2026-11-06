@@ -1,0 +1,88 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&display=swap');
+
+:root {
+  --kp-cream: #faf7f2;
+  --kp-paper: #fffdf9;
+  --kp-ink: #232427;
+  --kp-muted: #625f58;
+  --kp-terracotta: #c75a45;
+  --kp-olive: #71805a;
+  --kp-green: #315b45;
+  --kp-line: #e8e0d5;
+  --bs-body-font-family: 'DM Sans', sans-serif;
+  --bs-body-color: var(--kp-ink);
+  --bs-body-bg: var(--kp-cream);
+  --bs-primary: var(--kp-terracotta);
+  --bs-danger: var(--kp-terracotta);
+  --bs-success: var(--kp-green);
+  --bs-dark: var(--kp-ink);
+  --bs-border-color: var(--kp-line);
+  --bs-link-color: var(--kp-green);
+  --bs-link-hover-color: #244633;
+}
+
+html { scroll-behavior: smooth; }
+body { min-width: 320px; color: var(--kp-ink); background: var(--kp-cream); font-family: 'DM Sans', sans-serif; }
+button, input, select, textarea { font: inherit; }
+h1, h2, h3, h4, h5, h6, .display-1, .display-2, .display-3, .display-4, .display-5, .display-6 {
+  font-family: 'Fraunces', Georgia, serif;
+  letter-spacing: -.025em;
+}
+p { line-height: 1.65; }
+a { text-underline-offset: 3px; }
+
+.btn { min-height: 38px; border-radius: 999px; font-weight: 600; transition: transform .18s ease, background-color .18s ease, box-shadow .18s ease; }
+.btn:hover { transform: translateY(-1px); }
+.btn-primary, .btn-danger { --bs-btn-bg: var(--kp-terracotta); --bs-btn-border-color: var(--kp-terracotta); --bs-btn-hover-bg: #ad4938; --bs-btn-hover-border-color: #ad4938; --bs-btn-active-bg: #9c4031; --bs-btn-active-border-color: #9c4031; }
+.btn-success { --bs-btn-bg: var(--kp-green); --bs-btn-border-color: var(--kp-green); --bs-btn-hover-bg: #264936; --bs-btn-hover-border-color: #264936; }
+.btn-dark { --bs-btn-bg: var(--kp-ink); --bs-btn-border-color: var(--kp-ink); --bs-btn-hover-bg: #3b3c3e; --bs-btn-hover-border-color: #3b3c3e; }
+.btn-outline-dark { --bs-btn-color: var(--kp-ink); --bs-btn-border-color: #c9beb0; --bs-btn-hover-bg: var(--kp-ink); --bs-btn-hover-border-color: var(--kp-ink); }
+.btn-outline-secondary { --bs-btn-color: #5f5c56; --bs-btn-border-color: #d4cabb; }
+
+.card { border-color: var(--kp-line); border-radius: 18px; box-shadow: 0 8px 24px #31271a0a; }
+.bg-body-secondary { background-color: #f2ece2 !important; }
+.form-control, .form-select { min-height: 44px; border-color: #d9d0c4; border-radius: 12px !important; color: var(--kp-ink); background-color: var(--kp-paper); }
+textarea.form-control { min-height: 112px; }
+.form-control:focus, .form-select:focus { border-color: var(--kp-olive); box-shadow: 0 0 0 .22rem #71805a24; }
+.form-label { color: #514e48; font-weight: 600; }
+.alert { border: 0; border-radius: 14px; }
+.table { --bs-table-bg: transparent; --bs-table-striped-bg: #f2ece280; --bs-table-hover-bg: #f2ece2; }
+.table thead th { color: #57544e; font-size: .78rem; letter-spacing: .06em; text-transform: uppercase; }
+.table-dark { --bs-table-bg: var(--kp-ink); --bs-table-color: white; --bs-table-border-color: #4a4b4c; }
+.progress { background: #e8e0d5; }
+.modal-content { border: 1px solid var(--kp-line); border-radius: 20px; }
+.badge { font-family: 'DM Sans', sans-serif; }
+.catalog-page-heading { max-width: 750px; margin: 8px auto 32px; text-align: center; }
+.catalog-eyebrow { color: var(--kp-olive); font-size: .76rem; font-weight: 700; letter-spacing: .11em; text-transform: uppercase; }
+.catalog-page-heading h1 { margin: 8px 0; font-size: clamp(2.2rem, 4vw, 3.4rem); }
+.catalog-page-heading p { margin: 0; color: var(--kp-muted); }
+
+/* Main storefront navigation */
+.navbar.navbar-expand-lg.navbar-dark.bg-dark { min-height: 76px; border-bottom: 1px solid var(--kp-line); background: #fffdf9 !important; box-shadow: 0 3px 16px #31271a0b; }
+.navbar.navbar-expand-lg .container-fluid { min-height: 76px !important; }
+.navbar.navbar-expand-lg .btn-outline-light { color: var(--kp-ink); border-color: #d4cabb; }
+.navbar.navbar-expand-lg .btn-outline-light:hover { color: white; border-color: var(--kp-ink); background: var(--kp-ink); }
+.navbar.navbar-expand-lg .navbar-brand img, .navbar.navbar-expand-lg a img[alt="KE PERNIL"] { width: 82px !important; height: 82px !important; border: 4px solid #fffdf9; filter: drop-shadow(0 3px 9px #23242720) !important; }
+.navbar.navbar-expand-lg .btn-danger { box-shadow: none !important; }
+.navbar.navbar-expand-lg .navbar-toggler { border-color: #d4cabb; }
+.navbar.navbar-expand-lg .navbar-toggler-icon { filter: invert(1); }
+
+.kepernil-footer { margin-top: 48px; border-top: 1px solid var(--kp-line); background: #fffdf9; }
+.kepernil-footer-main { display: flex; justify-content: space-between; gap: 32px; align-items: center; padding-bottom: 30px; }
+.kepernil-footer-brand { display: flex; align-items: center; gap: 16px; }
+.kepernil-footer-brand img { width: 68px; height: 68px; border: 3px solid var(--kp-cream); border-radius: 50%; object-fit: cover; }
+.kepernil-footer-brand h2 { margin: 0 0 5px; font: 600 1.35rem 'Fraunces', Georgia, serif; }
+.kepernil-footer-brand p { max-width: 430px; margin: 0; color: var(--kp-muted); font-size: .9rem; }
+.kepernil-footer-links { display: flex; flex-wrap: wrap; gap: 10px 20px; align-items: center; }
+.kepernil-footer-links a { display: inline-flex; align-items: center; gap: 5px; color: var(--kp-green); font-size: .9rem; font-weight: 600; text-decoration: none; }
+.kepernil-footer-links a:hover { color: var(--kp-terracotta); }
+.kepernil-footer-bottom { display: flex; justify-content: space-between; gap: 12px; padding-top: 18px; border-top: 1px solid var(--kp-line); color: #77736c; font-size: .8rem; }
+.kepernil-footer-bottom span:last-child { display: inline-flex; align-items: center; gap: 6px; }
+.kepernil-footer-bottom svg { color: var(--kp-terracotta); }
+
+@media (max-width: 575.98px) {
+  h1 { font-size: clamp(2rem, 9vw, 2.8rem); }
+  .container-fluid.px-3, .container-fluid.px-3.px-md-4 { padding-right: 16px !important; padding-left: 16px !important; }
+  .kepernil-footer-main, .kepernil-footer-bottom { align-items: flex-start; flex-direction: column; }
+  .kepernil-footer-links { gap: 12px 18px; }
+}
