@@ -365,7 +365,7 @@ async function leerPreciosSugeridos() {
 
         // Si el precio sugerido en Google Sheets difiere del precio vigente en la tienda
         if (precioRedondeado !== prod.price) {
-            if (prod.suggestedPrice !== precioRedondeado) {
+            if (prod.suggestedPrice !== precioRedondeado || !prod.needsPriceConfirmation) {
                 prod.suggestedPrice = precioRedondeado;
                 prod.suggestedPriceDate = ahora;
                 prod.needsPriceConfirmation = true;
@@ -373,10 +373,10 @@ async function leerPreciosSugeridos() {
                 actualizados++;
                 logger.info(`[GoogleSheetsSync] Nueva sugerencia para "${prod.name}": Actual=$${prod.price} -> Google Sheets=$${precioRedondeado}`);
             }
-        } else if (prod.suggestedPrice !== null) {
-            // Si el precio en la hoja coincide exactamente con el precio de DB, limpiar sugerencia pendiente
+        } else if (prod.suggestedPrice !== null || prod.needsPriceConfirmation) {
             prod.suggestedPrice = null;
             prod.suggestedPriceDate = null;
+            prod.needsPriceConfirmation = false;
             await prod.save();
         }
     }
