@@ -1,0 +1,96 @@
+.kepernil-home {
+  --kp-cream: #faf7f2;
+  --kp-ink: #232427;
+  --kp-terracotta: #c75a45;
+  --kp-olive: #71805a;
+  --kp-green: #315b45;
+  color: var(--kp-ink);
+  background: var(--kp-cream);
+  font-family: 'DM Sans', sans-serif;
+}
+
+.kepernil-home h1,
+.kepernil-home h2,
+.kepernil-home h3 {
+  color: var(--kp-ink);
+  font-family: 'Fraunces', Georgia, serif;
+}
+
+.kepernil-container { width: min(1120px, calc(100% - 40px)); margin: 0 auto; }
+.kepernil-hero { padding: clamp(48px, 8vw, 100px) 0; background: linear-gradient(135deg, #fffdf9 0%, var(--kp-cream) 75%); }
+.kepernil-hero-grid { display: grid; grid-template-columns: 1.05fr .95fr; gap: clamp(36px, 7vw, 88px); align-items: center; }
+.kepernil-hero-copy h1 { max-width: 660px; margin: 18px 0; font-size: clamp(2.6rem, 5.5vw, 4.7rem); line-height: 1.04; letter-spacing: -.04em; }
+.kepernil-hero-copy > p { max-width: 590px; color: #5e5b55; font-size: 1.1rem; line-height: 1.75; }
+.kepernil-eyebrow { display: inline-flex; align-items: center; gap: 8px; color: var(--kp-olive); font-size: .78rem; font-weight: 700; letter-spacing: .11em; text-transform: uppercase; }
+.kepernil-hero-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 28px; }
+.kepernil-button { min-height: 48px; display: inline-flex; justify-content: center; align-items: center; gap: 9px; padding: 12px 20px; border: 1px solid transparent; border-radius: 999px; font: 700 .92rem 'DM Sans', sans-serif; text-decoration: none; transition: transform .18s ease, background-color .18s ease; }
+.kepernil-button:hover { transform: translateY(-2px); }
+.kepernil-button-primary { color: white; background: var(--kp-terracotta); }
+.kepernil-button-primary:hover { color: white; background: #ad4938; }
+.kepernil-button-outline { color: var(--kp-ink); border-color: #d6c9b7; background: transparent; }
+.kepernil-button-outline:hover { color: var(--kp-ink); background: white; }
+.kepernil-button-whatsapp { color: white; background: var(--kp-green); }
+.kepernil-button-whatsapp:hover { color: white; background: #264936; }
+.kepernil-hero-note { display: flex; align-items: center; gap: 8px; margin-top: 20px; color: #6d6a64; font-size: .85rem; }
+.kepernil-hero-photo { position: relative; min-height: 390px; overflow: hidden; border-radius: 28px; background: #e6dfd3; box-shadow: 0 24px 60px #33291820; }
+.kepernil-hero-photo img { position: absolute; width: 100%; height: 100%; object-fit: cover; }
+.kepernil-photo-caption { position: absolute; right: 18px; bottom: 18px; display: grid; padding: 14px 20px; border-radius: 15px; background: #fffdf2ed; }
+.kepernil-photo-caption span { color: #716e65; font-size: .78rem; }
+.kepernil-photo-caption strong { font-family: 'Fraunces', Georgia, serif; font-size: 1.25rem; }
+.kepernil-pernil-story { padding: clamp(54px, 7vw, 84px) 0; background: #f2ece2; }
+.kepernil-process-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; }
+.kepernil-process-card { overflow: hidden; border-radius: 20px; background: #fffdf9; box-shadow: 0 10px 28px #31271a0b; }
+.kepernil-process-card > img { display: block; width: 100%; height: 270px; object-fit: cover; }
+.kepernil-process-card > div { position: relative; padding: 20px 22px 23px; }
+.kepernil-process-card > div > span { color: var(--kp-terracotta); font-size: .72rem; font-weight: 700; letter-spacing: .12em; }
+.kepernil-process-card h3 { margin: 6px 0; font-size: 1.35rem; }
+.kepernil-process-card p { margin: 0; color: #625f58; font-size: .9rem; line-height: 1.6; }
+.kepernil-menu-section { padding: clamp(54px, 8vw, 92px) 0; background: white; }
+.kepernil-section-heading { max-width: 670px; margin: 0 auto 36px; text-align: center; }
+.kepernil-section-heading h2, .kepernil-values-section h2 { margin: 10px 0; font-size: clamp(2.1rem, 4vw, 3.3rem); }
+.kepernil-section-heading p, .kepernil-values-intro { color: #625f58; line-height: 1.7; }
+.kepernil-product-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 22px; }
+.weekly-product-card { display: flex; flex-direction: column; overflow: hidden; border: 1px solid #eee8df; border-radius: 20px; background: white; box-shadow: 0 8px 24px #31271a0a; }
+.weekly-product-image { position: relative; height: 220px; overflow: hidden; background: #f1ece4; }
+.weekly-product-image img { width: 100%; height: 100%; object-fit: cover; transition: transform .3s ease; }
+.weekly-product-card:hover .weekly-product-image img { transform: scale(1.04); }
+.weekly-product-placeholder { display: grid; width: 100%; height: 100%; place-items: center; color: var(--kp-olive); font-family: 'Fraunces', Georgia, serif; font-size: 1.6rem; }
+.weekly-product-status { position: absolute; right: 12px; bottom: 12px; padding: 7px 11px; border-radius: 999px; background: #fffdf2ed; color: #49463e; font-size: .72rem; font-weight: 700; }
+.weekly-product-status.is-available { color: #315b45; }
+.weekly-product-body { display: flex; flex: 1; flex-direction: column; align-items: flex-start; padding: 20px; }
+.weekly-product-category { margin: 0 0 5px; color: var(--kp-olive); font-size: .72rem; font-weight: 700; letter-spacing: .09em; text-transform: uppercase; }
+.weekly-product-body h3 { margin: 0; font-size: 1.4rem; }
+.weekly-product-details { display: -webkit-box; overflow: hidden; margin: 10px 0; color: #66635d; font-size: .9rem; line-height: 1.6; -webkit-box-orient: vertical; -webkit-line-clamp: 3; }
+.weekly-product-price { margin: auto 0 16px; padding-top: 10px; font-size: 1.1rem; font-weight: 700; }
+.weekly-product-body .kepernil-button { font-size: .82rem; }
+.kepernil-empty-state { display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 34px; border: 1px dashed #d8cebf; border-radius: 18px; color: #625f58; text-align: center; }
+.kepernil-empty-state p { margin: 0; }
+.kepernil-delivery-note { margin: 24px 0 0; color: #716e65; font-size: .85rem; text-align: center; }
+.kepernil-values-section { padding: clamp(54px, 8vw, 92px) 0; }
+.kepernil-values-grid { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(32px, 7vw, 90px); align-items: center; }
+.kepernil-value-list { display: grid; gap: 18px; }
+.kepernil-value-item { display: flex; gap: 15px; align-items: flex-start; padding: 18px; border: 1px solid #e8e0d5; border-radius: 16px; background: #fffdf9; }
+.kepernil-value-item > span { display: grid; width: 42px; height: 42px; flex: 0 0 42px; place-items: center; border-radius: 50%; color: var(--kp-olive); background: #edf0e7; }
+.kepernil-value-item h3 { margin: 1px 0 5px; font: 700 1rem 'DM Sans', sans-serif; }
+.kepernil-value-item p { margin: 0; color: #625f58; font-size: .9rem; line-height: 1.55; }
+
+@media (max-width: 767.98px) {
+  .kepernil-container { width: min(100% - 32px, 560px); }
+  .kepernil-hero-grid, .kepernil-values-grid { grid-template-columns: 1fr; }
+  .kepernil-hero-copy { text-align: center; }
+  .kepernil-hero-copy > p { margin-inline: auto; font-size: 1rem; }
+  .kepernil-hero-actions { justify-content: center; }
+  .kepernil-hero-actions .kepernil-button { width: 100%; }
+  .kepernil-hero-note { justify-content: center; }
+  .kepernil-hero-photo { min-height: 290px; }
+  .kepernil-process-grid { grid-template-columns: 1fr; }
+  .kepernil-process-card > img { height: 245px; }
+  .kepernil-product-grid { grid-template-columns: 1fr; }
+  .weekly-product-image { height: 230px; }
+  .kepernil-values-grid { gap: 25px; }
+}
+
+@media (min-width: 768px) and (max-width: 991.98px) {
+  .kepernil-process-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .kepernil-product-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}

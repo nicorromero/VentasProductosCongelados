@@ -21,7 +21,7 @@ function App() {
   return (
     <div className="d-flex flex-column min-vh-100">
       <NavBar />
-      <main className="flex-grow-1" style={{ paddingTop: '80px' }}>
+      <main className="flex-grow-1">
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/contacto" element={<Contact />} />

@@ -1,678 +1,178 @@
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useMemo, useState } from 'react';
 import axios from 'axios';
-import {
-  FiArrowRight,
-  FiClock,
-  FiHeart,
-  FiShoppingBag,
-  FiCheckCircle
-} from 'react-icons/fi';
-import { FaFire, FaPizzaSlice } from 'react-icons/fa';
-import { GiPieSlice, GiMeat } from 'react-icons/gi';
-import { MdOutlineKitchen } from 'react-icons/md';
+import { FiArrowRight, FiCheck, FiClock, FiHeart, FiMessageCircle, FiShield } from 'react-icons/fi';
+import './Home.css';
 
 const API_URL = import.meta.env.VITE_API_BASE_URL;
+const WHATSAPP_PHONE = '5493442550569';
 
-function Home() {
-  const navigate = useNavigate();
-  const [catalogProducts, setCatalogProducts] = useState([]);
-  const [heroSlide, setHeroSlide] = useState(0);
+function whatsappHref(message) {
+  return `https://wa.me/${WHATSAPP_PHONE}?text=${encodeURIComponent(message)}`;
+}
 
-  // Auto-cicla el carrusel del hero cada 4 segundos
-  useEffect(() => {
-    const timer = setInterval(() => setHeroSlide(s => (s + 1) % 2), 4000);
-    return () => clearInterval(timer);
-  }, []);
-
-  // Consultamos los productos reales del catálogo para utilizar sus fotos auténticas si existen
-  useEffect(() => {
-    let isMounted = true;
-    if (API_URL) {
-      axios.get(`${API_URL}/products`)
-        .then((res) => {
-          if (isMounted && Array.isArray(res.data)) {
-            setCatalogProducts(res.data);
-          }
-        })
-        .catch(() => {
-          // Si el servidor no responde o está offline, usa fotos locales auténticas de fallback
-        });
-    }
-    return () => {
-      isMounted = false;
-    };
-  }, []);
-
-  // Función auxiliar para obtener la imagen real del catálogo según categoría o fallback a foto real local
-  const getCategoryPhoto = (categoryKeyword, fallbackPhoto) => {
-    const found = catalogProducts.find((p) => {
-      const matchCat = p.category && p.category.toLowerCase().includes(categoryKeyword.toLowerCase());
-      const hasImg = p.image || (Array.isArray(p.images) && p.images[0]);
-      return matchCat && hasImg;
-    });
-    return found ? (found.image || found.images[0]) : fallbackPhoto;
-  };
+function WeeklyProductCard({ product }) {
+  const image = product.image || product.images?.[0];
+  const available = Number(product.stock) > 0;
 
   return (
-    <div className="home-landing-page" style={{ backgroundColor: '#FAF7F2', color: '#232427' }}>
-      {/* Estilos específicos para la landing: paleta de marca, tipografías y sombras */}
-      <style>{`
-        .font-bebas {
-          font-family: 'Bebas Neue', cursive, sans-serif;
-          letter-spacing: 0.5px;
-        }
-        .hero-badge {
-          background-color: rgba(182, 137, 73, 0.15);
-          color: #8C5D24;
-          border: 1px solid rgba(182, 137, 73, 0.35);
-        }
-        .btn-brand-primary {
-          background-color: #dc3545;
-          color: #ffffff;
-          border: none;
-          box-shadow: 0 4px 14px rgba(220, 53, 69, 0.35);
-          transition: all 0.25s ease;
-        }
-        .btn-brand-primary:hover {
-          background-color: #bb2d3b;
-          color: #ffffff;
-          transform: translateY(-2px);
-          box-shadow: 0 6px 20px rgba(220, 53, 69, 0.45);
-        }
-        .btn-brand-secondary {
-          background-color: transparent;
-          color: #232427;
-          border: 2px solid #B68949;
-          transition: all 0.25s ease;
-        }
-        .btn-brand-secondary:hover {
-          background-color: #B68949;
-          color: #ffffff;
-          transform: translateY(-2px);
-        }
-        .category-pill {
-          background-color: #ffffff;
-          color: #232427;
-          border: 1px solid rgba(182, 137, 73, 0.3);
-          transition: all 0.2s ease;
-          cursor: pointer;
-        }
-        .category-pill:hover {
-          background-color: #232427;
-          color: #ffffff;
-          border-color: #232427;
-          transform: translateY(-2px);
-          box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        }
-        .feature-card {
-          background: #ffffff;
-          border-radius: 1.25rem;
-          transition: transform 0.25s ease, box-shadow 0.25s ease;
-          border: 1px solid rgba(182, 137, 73, 0.15);
-        }
-        .feature-card:hover {
-          transform: translateY(-5px);
-          box-shadow: 0 12px 28px rgba(35, 36, 39, 0.08) !important;
-        }
-        .menu-card {
-          background: #ffffff;
-          border-radius: 1.25rem;
-          overflow: hidden;
-          transition: transform 0.25s ease, box-shadow 0.25s ease;
-          border: 1px solid rgba(0, 0, 0, 0.06);
-        }
-        .menu-card:hover {
-          transform: translateY(-5px);
-          box-shadow: 0 14px 28px rgba(0, 0, 0, 0.1) !important;
-        }
-        .menu-card img {
-          transition: transform 0.4s ease;
-        }
-        .menu-card:hover img {
-          transform: scale(1.05);
-        }
-        .quote-bubble {
-          background-color: #ffffff;
-          border-left: 4px solid #B68949;
-        }
-      `}</style>
+    <article className="weekly-product-card">
+      <div className="weekly-product-image">
+        {image ? (
+          <img src={image} alt={product.name} loading="lazy" />
+        ) : (
+          <div className="weekly-product-placeholder" aria-label="Imagen no disponible">Kepernil</div>
+        )}
+        <span className={`weekly-product-status ${available ? 'is-available' : 'is-unavailable'}`}>
+          {available ? 'Consultar disponibilidad' : 'Consultar por encargo'}
+        </span>
+      </div>
+      <div className="weekly-product-body">
+        <p className="weekly-product-category">{product.category || 'Cocina casera'}</p>
+        <h3>{product.name}</h3>
+        {product.details && <p className="weekly-product-details">{product.details}</p>}
+        <p className="weekly-product-price">
+          {Number.isFinite(Number(product.price))
+            ? new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS', maximumFractionDigits: 0 }).format(product.price)
+            : 'Consultar precio'}
+        </p>
+        <a
+          className="kepernil-button kepernil-button-whatsapp w-100"
+          href={whatsappHref(`Hola, quería consultar por ${product.name} y coordinar un cadete.`)}
+          target="_blank"
+          rel="noreferrer"
+        >
+          <FiMessageCircle aria-hidden="true" /> Consultar por WhatsApp / Coordinar cadete
+        </a>
+      </div>
+    </article>
+  );
+}
 
-      {/* =========================================================================
-          1. HERO SECTION (Propuesta de valor completa: Pernil + Congelados)
-          ========================================================================= */}
-      <section className="position-relative overflow-hidden py-4 py-lg-5" style={{ background: 'linear-gradient(180deg, #FFFFFF 0%, #FAF7F2 100%)' }}>
-        <div className="container py-3 py-lg-4">
-          <div className="row align-items-center g-4 g-lg-5">
+function Home() {
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(Boolean(API_URL));
 
-            {/* Columna Izquierda: Copywriting persuasivo sin emojis, con iconos vectoriales */}
-            <div className="col-12 col-lg-6 text-center text-lg-start">
+  useEffect(() => {
+    let isMounted = true;
+    if (!API_URL) {
+      setLoading(false);
+      return undefined;
+    }
 
-              {/* Badge de confianza */}
-              <div className="d-inline-flex align-items-center gap-2 hero-badge px-3 py-1 rounded-pill mb-3 fw-medium small">
-                <FiHeart className="text-danger" />
-                <span>Cocinado en familia • Hecho con dedicación</span>
-              </div>
+    axios.get(`${API_URL}/products`)
+      .then(({ data }) => {
+        if (isMounted && Array.isArray(data)) setProducts(data.filter((item) => item.active !== false));
+      })
+      .catch(() => {
+        if (isMounted) setProducts([]);
+      })
+      .finally(() => {
+        if (isMounted) setLoading(false);
+      });
 
-              {/* Título Principal (H1) */}
-              <h1 className="display-4 fw-bold font-bebas mb-3" style={{ color: '#232427', lineHeight: 1.08 }}>
-                COMIDA CASERA, RICA Y LISTA PARA TU DÍA A DÍA
-              </h1>
+    return () => { isMounted = false; };
+  }, []);
 
-              {/* Subtítulo enfocado en la variedad del catálogo */}
-              <p className="lead fs-5 text-secondary mb-4" style={{ maxWidth: '540px' }}>
-                ¿Ganas de comer rico y casero sin pasar horas en la cocina?
-                En <strong>Kepernil</strong> cocinamos para vos: desde nuestros clásicos <strong>perniles a fuego lento</strong> hasta <strong>milanesas tiernas, pizzas caseras y tarteletas frescas</strong>. Listas para calentar y disfrutar en minutos.
-              </p>
+  const generalWhatsApp = useMemo(
+    () => whatsappHref('Hola, quería consultar qué prepararon esta semana y coordinar un cadete.'),
+    [],
+  );
 
-              {/* Acciones principales (CTAs) */}
-              <div className="d-flex flex-column flex-sm-row align-items-center justify-content-center justify-content-lg-start gap-3 mb-4">
-                <button
-                  onClick={() => navigate('/productos')}
-                  className="btn btn-brand-primary btn-lg rounded-pill px-4 py-3 fw-bold d-flex align-items-center gap-2 w-100 w-sm-auto justify-content-center"
-                  type="button"
-                >
-                  <FiShoppingBag size={20} />
-                  <span>Explorar Todo el Catálogo</span>
-                  <FiArrowRight size={20} />
-                </button>
-                <a
-                  href="#menu-completo"
-                  className="btn btn-brand-secondary btn-lg rounded-pill px-4 py-3 fw-semibold w-100 w-sm-auto text-center text-decoration-none"
-                >
-                  Ver Opciones del Menú
-                </a>
-              </div>
-
-              {/* Accesos rápidos a categorías clave con iconos vectoriales limpios */}
-              <div className="pt-2">
-                <span className="text-muted small fw-medium d-block mb-2">Explorá directo por categoría:</span>
-                <div className="d-flex flex-wrap justify-content-center justify-content-lg-start gap-2">
-                  <button
-                    onClick={() => navigate('/productos')}
-                    className="btn btn-sm category-pill rounded-pill px-3 py-1 fw-medium d-inline-flex align-items-center gap-1"
-                    type="button"
-                  >
-                    <FaFire className="text-danger" size={13} />
-                    <span>Pernil & Combos</span>
-                  </button>
-                  <button
-                    onClick={() => navigate('/catalogo/Milanesas')}
-                    className="btn btn-sm category-pill rounded-pill px-3 py-1 fw-medium d-inline-flex align-items-center gap-1"
-                    type="button"
-                  >
-                    <GiMeat style={{ color: '#C0392B' }} size={14} />
-                    <span>Milanesas</span>
-                  </button>
-                  <button
-                    onClick={() => navigate('/catalogo/Pizzas')}
-                    className="btn btn-sm category-pill rounded-pill px-3 py-1 fw-medium d-inline-flex align-items-center gap-1"
-                    type="button"
-                  >
-                    <FaPizzaSlice style={{ color: '#E67E22' }} size={13} />
-                    <span>Pizzas</span>
-                  </button>
-                  <button
-                    onClick={() => navigate('/catalogo/Tarteletas')}
-                    className="btn btn-sm category-pill rounded-pill px-3 py-1 fw-medium d-inline-flex align-items-center gap-1"
-                    type="button"
-                  >
-                    <GiPieSlice className="text-success" size={14} />
-                    <span>Tarteletas</span>
-                  </button>
-                </div>
-              </div>
-
-              {/* Micro-copys de seguridad y practicidad */}
-              <div className="d-flex flex-wrap justify-content-center justify-content-lg-start gap-3 text-muted small pt-4">
-                <div className="d-flex align-items-center gap-1">
-                  <FiCheckCircle className="text-success" />
-                  <span>Sin registros obligatorios</span>
-                </div>
-                <div className="d-flex align-items-center gap-1">
-                  <FiCheckCircle className="text-success" />
-                  <span>Directo a tu freezer o mesa</span>
-                </div>
-                <div className="d-flex align-items-center gap-1">
-                  <FiCheckCircle className="text-success" />
-                  <span>Listo en 5 a 10 minutos</span>
-                </div>
-              </div>
-
+  return (
+    <div className="kepernil-home">
+      <section className="kepernil-hero">
+        <div className="kepernil-container kepernil-hero-grid">
+          <div className="kepernil-hero-copy">
+            <span className="kepernil-eyebrow"><FiHeart aria-hidden="true" /> Cocina familiar, hecha con dedicación</span>
+            <h1>Comida casera, hecha en familia y en pequeñas cantidades</h1>
+            <p>
+              Cada semana cocinamos nuevas opciones con los ingredientes que conseguimos frescos y a buen precio.
+              El menú y las cantidades pueden cambiar; mirá qué preparamos y escribinos para consultar disponibilidad
+              y coordinar tu pedido.
+            </p>
+            <div className="kepernil-hero-actions">
+              <a className="kepernil-button kepernil-button-primary" href="#menu-semanal">
+                Ver menú de esta semana <FiArrowRight aria-hidden="true" />
+              </a>
+              <a className="kepernil-button kepernil-button-outline" href={generalWhatsApp} target="_blank" rel="noreferrer">
+                <FiMessageCircle aria-hidden="true" /> Consultar por WhatsApp
+              </a>
             </div>
-
-            {/* Columna Derecha: Carrusel de fotos auténticas del negocio */}
-            <div className="col-12 col-lg-6">
-              <div className="position-relative mx-auto" style={{ maxWidth: '520px' }}>
-
-                {/* Carrusel: foto1.png y foto3.png */}
-                {(() => {
-                  const heroImages = [
-                    { src: '/foto1.png', alt: 'Pernil casero con panes esponjosos y salsas artesanales de Kepernil' },
-                    { src: '/foto3.png', alt: 'Horno a leña y cocción lenta — Kepernil' },
-                  ];
-                  return (
-                    <div className="position-relative shadow-lg rounded-4 overflow-hidden border border-2 border-white" style={{ maxHeight: '420px' }}>
-                      {heroImages.map((img, idx) => (
-                        <img
-                          key={img.src}
-                          src={img.src}
-                          alt={img.alt}
-                          className="w-100 h-100 object-fit-cover"
-                          style={{
-                            minHeight: '340px',
-                            display: heroSlide === idx ? 'block' : 'none',
-                          }}
-                        />
-                      ))}
-                      {/* Flechas de navegación */}
-                      <button
-                        onClick={() => setHeroSlide(s => (s === 0 ? heroImages.length - 1 : s - 1))}
-                        className="position-absolute top-50 start-0 translate-middle-y btn btn-sm btn-dark bg-opacity-50 rounded-circle ms-2 d-flex align-items-center justify-content-center"
-                        style={{ width: 36, height: 36, zIndex: 2, border: 'none', opacity: 0.75 }}
-                        aria-label="Foto anterior"
-                      >
-                        &#8592;
-                      </button>
-                      <button
-                        onClick={() => setHeroSlide(s => (s === heroImages.length - 1 ? 0 : s + 1))}
-                        className="position-absolute top-50 end-0 translate-middle-y btn btn-sm btn-dark bg-opacity-50 rounded-circle me-2 d-flex align-items-center justify-content-center"
-                        style={{ width: 36, height: 36, zIndex: 2, border: 'none', opacity: 0.75 }}
-                        aria-label="Foto siguiente"
-                      >
-                        &#8594;
-                      </button>
-                      {/* Indicadores de puntos */}
-                      <div className="position-absolute bottom-0 start-50 translate-middle-x mb-2 d-flex gap-2" style={{ zIndex: 2 }}>
-                        {heroImages.map((_, idx) => (
-                          <button
-                            key={idx}
-                            onClick={() => setHeroSlide(idx)}
-                            style={{
-                              width: 10, height: 10, borderRadius: '50%', border: 'none', padding: 0,
-                              backgroundColor: heroSlide === idx ? '#ffffff' : 'rgba(255,255,255,0.45)',
-                              cursor: 'pointer',
-                            }}
-                            aria-label={`Ir a foto ${idx + 1}`}
-                          />
-                        ))}
-                      </div>
-                    </div>
-                  );
-                })()}
-              </div>
-            </div>
+            <div className="kepernil-hero-note"><FiClock aria-hidden="true" /> La disponibilidad se confirma al coordinar el pedido.</div>
+          </div>
+          <div className="kepernil-hero-photo">
+            <img src="/foto.jpeg" alt="Preparación casera de la familia Kepernil" />
+            <div className="kepernil-photo-caption"><span>De nuestra cocina</span><strong>a tu mesa</strong></div>
           </div>
         </div>
       </section>
 
+      <section className="kepernil-pernil-story" aria-labelledby="pernil-story-title">
+        <div className="kepernil-container">
+          <div className="kepernil-section-heading">
+            <span className="kepernil-eyebrow">Así se disfruta Kepernil</span>
+            <h2 id="pernil-story-title">Del pernil al momento de compartir</h2>
+            <p>Un vistazo a algunas de nuestras preparaciones y a cómo llegan a la mesa.</p>
+          </div>
+          <div className="kepernil-process-grid">
+            <article className="kepernil-process-card">
+              <img src="/foto3.png" alt="Perniles durante su cocción" loading="lazy" />
+              <div><span>01</span><h3>Cocción con dedicación</h3><p>Cuidamos cada preparación para que llegue a tu mesa con todo su sabor.</p></div>
+            </article>
+            <article className="kepernil-process-card">
+              <img src="/foto4.png" alt="Pernil desmechado listo para servir" loading="lazy" />
+              <div><span>02</span><h3>Listo para compartir</h3><p>Una opción abundante para disfrutar en familia o con amigos.</p></div>
+            </article>
+            <article className="kepernil-process-card">
+              <img src="/foto1.png" alt="Panes y salsas para acompañar el pernil" loading="lazy" />
+              <div><span>03</span><h3>La mesa completa</h3><p>Consultanos qué acompañamientos están disponibles esta semana.</p></div>
+            </article>
+          </div>
+        </div>
+      </section>
 
+      <section className="kepernil-menu-section" id="menu-semanal">
+        <div className="kepernil-container">
+          <div className="kepernil-section-heading">
+            <span className="kepernil-eyebrow">Preparaciones en pequeñas cantidades</span>
+            <h2>Menú de esta semana</h2>
+            <p>La oferta cambia según los ingredientes disponibles. Consultanos antes de pedir y te confirmamos qué queda.</p>
+          </div>
+          {loading ? (
+            <p className="kepernil-empty-state" role="status">Estamos cargando las preparaciones…</p>
+          ) : products.length ? (
+            <div className="kepernil-product-grid">
+              {products.map((product) => <WeeklyProductCard key={product._id || product.id} product={product} />)}
+            </div>
+          ) : (
+            <div className="kepernil-empty-state">
+              <p>Estamos actualizando el menú de esta semana.</p>
+              <a className="kepernil-button kepernil-button-whatsapp" href={generalWhatsApp} target="_blank" rel="noreferrer">
+                <FiMessageCircle aria-hidden="true" /> Consultar por WhatsApp / Coordinar cadete
+              </a>
+            </div>
+          )}
+          <p className="kepernil-delivery-note">El envío se coordina con cadete. Confirmamos disponibilidad, costo y horario por WhatsApp.</p>
+        </div>
+      </section>
 
-
-
-      {/* =========================================================================
-          3. SECCIÓN DEL MENÚ COMPLETO: PERNIL, MILANESAS, PIZZAS Y TARTELETAS
-          (Utiliza fotos 100% reales del negocio y fotos reales del catálogo)
-          ========================================================================= */}
-      <section id="menu-completo" className="py-5" style={{ backgroundColor: '#FAF7F2' }}>
-        <div className="container py-3">
-
-          <div className="text-center mb-5">
-            <span className="text-uppercase fw-bold small" style={{ color: '#B68949', letterSpacing: '2px' }}>
-              Todo lo que Preparamos
-            </span>
-            <h2 className="display-5 fw-bold font-bebas mt-1 mb-2">
-              NUESTRAS ESPECIALIDADES CASERAS
-            </h2>
-            <p className="text-secondary mx-auto" style={{ maxWidth: '620px' }}>
-              Desde el clásico pernil para compartir hasta milanesas, pizzas y tarteletas para tener siempre una opción rica en casa.
+      <section className="kepernil-values-section">
+        <div className="kepernil-container kepernil-values-grid">
+          <div>
+            <span className="kepernil-eyebrow">Cocinamos como en casa</span>
+            <h2>Lo que nos importa</h2>
+            <p className="kepernil-values-intro">
+              Somos una familia que disfruta preparar comida rica y casera. Ponemos cuidado en cada preparación
+              y elegimos ingredientes naturales para compartir sabores simples y familiares.
             </p>
           </div>
-
-          <div className="row g-4">
-
-            {/* Opción 1: Pernil Desmechado & Combos (Foto real /foto4.png) */}
-            <div className="col-12 col-md-6 col-lg-3">
-              <div className="menu-card h-100 d-flex flex-column shadow-sm">
-                <div className="overflow-hidden position-relative" style={{ height: '200px' }}>
-                  <img
-                    src={getCategoryPhoto('Pernil', '/foto4.png')}
-                    alt="Pernil desmechado listo con pimientos y verdeo"
-                    className="w-100 h-100 object-fit-cover"
-                  />
-                  <span className="position-absolute top-0 end-0 m-3 badge rounded-pill bg-danger px-3 py-1 fw-medium shadow-sm small">
-                    La Especialidad
-                  </span>
-                </div>
-                <div className="p-3 p-xl-4 d-flex flex-column flex-grow-1">
-                  <div className="d-flex align-items-center gap-2 mb-2">
-                    <FaFire className="text-danger" />
-                    <h4 className="fs-5 fw-bold mb-0">Pernil & Sándwiches</h4>
-                  </div>
-                  <p className="text-secondary small flex-grow-1">
-                    Cocinado lentamente, con paciencia y dedicación, para disfrutar de todo su sabor en cada bocado. Acompañado de panes y salsas caseras, listo para compartir y disfrutar con quienes más querés
-                  </p>
-                  <button
-                    onClick={() => navigate('/productos')}
-                    className="btn btn-outline-dark rounded-pill w-100 fw-semibold d-flex align-items-center justify-content-center gap-2 mt-3 small"
-                    type="button"
-                  >
-                    <span>Ver Perniles</span>
-                    <FiArrowRight />
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            {/* Opción 2: Milanesas Caseras (Foto real del catálogo o foto artesanal de mesa) */}
-            <div className="col-12 col-md-6 col-lg-3">
-              <div className="menu-card h-100 d-flex flex-column shadow-sm">
-                <div className="overflow-hidden position-relative" style={{ height: '200px', backgroundColor: '#FAF2E6' }}>
-                  <img
-                    src={getCategoryPhoto('Milanesas', '/foto1.png')}
-                    alt="Milanesas caseras y preparaciones de Kepernil"
-                    className="w-100 h-100 object-fit-cover"
-                  />
-                  <span className="position-absolute top-0 end-0 m-3 badge rounded-pill bg-dark text-white px-3 py-1 fw-medium shadow-sm small">
-                    Para Todos los Días
-                  </span>
-                </div>
-                <div className="p-3 p-xl-4 d-flex flex-column flex-grow-1">
-                  <div className="d-flex align-items-center gap-2 mb-2">
-                    <GiMeat style={{ color: '#C0392B' }} />
-                    <h4 className="fs-5 fw-bold mb-0">Milanesas Caseras</h4>
-                  </div>
-                  <p className="text-secondary small flex-grow-1">
-                    Preparadas a mano, con ese sabor casero que tanto nos gusta. Prácticas, ricas y listas para tener en tu freezer y resolver tus almuerzos o cenas de una manera fácil y deliciosa.
-                  </p>
-                  <button
-                    onClick={() => navigate('/catalogo/Milanesas')}
-                    className="btn btn-outline-dark rounded-pill w-100 fw-semibold d-flex align-items-center justify-content-center gap-2 mt-3 small"
-                    type="button"
-                  >
-                    <span>Ver Milanesas</span>
-                    <FiArrowRight />
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            {/* Opción 3: Pizzas & Empanadas (Foto real de horno /foto3.png o foto real del catálogo) */}
-            <div className="col-12 col-md-6 col-lg-3">
-              <div className="menu-card h-100 d-flex flex-column shadow-sm">
-                <div className="overflow-hidden position-relative" style={{ height: '200px', backgroundColor: '#FDF2E9' }}>
-                  <img
-                    src={getCategoryPhoto('Pizzas', '/foto3.png')}
-                    alt="Cocción al horno y masas caseras"
-                    className="w-100 h-100 object-fit-cover"
-                  />
-                  <span className="position-absolute top-0 end-0 m-3 badge rounded-pill px-3 py-1 fw-medium shadow-sm small" style={{ backgroundColor: '#B68949', color: '#fff' }}>
-                    Masa Artesanal
-                  </span>
-                </div>
-                <div className="p-3 p-xl-4 d-flex flex-column flex-grow-1">
-                  <div className="d-flex align-items-center gap-2 mb-2">
-                    <FaPizzaSlice style={{ color: '#E67E22' }} />
-                    <h4 className="fs-5 fw-bold mb-0">Pizzas & Empanadas</h4>
-                  </div>
-                  <p className="text-secondary small flex-grow-1">
-                    Pizzas grandes de muzzarella, napolitana, prepizzas esponjosas y empanadas con rellenos abundantes. El comodín infalible para tus fines de semana.
-                  </p>
-                  <button
-                    onClick={() => navigate('/catalogo/Pizzas')}
-                    className="btn btn-outline-dark rounded-pill w-100 fw-semibold d-flex align-items-center justify-content-center gap-2 mt-3 small"
-                    type="button"
-                  >
-                    <span>Ver Pizzas</span>
-                    <FiArrowRight />
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            {/* Opción 4: Tarteletas & Vegetales Frescos (Foto real /foto6 (2).png de vegetales frescos picados) */}
-            <div className="col-12 col-md-6 col-lg-3">
-              <div className="menu-card h-100 d-flex flex-column shadow-sm">
-                <div className="overflow-hidden position-relative" style={{ height: '200px' }}>
-                  <img
-                    src={getCategoryPhoto('Tarteletas', '/foto6 (2).png')}
-                    alt="Vegetales frescos picados para tarteletas y preparaciones"
-                    className="w-100 h-100 object-fit-cover"
-                  />
-                  <span className="position-absolute top-0 end-0 m-3 badge rounded-pill bg-success text-white px-3 py-1 fw-medium shadow-sm small">
-                    100% Fresco
-                  </span>
-                </div>
-                <div className="p-3 p-xl-4 d-flex flex-column flex-grow-1">
-                  <div className="d-flex align-items-center gap-2 mb-2">
-                    <GiPieSlice className="text-success" />
-                    <h4 className="fs-5 fw-bold mb-0">Tarteletas & Tartas</h4>
-                  </div>
-                  <p className="text-secondary small flex-grow-1">
-                    Hechas en casa, con masa integral y rellenos preparados con dedicación, combinando pollo y verduras seleccionadas. Ricas, prácticas y llenas de sabor, ideales para disfrutar de una comida casera sin pasar horas en la cocina. Del freezer al horno, y de Kepernil a tu mesa.
-                  </p>
-                  <button
-                    onClick={() => navigate('/catalogo/Tarteletas')}
-                    className="btn btn-outline-dark rounded-pill w-100 fw-semibold d-flex align-items-center justify-content-center gap-2 mt-3 small"
-                    type="button"
-                  >
-                    <span>Ver Tarteletas</span>
-                    <FiArrowRight />
-                  </button>
-                </div>
-              </div>
-            </div>
-
-          </div>
-
-          {/* Banner central de llamada al catálogo */}
-          <div className="text-center mt-5">
-            <button
-              onClick={() => navigate('/productos')}
-              className="btn btn-brand-primary btn-lg rounded-pill px-5 py-3 fw-bold shadow-sm d-inline-flex align-items-center gap-2"
-              type="button"
-            >
-              <span>Ver Precios y Armar Mi Pedido</span>
-              <FiArrowRight size={20} />
-            </button>
-          </div>
-
-        </div>
-      </section>
-
-
-      {/* =========================================================================
-          4. SECCIÓN HISTORIA FAMILIAR & TRANSPARENCIA (Humanizar la marca)
-          ========================================================================= */}
-      <section id="historia" className="py-5 bg-white border-top border-light">
-        <div className="container py-4">
-          <div className="row align-items-center g-4 g-lg-5">
-
-            {/* Foto real de la familia cocinando juntos con cofia (foto6.png) */}
-            <div className="col-12 col-lg-5 text-center">
-              <div className="position-relative d-inline-block">
-                <div className="rounded-4 overflow-hidden shadow-lg border border-3 border-white" style={{ maxWidth: '400px' }}>
-                  <img
-                    src="/foto.jpeg"
-                    alt="Familia de Kepernil amasando y cocinando con dedicación"
-                    className="w-100 h-100 object-fit-cover"
-                    style={{ minHeight: '380px' }}
-                  />
-                </div>
-                {/* Sello de autenticidad */}
-                <div
-                  className="position-absolute bottom-0 start-50 translate-middle-x mb-n3 bg-dark text-white rounded-pill px-4 py-2 shadow d-flex align-items-center gap-2"
-                  style={{ whiteSpace: 'nowrap', border: '2px solid #B68949' }}
-                >
-                  <FiHeart className="text-danger" />
-                  <span className="fw-semibold small">De Nuestra Familia a Tu Mesa</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Texto de la historia (Integra perfectamente las frases base del negocio) */}
-            <div className="col-12 col-lg-7 pt-4 pt-lg-0">
-              <span className="text-uppercase fw-bold small" style={{ color: '#B68949', letterSpacing: '2px' }}>
-                Nuestra Historia
-              </span>
-              <h2 className="display-5 fw-bold font-bebas mt-1 mb-3">
-                ¡HOLA! SOMOS KEPERNIL
-              </h2>
-
-              <div className="quote-bubble p-4 rounded-3 shadow-sm mb-4">
-                <p className="fs-5 mb-0 fst-italic" style={{ color: '#232427', lineHeight: '1.6' }}>
-                  &ldquo;Somos una familia que disfruta hacer comida casera, rica y hecha con amor.
-                  Trabajamos desde casa y ponemos dedicación en cada cosa que preparamos.&rdquo;
-                </p>
-              </div>
-
-              <p className="text-secondary mb-4" style={{ lineHeight: '1.7' }}>
-                Creemos que el momento de comer tiene que ser una pausa linda del día, no un motivo de estrés. Por eso tenemos distintas opciones de comidas caseras, prácticas y listas para disfrutar, y vamos incorporando nuevas propuestas para acompañarte en cada momento: desde un pernil inolvidable para compartir con amigos hasta milanesas, pizzas y tarteletas para tener siempre a mano en tu freezer.
-              </p>
-
-              {/* Valores diferenciales */}
-              <div className="row g-3 mb-4">
-                <div className="col-12 col-sm-6">
-                  <div className="d-flex align-items-start gap-2">
-                    <FiCheckCircle className="text-success mt-1 flex-shrink-0" size={18} />
-                    <span className="small text-dark fw-medium">Ingredientes frescos y seleccionados cada mañana</span>
-                  </div>
-                </div>
-                <div className="col-12 col-sm-6">
-                  <div className="d-flex align-items-start gap-2">
-                    <FiCheckCircle className="text-success mt-1 flex-shrink-0" size={18} />
-                    <span className="small text-dark fw-medium">Higiene, amor y dedicación en cada bandeja</span>
-                  </div>
-                </div>
-                <div className="col-12 col-sm-6">
-                  <div className="d-flex align-items-start gap-2">
-                    <FiCheckCircle className="text-success mt-1 flex-shrink-0" size={18} />
-                    <span className="small text-dark fw-medium">Recetas caseras probadas que le gustan a grandes y chicos</span>
-                  </div>
-                </div>
-                <div className="col-12 col-sm-6">
-                  <div className="d-flex align-items-start gap-2">
-                    <FiCheckCircle className="text-success mt-1 flex-shrink-0" size={18} />
-                    <span className="small text-dark fw-medium">La solución perfecta para no cocinar y comer rico</span>
-                  </div>
-                </div>
-              </div>
-
-              <button
-                onClick={() => navigate('/productos')}
-                className="btn btn-outline-dark rounded-pill px-4 py-2 fw-semibold d-inline-flex align-items-center gap-2"
-                type="button"
-              >
-                <span>Conocé Todo Nuestro Menú</span>
-                <FiArrowRight />
-              </button>
-            </div>
-
+          <div className="kepernil-value-list">
+            <div className="kepernil-value-item"><span><FiShield aria-hidden="true" /></span><div><h3>Higiene y cuidado</h3><p>Trabajamos con atención y limpieza en cada etapa de la preparación.</p></div></div>
+            <div className="kepernil-value-item"><span><FiCheck aria-hidden="true" /></span><div><h3>Ingredientes naturales</h3><p>Usamos verduras, vegetales, carnes y condimentos deshidratados.</p></div></div>
+            <div className="kepernil-value-item"><span><FiHeart aria-hidden="true" /></span><div><h3>Sin agregados industriales</h3><p>No agregamos conservantes ni saborizantes industriales.</p></div></div>
           </div>
         </div>
       </section>
-
-
-      {/* =========================================================================
-          5. CÓMO FUNCIONA (Eliminar fricción y objeciones de compra)
-          ========================================================================= */}
-      <section className="py-5" style={{ backgroundColor: '#FAF7F2' }}>
-        <div className="container py-3">
-          <div className="text-center mb-5">
-            <span className="text-uppercase fw-bold small" style={{ color: '#B68949', letterSpacing: '2px' }}>
-              Simple y Rápido
-            </span>
-            <h2 className="display-5 fw-bold font-bebas mt-1 mb-2">
-              ¿CÓMO PEDIR EN KEPERNIL?
-            </h2>
-            <p className="text-secondary mx-auto" style={{ maxWidth: '540px' }}>
-              En tan solo 3 pasos tenés tu comida casera lista en tu mesa sin complicaciones.
-            </p>
-          </div>
-
-          <div className="row g-4 text-center">
-
-            {/* Paso 1 */}
-            <div className="col-12 col-md-4">
-              <div className="bg-white p-4 rounded-4 shadow-sm h-100 border border-light position-relative">
-                <div
-                  className="rounded-circle text-white fw-bold d-flex align-items-center justify-content-center mx-auto mb-3"
-                  style={{ width: '48px', height: '48px', backgroundColor: '#232427', fontSize: '1.2rem' }}
-                >
-                  1
-                </div>
-                <h4 className="fw-bold mb-2">Elegís en el Catálogo</h4>
-                <p className="text-secondary small mb-0">
-                  Explorás nuestros perniles, milanesas, pizzas o tarteletas, agregás tus favoritos al carrito sin trámites ni registros.
-                </p>
-              </div>
-            </div>
-
-            {/* Paso 2 */}
-            <div className="col-12 col-md-4">
-              <div className="bg-white p-4 rounded-4 shadow-sm h-100 border border-light position-relative">
-                <div
-                  className="rounded-circle text-white fw-bold d-flex align-items-center justify-content-center mx-auto mb-3"
-                  style={{ width: '48px', height: '48px', backgroundColor: '#B68949', fontSize: '1.2rem' }}
-                >
-                  2
-                </div>
-                <h4 className="fw-bold mb-2">Confirmás tu Pedido</h4>
-                <p className="text-secondary small mb-0">
-                  Completás tus datos de entrega o retiro y coordinamos el horario para que recibas todo fresco y en su punto justo.
-                </p>
-              </div>
-            </div>
-
-            {/* Paso 3 */}
-            <div className="col-12 col-md-4">
-              <div className="bg-white p-4 rounded-4 shadow-sm h-100 border border-light position-relative">
-                <div
-                  className="rounded-circle text-white fw-bold d-flex align-items-center justify-content-center mx-auto mb-3"
-                  style={{ width: '48px', height: '48px', backgroundColor: '#dc3545', fontSize: '1.2rem' }}
-                >
-                  3
-                </div>
-                <h4 className="fw-bold mb-2">Calentás y Disfrutás</h4>
-                <p className="text-secondary small mb-0">
-                  Unos minutitos de horno o microondas, y tenés un banquete casero servido en la mesa con sabor auténtico de hogar.
-                </p>
-              </div>
-            </div>
-
-          </div>
-        </div>
-      </section>
-
-
-      {/* =========================================================================
-          6. FINAL CTA BANNER (Conversion Closer)
-          ========================================================================= */}
-      <section className="py-5" style={{ backgroundColor: '#232427', color: '#ffffff' }}>
-        <div className="container py-4 text-center">
-          <div className="mx-auto" style={{ maxWidth: '680px' }}>
-            <span className="badge rounded-pill px-3 py-2 mb-3 fw-bold" style={{ backgroundColor: '#B68949', color: '#ffffff' }}>
-              ¡HOY NO COCINES!
-            </span>
-            <h2 className="display-4 fw-bold font-bebas mb-3" style={{ color: '#ffffff' }}>
-              LLENÁ TU FREEZER Y TU MESA CON VERDADERO SABOR CASERO
-            </h2>
-            <p className="lead text-light opacity-75 mb-4 fs-5">
-              Pernil a fuego lento, milanesas caseras, pizzas y tarteletas. Hacé tu pedido en un par de clics y disfrutá en familia.
-            </p>
-            <button
-              onClick={() => navigate('/productos')}
-              className="btn btn-brand-primary btn-lg rounded-pill px-5 py-3 fw-bold shadow-lg d-inline-flex align-items-center gap-2"
-              type="button"
-            >
-              <FiShoppingBag size={22} />
-              <span>Ir al Catálogo de Productos</span>
-              <FiArrowRight size={22} />
-            </button>
-          </div>
-        </div>
-      </section>
-
     </div>
   );
 }
